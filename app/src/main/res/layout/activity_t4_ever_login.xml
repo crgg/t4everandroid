@@ -9,6 +9,7 @@
     tools:context=".Login.T4EverLoginActivity">
 
     <androidx.cardview.widget.CardView
+        android:fitsSystemWindows="true"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         android:background="@color/white"
@@ -60,6 +61,8 @@
                 android:layout_height="wrap_content"/>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -93,6 +96,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -127,6 +132,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"

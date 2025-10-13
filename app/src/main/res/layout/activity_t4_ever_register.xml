@@ -9,6 +9,7 @@
     tools:context=".Login.T4EverRegisterActivity">
 
     <androidx.cardview.widget.CardView
+        android:fitsSystemWindows="true"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         android:background="@color/white"
@@ -60,6 +61,8 @@
                 android:layout_height="wrap_content"/>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -93,6 +96,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -126,6 +131,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -160,6 +167,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -194,13 +203,15 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <CheckBox
-                    android:id="@+id/rememberMe"
+                    android:id="@+id/acceptTermsAndPolicy"
                     android:layout_gravity="start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
@@ -214,6 +225,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/termsAndConditions"
                     android:layout_marginStart="2dp"
                     android:textSize="12sp"
                     android:layout_gravity="center_vertical"
@@ -232,6 +244,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/privacyPolicy"
                     android:layout_marginStart="2dp"
                     android:textSize="12sp"
                     android:layout_gravity="center_vertical"
@@ -243,6 +256,8 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:id="@+id/createAccountBtn"
                 android:text="@string/create_account"
                 android:textStyle="bold"

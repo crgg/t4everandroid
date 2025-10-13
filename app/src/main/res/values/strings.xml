@@ -23,4 +23,36 @@
     <string name="name">Name</string>
     <string name="your_name">Your Name</string>
     <string name="start_building_your_digital_legacy">Start building your digital legacy</string>
+    <string name="email_is_required">Email Is Required</string>
+    <string name="password_is_required">Password Is Required</string>
+    <string name="the_email_must_be_a_valid_format">The email must be a valid format</string>
+    <string name="the_email_must_be_a_valid_email_address">The email must be a valid email address</string>
+    <string name="alert">Alert</string>
+    <string name="ok">OK</string>
+    <string name="success">Success</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="authentication_is_expired">Authentication is expired</string>
+    <string name="unknown_error_contact_administrator">Unknown error contact administrator</string>
+    <string name="unknown_error_while_attempting_to_log_in">Unknown error while attempting to log in</string>
+    <string name="name_is_required">Name Is Required</string>
+    <string name="password_must_be_at_least_8_characters">Password must be at least 8 characters</string>
+    <string name="confirm_password_is_required">Please confirm your password</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="you_must_accept_the_terms_and_conditions_before_continuing">You must accept the terms and conditions before continuing</string>
+    <string name="notifications">notifications</string>
+    <string name="options_user">options User</string>
+    <string name="settings">Settings</string>
+    <string name="media">Media</string>
+    <string name="chat">Chat</string>
+    <string name="messages">Messages</string>
+    <string name="conversations">Conversations</string>
+    <string name="questions">Questions</string>
+    <string name="legacy_profiles">Legacy Profiles</string>
+    <string name="dashboard">Dashboard</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_legacy_profile">Create Legacy Profile</string>
 </resources>
