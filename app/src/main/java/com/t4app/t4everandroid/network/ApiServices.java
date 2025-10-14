@@ -8,6 +8,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface ApiServices {
@@ -23,5 +24,8 @@ public interface ApiServices {
     Call<JsonObject> register(
             @FieldMap Map<String, Object> body
     );
+
+    @GET(ApiConfig.ASSISTANTS_URL)
+    Call<JsonObject> getAssistants();
 
 }

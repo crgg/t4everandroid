@@ -1,18 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp"
     android:gravity="bottom"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:background="@color/primary_login_color">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
 
-    <TextView
-        android:id="@+id/tv_user_name"
-        android:text="Welcome, User"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <ImageView
+        android:id="@+id/t4_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="95dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="10dp"
+        android:layout_gravity="start"
+        android:src="@drawable/logo_t4_person" />
+
+    <View
+        android:id="@+id/first_separation"
+        app:layout_constraintTop_toBottomOf="@id/t4_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/soft_gray"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <include
+        android:id="@+id/info_user_item"
+        layout="@layout/item_user_info"/>
+
+
+    <View
+        android:background="@color/soft_gray"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+
 </LinearLayout>

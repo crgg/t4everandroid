@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/soft_gray">
+        
+        <TextView
+            android:text="@string/legacy_profiles"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="21sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:text="@string/manage_the_profiles"
+            android:textColor="@color/text_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:gravity="center|center_vertical"
+            android:padding="9dp"
+            android:background="@drawable/bg_button"
+            android:backgroundTint="@color/second_login_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:contentDescription="@string/create_profile"
+                android:src="@drawable/ic_add"
+                android:layout_width="22dp"
+                android:layout_height="22dp"/>
+
+            <TextView
+                android:layout_marginStart="5dp"
+                android:text="@string/create_profile"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <include
+            layout="@layout/item_total_profiles" />
+
+        <include
+            layout="@layout/item_profiles_active" />
+
+        <include
+            layout="@layout/item_profiles_completed" />
+
+        <include
+            layout="@layout/item_no_profiles_created" />
+    </LinearLayout>
+
+</ScrollView>

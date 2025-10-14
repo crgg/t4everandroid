@@ -1,12 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.ui.HomeFragment">
+    android:fillViewport="true">
 
-    <include
-        layout="@layout/item_home_welcome" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/soft_gray"
+        tools:context=".main.ui.HomeFragment">
 
+        <include
+            android:id="@+id/welcome_item"
+            layout="@layout/item_home_welcome" />
 
-</LinearLayout>
+        <include
+            android:id="@+id/legacy_profiles_item"
+            layout="@layout/item_legacy_profiles" />
+
+        <include
+            android:id="@+id/question_answered_item"
+            layout="@layout/item_questions_answered" />
+
+        <include
+            android:id="@+id/conversations_item"
+            layout="@layout/item_conversations" />
+
+        <include
+            android:id="@+id/scheduled_messages_item"
+            layout="@layout/item_scheduled_messages" />
+
+        <include
+            android:id="@+id/recent_activity_item"
+            layout="@layout/item_recent_activity" />
+
+        <include
+            android:id="@+id/item_quick_actions"
+            layout="@layout/item_quick_actions" />
+    </LinearLayout>
+
+</ScrollView>

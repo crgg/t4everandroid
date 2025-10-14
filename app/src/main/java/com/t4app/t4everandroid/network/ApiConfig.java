@@ -5,5 +5,6 @@ public class ApiConfig {
 
     public static final String LOGIN_URL = "api/auth/login";
     public static final String REGISTER_URL = "api/auth/register";
+    public static final String ASSISTANTS_URL = "api/assistants";
 
 }

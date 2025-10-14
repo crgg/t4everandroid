@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.TextView;
 
 import com.t4app.t4everandroid.R;
 
@@ -24,7 +25,14 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.ActivityT4EverLoginBinding;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
+import com.t4app.t4everandroid.main.ui.ChatFragment;
+import com.t4app.t4everandroid.main.ui.ConversationsFragment;
 import com.t4app.t4everandroid.main.ui.HomeFragment;
+import com.t4app.t4everandroid.main.ui.LegacyProfilesFragment;
+import com.t4app.t4everandroid.main.ui.MediaFragment;
+import com.t4app.t4everandroid.main.ui.MessagesFragment;
+import com.t4app.t4everandroid.main.ui.QuestionsFragment;
+import com.t4app.t4everandroid.main.ui.SettingsFragment;
 
 public class T4EverMainActivity extends AppCompatActivity {
 
@@ -75,15 +83,36 @@ public class T4EverMainActivity extends AppCompatActivity {
 
         binding.toolbar.userName.setText(sessionManager.getName());
 
-        navigationView.setCheckedItem(R.id.nav_home);
+        View navHeader = navigationView.getHeaderView(0);
+        TextView name = navHeader.findViewById(R.id.name);
+        TextView email = navHeader.findViewById(R.id.email);
+
+        name.setText(sessionManager.getName());
+        email.setText(sessionManager.getUserEmail());
+
         showFragment(new HomeFragment());
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            item.setChecked(true);
             int id  = item.getItemId();
+
             if (id == R.id.nav_home) {
                 showFragment(new HomeFragment());
+            }else  if (id == R.id.nav_legacy_profiles) {
+                showFragment(new LegacyProfilesFragment());
+            }else  if (id == R.id.nav_questions) {
+                showFragment(new QuestionsFragment());
+            }else  if (id == R.id.nav_conversations) {
+                showFragment(new ConversationsFragment());
+            }else  if (id == R.id.nav_messages) {
+                showFragment(new MessagesFragment());
+            }else  if (id == R.id.nav_chat) {
+                showFragment(new ChatFragment());
+            }else  if (id == R.id.nav_media) {
+                showFragment(new MediaFragment());
+            }else  if (id == R.id.nav_settings) {
+                showFragment(new SettingsFragment());
             }
+
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });

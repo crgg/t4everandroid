@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.t4app.t4everandroid.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +34,7 @@ public class RetrofitClient {
     public static Retrofit getRetrofitClient() {
         String baseUrl = ApiConfig.BASE_URL;
         Log.d(TAG, "ENTRO EN GET RETROFIT CLIENT");
-//        SessionManager sessionManager = SessionManager.getInstance();
+        SessionManager sessionManager = SessionManager.getInstance();
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(message -> {
             Log.d("RETRO", message);
@@ -44,7 +45,7 @@ public class RetrofitClient {
             @Override
             public Response intercept(@NonNull Chain chain) throws IOException {
                 Request newRequest = chain.request().newBuilder()
-//                        .addHeader("Authorization", "Bearer " + sessionManager.getTokenKey())
+                        .addHeader("Authorization", "Bearer " + sessionManager.getTokenKey())
                         .build();
 
                 Response response = chain.proceed(newRequest);
@@ -180,7 +181,7 @@ public class RetrofitClient {
     public static Retrofit getRetrofitClientCustom() {
         String baseUrl = ApiConfig.BASE_URL;
 //        Log.d(TAG, "ENTRO EN GET RETROFIT CLIENT");
-//        SessionManager sessionManager = SessionManager.getInstance();
+        SessionManager sessionManager = SessionManager.getInstance();
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(message -> {
             Log.d("RETRO", message);
@@ -191,7 +192,7 @@ public class RetrofitClient {
             @Override
             public Response intercept(@NonNull Chain chain) throws IOException {
                 Request newRequest = chain.request().newBuilder()
-//                        .addHeader("Authorization", "Bearer " + sessionManager.getTokenKey())
+                        .addHeader("Authorization", "Bearer " + sessionManager.getTokenKey())
                         .build();
 
                 Response response = chain.proceed(newRequest);
