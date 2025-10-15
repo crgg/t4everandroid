@@ -47,6 +47,14 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
+    implementation ("androidx.room:room-runtime:2.8.2")
+    annotationProcessor ("androidx.room:room-compiler:2.8.2")
+    implementation ("androidx.room:room-ktx:2.8.2")
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.lifecycle.viewmodel.savedstate)
+    implementation(libs.navigation.ui)
+
+    implementation ("androidx.core:core:1.17.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

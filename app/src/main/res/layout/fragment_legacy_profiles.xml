@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"/>
 
         <LinearLayout
+            android:id="@+id/create_legacy_profile_btn"
             android:layout_marginTop="10dp"
             android:gravity="center|center_vertical"
             android:padding="9dp"
@@ -53,16 +54,26 @@
         </LinearLayout>
 
         <include
+            android:id="@+id/item_total_profiles"
             layout="@layout/item_total_profiles" />
 
         <include
+            android:id="@+id/item_active_profiles"
             layout="@layout/item_profiles_active" />
 
         <include
+            android:id="@+id/item_completed_profiles"
             layout="@layout/item_profiles_completed" />
 
         <include
+            android:id="@+id/item_no_profiles_created"
             layout="@layout/item_no_profiles_created" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_profiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </ScrollView>

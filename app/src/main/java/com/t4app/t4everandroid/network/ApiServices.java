@@ -2,10 +2,14 @@ package com.t4app.t4everandroid.network;
 
 import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.Login.models.LoginResponse;
+import com.t4app.t4everandroid.main.Models.ProfileRequest;
+import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
+import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
 
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -26,6 +30,11 @@ public interface ApiServices {
     );
 
     @GET(ApiConfig.ASSISTANTS_URL)
-    Call<JsonObject> getAssistants();
+    Call<ResponseGetAssistants> getAssistants();
+
+    @POST(ApiConfig.ASSISTANTS_URL)
+    Call<ResponseCreateAssistant> createAssistant(
+            @Body ProfileRequest body
+            );
 
 }

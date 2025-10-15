@@ -1,18 +1,35 @@
 package com.t4app.t4everandroid.main.ui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.SafeClickListener;
+import com.t4app.t4everandroid.databinding.FragmentConversationsBinding;
+import com.t4app.t4everandroid.databinding.FragmentLegacyProfilesBinding;
+import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.adapter.LegacyProfileAdapter;
 
 public class LegacyProfilesFragment extends Fragment {
+
+    private FragmentLegacyProfilesBinding binding;
+    private ActivityResultLauncher<Intent> launcher;
+
+    private LegacyProfileAdapter adapter;
 
     public LegacyProfilesFragment() {}
 
@@ -28,12 +45,69 @@ public class LegacyProfilesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_legacy_profiles, container, false);
+        binding = FragmentLegacyProfilesBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+        if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()){
+            binding.itemNoProfilesCreated.getRoot().setVisibility(View.GONE);
+        }
+
+        launcher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        boolean update = result.getData().getBooleanExtra("update", false);
+                        if (update){
+                            binding.itemTotalProfiles.countTotalProfiles.setText(String.valueOf(GlobalDataCache.legacyProfiles.size()));
+                            binding.itemActiveProfiles.countActiveProfiles.setText("0");
+                            binding.itemCompletedProfiles.countCompletedProfiles.setText("0");
+                            adapter.setProfileList(GlobalDataCache.legacyProfiles);
+                        }
+                    }
+                }
+        );
+
+        binding.createLegacyProfileBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                Intent intent = new Intent(requireActivity(), CreateLegacyProfileActivity.class);
+                launcher.launch(intent);
+            }
+        });
+
+        adapter = new LegacyProfileAdapter(GlobalDataCache.legacyProfiles, new ListenersUtils.OnProfileActionListener() {
+            @Override
+            public void onSelect(LegacyProfile profile) {
+
+            }
+
+            @Override
+            public void onChat(LegacyProfile profile) {
+
+            }
+
+            @Override
+            public void onEdit(LegacyProfile profile) {
+
+            }
+
+            @Override
+            public void onDelete(LegacyProfile profile) {
+
+            }
+        });
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        binding.itemTotalProfiles.countTotalProfiles.setText(String.valueOf(GlobalDataCache.legacyProfiles.size()));
+        binding.itemActiveProfiles.countActiveProfiles.setText("0");
+        binding.itemCompletedProfiles.countCompletedProfiles.setText("0");
+
+        binding.rvProfiles.setLayoutManager(new LinearLayoutManager(requireActivity()));
+        binding.rvProfiles.setAdapter(adapter);
+
     }
 }

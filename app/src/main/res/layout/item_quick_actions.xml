@@ -6,21 +6,21 @@
     android:layout_marginTop="15dp"
     android:layout_marginStart="15dp"
     android:layout_marginEnd="15dp"
+    android:layout_marginBottom="20dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="15dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
@@ -28,17 +28,136 @@
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:textSize="17sp"
-                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:contentDescription="@string/recent_activity"
+                android:src="@drawable/ic_quick_actions"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                app:tint="@color/text_color" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white">
+
+            <LinearLayout
+                android:background="@drawable/bg_soft_border_line"
+                android:id="@+id/item_answer_questions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_questions"
+                    app:tint="@color/text_color"
+                    android:contentDescription="@string/questions" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/answer_questions"
+                    android:textColor="@color/soft_black"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_more_info"
+                    app:tint="@color/text_color"
+                    android:contentDescription="@string/questions" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:background="@drawable/bg_soft_border_line"
+                android:id="@+id/item_record_conversation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_file"
+                    app:tint="@color/text_color"
+                    android:contentDescription="@string/questions" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/record_conversation"
+                    android:textColor="@color/soft_black"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_more_info"
+                    app:tint="@color/text_color"
+                    android:contentDescription="@string/questions" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="@drawable/bg_soft_border_line"
+                android:id="@+id/item_create_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_chat_dashboard_outline"
+                    app:tint="@color/black"
+                    android:contentDescription="@string/questions" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="Create Message"
+                    android:textColor="@color/soft_black"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_more_info"
+                    app:tint="@color/text_color"
+                    android:contentDescription="@string/questions" />
+            </LinearLayout>
 
         </LinearLayout>
 
-        <ImageView
-            android:contentDescription="@string/recent_activity"
-            android:src="@drawable/ic_quick_actions"
-            android:layout_width="23dp"
-            android:layout_height="23dp"
-            app:tint="@color/text_color" />
+
+
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

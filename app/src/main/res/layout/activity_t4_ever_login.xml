@@ -139,7 +139,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <CheckBox
+                <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/rememberMe"
                     android:textSize="12sp"
                     android:text="@string/remember_me"
@@ -147,6 +147,7 @@
                     android:layout_gravity="start"
                     android:layout_weight="1"
                     android:layout_width="0dp"
+                    app:buttonTint="@color/second_login_color"
                     android:layout_height="wrap_content"/>
 
                 <TextView

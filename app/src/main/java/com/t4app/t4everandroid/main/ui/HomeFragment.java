@@ -10,13 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentHomeBinding;
+import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import retrofit2.Call;
@@ -51,7 +51,14 @@ public class HomeFragment extends Fragment {
 
         binding.welcomeItem.welcomeMessage.setText(getString(R.string.welcome, sessionManager.getName()));
         //TODO:OPTIMIZE THIS CREATE GLOBAL CACHE OR SOMETHING TO SAVE STATE AND ADD IN DIFF FRAGMENTS
-        getAssistants();
+        if (GlobalDataCache.legacyProfiles == null){
+            getAssistants();
+        }else{
+            binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(GlobalDataCache.legacyProfiles.size()));
+            binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
+            binding.scheduledMessagesItem.countMessages.setText("0");
+            binding.conversationsItem.countConversations.setText("0");
+        }
 
         return view;
     }
@@ -94,27 +101,52 @@ public class HomeFragment extends Fragment {
                 showFragment(new QuestionsFragment());
             }
         });
+
+        binding.itemQuickActions.itemAnswerQuestions.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showFragment(new QuestionsFragment());
+            }
+        });
+
+        binding.itemQuickActions.itemRecordConversation.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showFragment(new ConversationsFragment());
+            }
+        });
+
+        binding.itemQuickActions.itemCreateMessage.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showFragment(new MessagesFragment());
+            }
+        });
+
     }
 
     private void getAssistants(){
         ApiServices apiServices = AppController.getApiServices();
-        Call<JsonObject> call = apiServices.getAssistants();
+        Call<ResponseGetAssistants> call = apiServices.getAssistants();
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(Call<ResponseGetAssistants> call, Response<ResponseGetAssistants> response) {
                 if (response.isSuccessful()) {
-                    JsonObject body = response.body();
+                    ResponseGetAssistants body = response.body();
                     if (body != null) {
-                        if (body.has("status")) {
-                            if (body.get("status").getAsBoolean()) {
-                                if (body.get("data").getAsJsonArray() != null) {
-                                    JsonArray jsonElements = body.get("data").getAsJsonArray();
-                                    if (jsonElements.isEmpty()) {
-                                        binding.conversationsItem.countConversations.setText("0");
-                                        binding.legacyProfilesItem.countLegacyProfiles.setText("0");
-                                        binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
-                                        binding.scheduledMessagesItem.countMessages.setText("0");
-                                    }
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                GlobalDataCache.legacyProfiles = body.getData();
+                                if (body.getData().isEmpty()) {
+                                    binding.conversationsItem.countConversations.setText("0");
+                                    binding.legacyProfilesItem.countLegacyProfiles.setText("0");
+                                    binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
+                                    binding.scheduledMessagesItem.countMessages.setText("0");
+                                }else{
+                                    binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
+                                    binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
+                                    binding.scheduledMessagesItem.countMessages.setText("0");
+                                    binding.conversationsItem.countConversations.setText("0");
                                 }
                             }
                         }
@@ -123,7 +155,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+            public void onFailure(Call<ResponseGetAssistants> call, Throwable throwable) {
                 Log.e(TAG, "onFailure Get Assistants ", throwable);
             }
         });

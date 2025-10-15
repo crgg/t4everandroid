@@ -11,6 +11,8 @@
     <color name="second_login_color">#2C4563</color>
     <color name="border_color_buttons">#057AFF</color>
     <color name="green_success">#4CAF50</color>
+    <color name="text_green">#166534</color>
+    <color name="soft_green">#C5F8D6</color>
     <color name="alert_color">#FFC107</color>
     <color name="red">#C13636</color>
     <color name="purple">#7A22AB</color>
