@@ -49,9 +49,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-            <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+            <AutoCompleteTextView
+                android:id="@+id/categories_auto"
                 android:layout_marginStart="6dp"
+                android:inputType="none"
+                android:clickable="true"
+                android:importantForAutofill="no"
+                android:cursorVisible="false"
+                android:focusable="false"
                 android:layout_weight="1"
+                android:text="@string/all_categories"
                 android:background="@drawable/bg_border_line"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

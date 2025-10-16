@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid.main.ui;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.ActivityCreateLegacyProfileBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
 import com.t4app.t4everandroid.network.ApiServices;
@@ -54,10 +56,12 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private ActivityCreateLegacyProfileBinding binding;
 
     private TextInputLayout fullNameLayout, aliasLayout, relationshipLayout, personalityLayout,
-            birthdateLayout, deathdateLayout;
+            birthdateLayout, deathdateLayout, ageLayout;
     private TextInputEditText fullNameValue, aliasValue, relationshipValue, personalityValue,
-            birthdateValue, deathdateValue;
+            birthdateValue, deathdateValue, ageValue;
     private AutoCompleteTextView autoCountry, autoLanguage;
+
+    private LegacyProfile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +73,23 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        boolean isUpdate = getIntent().getBooleanExtra("is_update", false);
 
         binding = ActivityCreateLegacyProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         initViews();
+
+        if (isUpdate){
+            profile = (LegacyProfile) getIntent().getSerializableExtra("legacy_profile");
+            if (profile != null){
+                setValues(profile);
+            }
+
+            binding.titleCreateProfile.setText(R.string.edit_legacy_profile);
+
+            binding.createProfileBtn.setText(R.string.update_legacy_profile);
+        }
 
         binding.birthdateValue.setOnClickListener(new SafeClickListener() {
             @Override
@@ -89,6 +105,13 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             }
         });
 
+        binding.uploadImageBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                //TODO:UPLOAD IMAGE PROFILE LEGACY PROFILE
+            }
+        });
+
         setupCountryAutocomplete();
         setupLanguageAutocomplete();
 
@@ -99,6 +122,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                     String fullName = getTextTv(fullNameValue);
                     String alias = getTextTv(aliasValue);
                     String relationship = getTextTv(relationshipValue);
+                    int age = Integer.parseInt(getTextTv(ageValue));
                     String birthdate = formatDate(getTextTv(birthdateValue));
                     String deathdate = formatDate(getTextTv(deathdateValue));
                     List<String> personalityList = getPersonalityList(getTextTv(personalityValue));
@@ -107,7 +131,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
 
 
                     ProfileRequest request = new ProfileRequest(alias,
-                            0,
+                            age,
                             birthdate,
                             deathdate,
                             relationship,
@@ -118,7 +142,11 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                             fullName
                     );
 
-                    createUser(request);
+                    if (isUpdate){
+                        updateProfile(request, profile);
+                    }else{
+                        createUser(request);
+                    }
                 }
             }
         });
@@ -152,6 +180,39 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void updateProfile(ProfileRequest data, LegacyProfile legacyProfile){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseCreateAssistant> call = apiServices.updateAssistant(legacyProfile.getId(), data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseCreateAssistant> call, Response<ResponseCreateAssistant> response) {
+                if (response.isSuccessful()) {
+                    ResponseCreateAssistant body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                GlobalDataCache.legacyProfiles.set(
+                                        GlobalDataCache.legacyProfiles.indexOf(legacyProfile),
+                                        body.getData()
+                                );
+                                MessagesUtils.showMessageFinishAndReturn(CreateLegacyProfileActivity.this,
+                                        body.getMsg(), "update_list");
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseCreateAssistant> call, Throwable throwable) {
+                MessagesUtils.showErrorDialog(CreateLegacyProfileActivity.this,
+                        ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
 
     private String getTextTv(@NonNull TextInputEditText editText) {
         String text = editText.getText() != null ? editText.getText().toString().trim() : "";
@@ -229,6 +290,11 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             valid = false;
         }
 
+        if (isEmpty(ageValue)) {
+            setError(ageLayout, getString(R.string.age_is_required));
+            valid = false;
+        }
+
         if (isEmpty(relationshipValue)) {
             setError(relationshipLayout, getString(R.string.relationship_is_required));
             valid = false;
@@ -300,6 +366,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private void initViews() {
         fullNameLayout = findViewById(R.id.full_name_layout);
         aliasLayout = findViewById(R.id.alias_layout);
+        ageLayout = findViewById(R.id.age_layout);
         relationshipLayout = findViewById(R.id.relationship_layout);
         personalityLayout = findViewById(R.id.personality_layout);
         birthdateLayout = findViewById(R.id.birthdate_layout);
@@ -307,6 +374,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
 
         fullNameValue = findViewById(R.id.full_name_value);
         aliasValue = findViewById(R.id.alias_value);
+        ageValue = findViewById(R.id.age_value);
         relationshipValue = findViewById(R.id.relationship_value);
         personalityValue = findViewById(R.id.personality_value);
         birthdateValue = findViewById(R.id.birthdate_value);
@@ -319,12 +387,25 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private void clearErrors() {
         fullNameLayout.setError(null);
         aliasLayout.setError(null);
+        ageLayout.setError(null);
         relationshipLayout.setError(null);
         personalityLayout.setError(null);
         birthdateLayout.setError(null);
         deathdateLayout.setError(null);
         autoCountry.setError(null);
         autoLanguage.setError(null);
+    }
+
+    private void setValues(LegacyProfile profile) {
+        fullNameValue.setText(profile.getName());
+        aliasValue.setText(profile.getAlias());
+        relationshipValue.setText(profile.getFamilyRelationship());
+        personalityValue.setText(String.join(", ", profile.getBasePersonality()));
+        ageValue.setText(String.valueOf(profile.getAge()));
+//        birthdateValue.setText(profile.get);
+//        deathdateValue.setText();
+        autoCountry.setText(profile.getCountry());
+        autoLanguage.setText(profile.getLanguage());
     }
 
 }

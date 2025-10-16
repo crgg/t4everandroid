@@ -382,8 +382,7 @@ public class MessagesUtils {
 
     public static void showMessageFinishAndReturn(Context context,
                                                   String errorMessage,
-                                                  String type,
-                                                  Serializable data) {
+                                                  String type) {
         if (isDialogShowing){
             return;
         }
@@ -416,7 +415,6 @@ public class MessagesUtils {
                     isDialogShowing = false;
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra("type", type);
-                    resultIntent.putExtra("data", data);
                     activity.setResult(RESULT_OK, resultIntent);
                     activity.finish();
                 }

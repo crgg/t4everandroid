@@ -42,8 +42,18 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button_actions_profile"
             android:layout_marginTop="10dp"
             android:text="@string/go_to_legacy_profiles"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/second_login_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_first"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"
             android:textColor="@color/white"
             android:backgroundTint="@color/second_login_color"
             android:layout_width="wrap_content"

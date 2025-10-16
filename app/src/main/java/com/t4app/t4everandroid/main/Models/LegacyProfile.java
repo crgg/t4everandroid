@@ -9,6 +9,7 @@ import com.t4app.t4everandroid.room.converters.LegacyProfileConverter;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(tableName = "profiles")
 @TypeConverters({LegacyProfileConverter.class})
@@ -199,5 +200,13 @@ public class LegacyProfile implements Serializable {
 
     public void setBigFiveAnswers(List<Question> bigFiveAnswers) {
         this.bigFiveAnswers = bigFiveAnswers;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof LegacyProfile)) return false;
+        LegacyProfile other = (LegacyProfile) obj;
+        return Objects.equals(this.id, other.id);
     }
 }

@@ -33,6 +33,7 @@
                 android:layout_height="46dp"/>
 
             <TextView
+                android:id="@+id/title_create_profile"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/back_btn"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -86,7 +87,7 @@
                 android:paddingVertical="8dp"
                 android:hint="@string/full_name"
                 android:textColorHint="@color/gray_hint"
-                android:inputType="text|textEmailAddress"
+                android:inputType="text"
                 android:textSize="15sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -105,7 +106,27 @@
                 android:paddingVertical="8dp"
                 android:hint="@string/alias"
                 android:textColorHint="@color/gray_hint"
-                android:inputType="text|textEmailAddress"
+                android:inputType="text"
+                android:textSize="15sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_marginTop="10dp"
+            android:id="@+id/age_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/age_value"
+                android:layout_width="match_parent"
+                android:textColor="@color/text_color"
+                android:layout_height="40dp"
+                android:paddingVertical="8dp"
+                android:hint="@string/age"
+                android:textColorHint="@color/gray_hint"
+                android:inputType="number"
                 android:textSize="15sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -139,7 +160,7 @@
                     android:paddingVertical="8dp"
                     android:hint="@string/eg_father_mother_grandfather_friend"
                     android:textColorHint="@color/gray_hint"
-                    android:inputType="text|textEmailAddress"
+                    android:inputType="text"
                     android:textSize="15sp"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -175,7 +196,7 @@
                     android:paddingVertical="8dp"
                     android:hint="@string/eg_funny_serious_etc"
                     android:textColorHint="@color/gray_hint"
-                    android:inputType="text|textEmailAddress"
+                    android:inputType="text"
                     android:textSize="15sp"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>

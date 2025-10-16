@@ -10,10 +10,13 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 
 public interface ApiServices {
 
@@ -31,6 +34,17 @@ public interface ApiServices {
 
     @GET(ApiConfig.ASSISTANTS_URL)
     Call<ResponseGetAssistants> getAssistants();
+
+    @DELETE(ApiConfig.ACTIONS_ASSISTANTS_URL)
+    Call<JsonObject> deleteAssistant(
+            @Path("uuid")String uuid
+    );
+
+    @PUT(ApiConfig.ACTIONS_ASSISTANTS_URL)
+    Call<ResponseCreateAssistant> updateAssistant(
+            @Path("uuid")String uuid,
+            @Body ProfileRequest body
+    );
 
     @POST(ApiConfig.ASSISTANTS_URL)
     Call<ResponseCreateAssistant> createAssistant(
