@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid.main;
 
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.Models.QuestionTest;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 
 public class GlobalDataCache {
     public static List<LegacyProfile> legacyProfiles = null;
-    public static List<QuestionTest> questions = new ArrayList<>();
+    public static List<Question> questions = new ArrayList<>();
     public static LegacyProfile legacyProfileSelected = null;
 
     public static void clearData(){

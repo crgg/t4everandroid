@@ -4,7 +4,9 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.Login.models.LoginResponse;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
+import com.t4app.t4everandroid.main.Models.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
+import com.t4app.t4everandroid.main.Models.ResponseUpdateProfile;
 
 import java.util.Map;
 
@@ -17,6 +19,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiServices {
 
@@ -25,6 +28,9 @@ public interface ApiServices {
     Call<LoginResponse> login(
             @FieldMap Map<String, Object> body
     );
+
+    @POST(ApiConfig.LOGOUT_URL)
+    Call<JsonObject> logout();
 
     @POST(ApiConfig.REGISTER_URL)
     @FormUrlEncoded
@@ -50,5 +56,22 @@ public interface ApiServices {
     Call<ResponseCreateAssistant> createAssistant(
             @Body ProfileRequest body
             );
+
+    @GET(ApiConfig.GET_QUESTIONS_ASSISTANT)
+    Call<ResponseGetAssistantQuestions> getQuestionsAssistant(
+            @Query("assistant_id") String uuid
+    );
+
+    @POST(ApiConfig.UPDATE_PROFILE_URL)
+    @FormUrlEncoded
+    Call<ResponseUpdateProfile> updateProfile(
+            @FieldMap Map<String, Object> body
+    );
+
+    @POST(ApiConfig.CHANGE_PASSWORD_URL)
+    @FormUrlEncoded
+    Call<JsonObject> changePassword(
+            @FieldMap Map<String, Object> body
+    );
 
 }

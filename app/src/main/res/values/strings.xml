@@ -156,4 +156,27 @@
     <string name="values">💎 Values</string>
     <string name="add_first_question">Add First Question</string>
     <string name="select_a_category">Select a category</string>
+    <string name="msg_delete">Are you sure? You won\'t be able to undo it.</string>
+    <string name="this_question_still_doesn_t_have_an_answer">This question still doesn\'t have an answer</string>
+    <string name="agreeableness">🤝 Agreeableness</string>
+    <string name="conscientiousness">💪 Conscientiousness</string>
+    <string name="extraversion">👥 Extraversion</string>
+    <string name="neuroticism">😰 Neuroticism</string>
+    <string name="openness">🌎 Openness</string>
+    <string name="update_profile">Update Profile</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="profile">Profile</string>
+    <string name="change_password">Change Password</string>
+    <string name="change">Change</string>
+    <string name="update_password">Update Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="please_select_a_language">Please select a language</string>
+    <string name="please_select_a_country">Please select a country</string>
+    <string name="please_enter_your_birthdate">Please enter your birthdate</string>
+    <string name="please_enter_an_alias">Please enter an alias</string>
+    <string name="please_enter_your_full_name">Please enter your full name</string>
+    <string name="current_password_is_required">Current password is required</string>
+    <string name="new_password_is_required">New password is required</string>
 </resources>

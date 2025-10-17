@@ -1,7 +1,6 @@
 package com.t4app.t4everandroid.main.ui;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,10 +30,6 @@ import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
 import com.t4app.t4everandroid.network.ApiServices;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,10 +37,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,9 +49,9 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private ActivityCreateLegacyProfileBinding binding;
 
     private TextInputLayout fullNameLayout, aliasLayout, relationshipLayout, personalityLayout,
-            birthdateLayout, deathdateLayout, ageLayout;
+            birthdateLayout, deathdateLayout;
     private TextInputEditText fullNameValue, aliasValue, relationshipValue, personalityValue,
-            birthdateValue, deathdateValue, ageValue;
+            birthdateValue, deathdateValue;
     private AutoCompleteTextView autoCountry, autoLanguage;
 
     private LegacyProfile profile;
@@ -122,16 +115,14 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                     String fullName = getTextTv(fullNameValue);
                     String alias = getTextTv(aliasValue);
                     String relationship = getTextTv(relationshipValue);
-                    int age = Integer.parseInt(getTextTv(ageValue));
                     String birthdate = formatDate(getTextTv(birthdateValue));
                     String deathdate = formatDate(getTextTv(deathdateValue));
                     List<String> personalityList = getPersonalityList(getTextTv(personalityValue));
                     String country = autoCountry.getText().toString().trim();
                     String language = autoLanguage.getText().toString().trim();
 
-
                     ProfileRequest request = new ProfileRequest(alias,
-                            age,
+                            calculateAge(birthdate),
                             birthdate,
                             deathdate,
                             relationship,
@@ -290,11 +281,6 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             valid = false;
         }
 
-        if (isEmpty(ageValue)) {
-            setError(ageLayout, getString(R.string.age_is_required));
-            valid = false;
-        }
-
         if (isEmpty(relationshipValue)) {
             setError(relationshipLayout, getString(R.string.relationship_is_required));
             valid = false;
@@ -366,7 +352,6 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private void initViews() {
         fullNameLayout = findViewById(R.id.full_name_layout);
         aliasLayout = findViewById(R.id.alias_layout);
-        ageLayout = findViewById(R.id.age_layout);
         relationshipLayout = findViewById(R.id.relationship_layout);
         personalityLayout = findViewById(R.id.personality_layout);
         birthdateLayout = findViewById(R.id.birthdate_layout);
@@ -374,7 +359,6 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
 
         fullNameValue = findViewById(R.id.full_name_value);
         aliasValue = findViewById(R.id.alias_value);
-        ageValue = findViewById(R.id.age_value);
         relationshipValue = findViewById(R.id.relationship_value);
         personalityValue = findViewById(R.id.personality_value);
         birthdateValue = findViewById(R.id.birthdate_value);
@@ -387,7 +371,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private void clearErrors() {
         fullNameLayout.setError(null);
         aliasLayout.setError(null);
-        ageLayout.setError(null);
+
         relationshipLayout.setError(null);
         personalityLayout.setError(null);
         birthdateLayout.setError(null);
@@ -401,11 +385,36 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         aliasValue.setText(profile.getAlias());
         relationshipValue.setText(profile.getFamilyRelationship());
         personalityValue.setText(String.join(", ", profile.getBasePersonality()));
-        ageValue.setText(String.valueOf(profile.getAge()));
 //        birthdateValue.setText(profile.get);
 //        deathdateValue.setText();
         autoCountry.setText(profile.getCountry());
         autoLanguage.setText(profile.getLanguage());
     }
+
+    public int calculateAge(String birthDateString) {
+        if (birthDateString == null || birthDateString.isEmpty()) return 0;
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date birthDate = sdf.parse(birthDateString);
+
+            Calendar birthCal = Calendar.getInstance();
+            birthCal.setTime(birthDate);
+
+            Calendar today = Calendar.getInstance();
+
+            int age = today.get(Calendar.YEAR) - birthCal.get(Calendar.YEAR);
+
+            if (today.get(Calendar.DAY_OF_YEAR) < birthCal.get(Calendar.DAY_OF_YEAR)) {
+                age--;
+            }
+            return age;
+
+        } catch (ParseException e) {
+            Log.e(TAG, "calculateAge: ", e);
+            return 0;
+        }
+    }
+
 
 }

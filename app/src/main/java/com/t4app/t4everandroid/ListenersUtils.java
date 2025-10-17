@@ -1,6 +1,9 @@
 package com.t4app.t4everandroid;
 
+import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.Question;
+import com.t4app.t4everandroid.main.Models.QuestionTest;
 
 public class ListenersUtils {
 
@@ -8,11 +11,20 @@ public class ListenersUtils {
         void onResult(boolean confirmed);
     }
 
+    public interface OnUserUpdateListener{
+        void onResult(User user);
+    }
+
     public interface OnProfileActionListener {
         void onSelect(LegacyProfile profile);
         void onChat(LegacyProfile profile);
         void onEdit(LegacyProfile profile, int position);
         void onDelete(LegacyProfile profile, int position);
+    }
+
+    public interface OnQuestionActionsListener{
+        void onDelete(Question questionTest, int pos);
+        void onEdit(Question questionTest, int pos);
     }
 
 }

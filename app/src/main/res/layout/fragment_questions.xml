@@ -72,6 +72,7 @@
                     android:gravity="center">
 
                     <TextView
+                        android:id="@+id/total_questions"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         android:textSize="18sp"
@@ -105,6 +106,7 @@
                     android:backgroundTint="@color/white">
 
                     <TextView
+                        android:id="@+id/total_answered"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         android:textSize="18sp"
@@ -144,6 +146,7 @@
                     android:padding="13dp">
 
                     <TextView
+                        android:id="@+id/total_pending"
                         android:layout_marginStart="5dp"
                         android:textColor="@color/black"
                         android:textStyle="bold"
@@ -177,6 +180,7 @@
                     android:padding="13dp">
 
                     <TextView
+                        android:id="@+id/total_categories"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         android:textSize="18sp"

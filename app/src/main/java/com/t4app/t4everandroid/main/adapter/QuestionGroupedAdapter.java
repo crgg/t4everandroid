@@ -4,13 +4,18 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.ListItem;
+import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.Models.QuestionTest;
 
 import java.util.List;
@@ -19,10 +24,12 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private List<ListItem> items;
     private Context context;
+    private static ListenersUtils.OnQuestionActionsListener listener;
 
-    public QuestionGroupedAdapter(Context context, List<ListItem> items) {
+    public QuestionGroupedAdapter(Context context, List<ListItem> items, ListenersUtils.OnQuestionActionsListener listener) {
         this.context = context;
         this.items = items;
+        this.listener = listener;
     }
 
     @Override
@@ -60,6 +67,10 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
+    public Context getContext() {
+        return context;
+    }
+
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView txtCategoryTitle;
         HeaderViewHolder(View v) {
@@ -72,16 +83,46 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     static class QuestionViewHolder extends RecyclerView.ViewHolder {
-        TextView txtQuestion, txtAnswer;
+        TextView txtQuestion, txtAnswer, txtNoAnswer;
+        AppCompatImageButton btnDelete, btnEdit;
         QuestionViewHolder(View v) {
             super(v);
             txtQuestion = v.findViewById(R.id.txtQuestion);
             txtAnswer = v.findViewById(R.id.txtAnswer);
+            txtNoAnswer = v.findViewById(R.id.text_no_answer);
+            btnDelete = v.findViewById(R.id.btn_delete_question);
+            btnEdit = v.findViewById(R.id.btn_edit_question);
         }
-        void bind(QuestionTest question) {
+        void bind(Question question) {
             txtQuestion.setText(question.getQuestion());
-            txtAnswer.setText(question.getAnswer());
+            if (question.getAnsweredAt() == null){
+                txtNoAnswer.setVisibility(View.VISIBLE);
+            }else{
+                txtNoAnswer.setVisibility(View.GONE);
+            }
+//            txtAnswer.setText(question.get());
+
+            btnDelete.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    int currentPos = getAdapterPosition();
+                    if (currentPos != RecyclerView.NO_POSITION){
+                        listener.onDelete(question, currentPos);
+                    }
+                }
+            });
+
+            btnEdit.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    int currentPos = getAdapterPosition();
+                    if (currentPos != RecyclerView.NO_POSITION){
+                        listener.onEdit(question, currentPos);
+                    }
+                }
+            });
         }
+
     }
 
     public void updateList(List<ListItem> newList) {
@@ -89,8 +130,8 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         notifyDataSetChanged();
     }
 
-    public void addQuestionToCategory(QuestionTest question) {
-        String category = question.getCategory();
+    public void addQuestionToCategory(Question question) {
+        String category = question.getDimension();
         int insertPos = -1;
 
         for (int i = 0; i < items.size(); i++) {
@@ -114,5 +155,57 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             notifyItemInserted(insertPos);
         }
     }
+
+    public void removeItem(int position) {
+        if (position < 0 || position >= items.size()) return;
+
+        ListItem toRemove = items.get(position);
+
+        if (toRemove.getType() == ListItem.TYPE_HEADER) return;
+
+        String category = toRemove.getCategory();
+
+        items.remove(position);
+        notifyItemRemoved(position);
+
+        boolean hasMoreInCategory = false;
+
+        for (ListItem item : items) {
+            if (item.getType() == ListItem.TYPE_ITEM &&
+                    item.getCategory().equals(category)) {
+                hasMoreInCategory = true;
+                break;
+            }
+        }
+
+        if (!hasMoreInCategory) {
+            int headerPos = -1;
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getType() == ListItem.TYPE_HEADER &&
+                        items.get(i).getCategory().equals(category)) {
+                    headerPos = i;
+                    break;
+                }
+            }
+
+            if (headerPos != -1) {
+                items.remove(headerPos);
+                notifyItemRemoved(headerPos);
+            }
+        }
+    }
+
+    public void updateItem(int position, Question updatedQuestion) {
+        if (position < 0 || position >= items.size()) return;
+
+        ListItem item = items.get(position);
+
+        if (item.getType() == ListItem.TYPE_ITEM) {
+            item.setQuestion(updatedQuestion);
+            notifyItemChanged(position);
+        }
+    }
+
+
 
 }

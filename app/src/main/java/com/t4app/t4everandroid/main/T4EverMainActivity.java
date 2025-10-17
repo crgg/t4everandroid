@@ -2,11 +2,10 @@ package com.t4app.t4everandroid.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
-
-import com.t4app.t4everandroid.R;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -19,11 +18,15 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.JsonObject;
+import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.ErrorUtils;
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.Login.T4EverLoginActivity;
+import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
-import com.t4app.t4everandroid.databinding.ActivityT4EverLoginBinding;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
 import com.t4app.t4everandroid.main.ui.ConversationsFragment;
@@ -33,13 +36,22 @@ import com.t4app.t4everandroid.main.ui.MediaFragment;
 import com.t4app.t4everandroid.main.ui.MessagesFragment;
 import com.t4app.t4everandroid.main.ui.QuestionsFragment;
 import com.t4app.t4everandroid.main.ui.SettingsFragment;
+import com.t4app.t4everandroid.main.ui.UpdateProfileFragment;
+import com.t4app.t4everandroid.network.ApiServices;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class T4EverMainActivity extends AppCompatActivity {
 
+    private static final String TAG  = "MAIN_ACT";
     public static T4EverMainActivity instance;
 
     private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle toggle;
     private NavigationView navigationView;
 
     private ActivityT4EverMainBinding binding;
@@ -115,6 +127,70 @@ public class T4EverMainActivity extends AppCompatActivity {
 
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
+        });
+
+        binding.toolbar.userContainer.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                PopupMenu popup = new PopupMenu(T4EverMainActivity.this, v);
+                popup.getMenuInflater().inflate(R.menu.menu_user_actions, popup.getMenu());
+
+                try {
+                    Field mFieldPopup = popup.getClass().getDeclaredField("mPopup");
+                    mFieldPopup.setAccessible(true);
+                    Object menuPopupHelper = mFieldPopup.get(popup);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                } catch (Exception e) {
+                    Log.e(TAG, "onSafeClick: ", e);
+                }
+
+                popup.setOnMenuItemClickListener(item -> {
+                    int id = item.getItemId();
+                    if(id == R.id.action_update_profile){
+                        showFragment(new UpdateProfileFragment());
+                        return true;
+                    }else if (id == R.id.action_sign_out){
+                        logout(confirmed -> {
+                            if (confirmed){
+                                Log.d(TAG, "ON CLEAR: ");
+                                sessionManager.clearSession();
+                                Intent intent = new Intent(T4EverMainActivity.this, T4EverLoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                        return true;
+                    }
+                    return false;
+                });
+                popup.show();
+            }
+        });
+    }
+
+    private void logout(ListenersUtils.ConfirmationCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<JsonObject> call = apiServices.logout();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()){
+                    JsonObject body = response.body();
+                    if (body != null){
+                        if (body.get("status").getAsBoolean()){
+                            GlobalDataCache.clearData();
+                            callback.onResult(true);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+                MessagesUtils.showErrorDialog(T4EverMainActivity.this, ErrorUtils.parseError(throwable));
+            }
         });
     }
 
