@@ -52,19 +52,32 @@
                 android:layout_height="wrap_content"/>
 
 
-            <ImageView
-                android:id="@+id/upload_image_btn"
-                android:layout_marginTop="15dp"
-                android:contentDescription="@string/upload_a_photo"
-                app:tint="@color/white"
-                android:src="@drawable/ic_upload"
-                android:background="@drawable/bg_profile"
-                android:backgroundTint="@color/second_login_color"
-                android:scaleType="centerInside"
-                android:adjustViewBounds="true"
-                android:padding="13dp"
-                android:layout_width="56dp"
-                android:layout_height="56dp"/>
+            <FrameLayout
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/upload_image_btn"
+                    android:layout_marginTop="15dp"
+                    android:contentDescription="@string/upload_a_photo"
+                    android:background="@drawable/bg_profile"
+                    android:backgroundTint="@color/second_login_color"
+                    android:scaleType="centerCrop"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"/>
+
+                <ImageView
+                    android:id="@+id/iconUpload"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="bottom|end"
+                    android:padding="3dp"
+                    android:backgroundTint="@color/second_login_color"
+                    android:src="@drawable/ic_upload"
+                    app:tint="@color/white" />
+
+            </FrameLayout>
+
 
             <TextView
                 app:layout_constraintTop_toTopOf="parent"

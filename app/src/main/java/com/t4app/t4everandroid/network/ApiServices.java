@@ -6,18 +6,22 @@ import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
+import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.Models.ResponseUpdateProfile;
 
 import java.util.Map;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -67,6 +71,15 @@ public interface ApiServices {
     Call<ResponseUpdateProfile> updateProfile(
             @FieldMap Map<String, Object> body
     );
+
+    @GET(ApiConfig.GET_USER_INFO)
+    Call<ResponseGetUserInfo> getUserInfo();
+
+    @POST(ApiConfig.UPLOAD_PROFILE_IMAGE_URL)
+    @Multipart
+    Call<ResponseUpdateProfile> uploadImageProfile(
+            @Part MultipartBody.Part file
+            );
 
     @POST(ApiConfig.CHANGE_PASSWORD_URL)
     @FormUrlEncoded

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
@@ -28,6 +31,8 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
+import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
+import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
 import com.t4app.t4everandroid.main.ui.ConversationsFragment;
 import com.t4app.t4everandroid.main.ui.HomeFragment;
@@ -56,6 +61,8 @@ public class T4EverMainActivity extends AppCompatActivity {
 
     private ActivityT4EverMainBinding binding;
 
+    private UserRepository userRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +84,12 @@ public class T4EverMainActivity extends AppCompatActivity {
             Intent intent = new Intent(T4EverMainActivity.this, T4EverLoginActivity.class);
             startActivity(intent);
             finish();
+            return;
+        }else if (!sessionManager.getRememberMe()){
+            Intent intent = new Intent(T4EverMainActivity.this, T4EverLoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -98,9 +111,23 @@ public class T4EverMainActivity extends AppCompatActivity {
         View navHeader = navigationView.getHeaderView(0);
         TextView name = navHeader.findViewById(R.id.name);
         TextView email = navHeader.findViewById(R.id.email);
+        ImageView icon = navHeader.findViewById(R.id.icon_user);
 
         name.setText(sessionManager.getName());
         email.setText(sessionManager.getUserEmail());
+        if(sessionManager.getAvatarUrl() != null && !sessionManager.getAvatarUrl().isEmpty()){
+            String path = sessionManager.getAvatarUrl();
+            if (!sessionManager.getAvatarUrl().contains("https://go2storage.s3.us-east-2.amazonaws.com")){
+                path = "https://go2storage.s3.us-east-2.amazonaws.com/" + sessionManager.getAvatarUrl();
+            }
+            Glide.with(this)
+                    .load(path)
+                    .transform(new CircleCrop())
+                    .into(icon);
+            icon.setBackground(null);
+        }
+        userRepository = new UserRepository();
+        getUserInfo();
 
         showFragment(new HomeFragment());
 
@@ -203,6 +230,28 @@ public class T4EverMainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+    }
+
+    private void getUserInfo(){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseGetUserInfo> call = apiServices.getUserInfo();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseGetUserInfo> call, Response<ResponseGetUserInfo> response) {
+                if (response.isSuccessful()) {
+                    ResponseGetUserInfo body = response.body();
+                    if (body != null && body.isStatus()) {
+                        Log.d(TAG, "ENTRY HERE GET INFO OK ");
+                        userRepository.updateUser(body.getData().getUser());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseGetUserInfo> call, Throwable throwable) {
+                Log.d(TAG, "onFailure: GET USER " + throwable.getMessage());
+            }
+        });
     }
 
 

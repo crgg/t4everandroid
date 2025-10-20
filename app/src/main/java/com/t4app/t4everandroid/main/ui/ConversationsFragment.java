@@ -2,6 +2,8 @@ package com.t4app.t4everandroid.main.ui;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -9,65 +11,84 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentConversationsBinding;
 import com.t4app.t4everandroid.databinding.FragmentQuestionsBinding;
+import com.t4app.t4everandroid.main.GlobalDataCache;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ConversationsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ConversationsFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
     private FragmentConversationsBinding binding;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public ConversationsFragment() {}
 
-    public ConversationsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ConversationsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ConversationsFragment newInstance(String param1, String param2) {
-        ConversationsFragment fragment = new ConversationsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static ConversationsFragment newInstance() {
+        return new ConversationsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         binding = FragmentConversationsBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_profile_conversation);
+
+        if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
+            binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
+
+        } else if (GlobalDataCache.legacyProfileSelected == null){
+            binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_profile_conversation);
+            binding.createNewConversationBtn.setEnabled(false);
+            binding.createNewConversationBtn.setAlpha(0.5f);
+
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
+        }else {
+            binding.itemSelectLegacy.selectLegacyDescription.setText(
+                    getString(R.string.profile_selected_conversation,
+                            GlobalDataCache.legacyProfileSelected.getName()));
+            binding.createNewConversationBtn.setEnabled(true);
+            binding.createNewConversationBtn.setAlpha(1f);
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.VISIBLE);
+            binding.itemSelectLegacy.btnAddFirst.setText(R.string.record_first_conversation);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.GONE);
+        }
+
+        binding.itemSelectLegacy.buttonActionsProfile.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showFragment(new LegacyProfilesFragment());
+            }
+        });
+
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        CreateConversationBottomSheet bottomSheet = new CreateConversationBottomSheet();
+        binding.createNewConversationBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                bottomSheet.show(getChildFragmentManager(), "create_conversation");
+            }
+        });
+    }
+
+    private void showFragment(Fragment fragment) {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

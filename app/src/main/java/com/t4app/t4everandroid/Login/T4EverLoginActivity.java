@@ -94,9 +94,10 @@ public class T4EverLoginActivity extends AppCompatActivity {
                                     user.getId(),
                                     user.getName(),
                                     user.getEmail(),
+                                    user.getAvatarUrl(),
                                     token.getToken(),
-                                    binding.rememberMe.isChecked()
-                                    );
+                                    true,
+                                    binding.rememberMe.isChecked());
                             startActivity(intent);
                             finish();
                         }else{

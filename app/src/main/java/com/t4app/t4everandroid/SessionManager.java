@@ -21,6 +21,7 @@ public class SessionManager {
     private static final String KEY_EMAIL_VERIFIED_AT = "email_verified_at";
     private static final String KEY_TOKEN_USER = "token";
     private static final String KEY_IS_LOGGED = "is_logged";
+    private static final String KEY_REMEMBER = "is_remember";
 
     private SharedPreferences.Editor editor;
 
@@ -163,15 +164,19 @@ public class SessionManager {
     public void saveUserDetails(Integer id,
                                 String name,
                                 String userEmail,
+                                String avatarUrl,
                                 String tokenKey,
-                                boolean isLogged){
+                                boolean isLogged,
+                                boolean rememberMe){
         SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         editor.putInt(KEY_USER_ID, id);
         editor.putString(KEY_USER_EMAIL, userEmail);
         editor.putString(KEY_NAME, name);
         editor.putString(KEY_TOKEN_USER, tokenKey);
+        editor.putString(KEY_AVATAR_URL, avatarUrl);
         editor.putBoolean(KEY_IS_LOGGED, isLogged);
+        editor.putBoolean(KEY_REMEMBER, rememberMe);
         editor.apply();
     }
 
@@ -211,6 +216,11 @@ public class SessionManager {
     public boolean getIsLogged() {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(KEY_IS_LOGGED, false);
+    }
+
+    public boolean getRememberMe() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(KEY_REMEMBER, false);
     }
 
     public void clearSession() {

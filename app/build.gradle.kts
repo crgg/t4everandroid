@@ -47,6 +47,8 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
+    implementation("com.github.bumptech.glide:glide:5.0.5")
+
     implementation ("androidx.room:room-runtime:2.8.2")
     annotationProcessor ("androidx.room:room-compiler:2.8.2")
     implementation ("androidx.room:room-ktx:2.8.2")

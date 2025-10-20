@@ -1,12 +1,19 @@
 package com.t4app.t4everandroid.Login.models;
 
+import androidx.annotation.Nullable;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+@Entity(tableName = "user")
 public class User implements Serializable {
 
     @SerializedName("id")
+    @PrimaryKey
     public int id;
 
     @SerializedName("name")
@@ -14,6 +21,9 @@ public class User implements Serializable {
 
     @SerializedName("email")
     public String email;
+
+    @SerializedName("email_verified_at")
+    public String emailVerifiedAt;
 
     @SerializedName("rol")
     public String rol;
@@ -30,7 +40,7 @@ public class User implements Serializable {
     @SerializedName("language")
     public String language;
 
-    @SerializedName("avatar_url")
+    @SerializedName(value ="avatar_url", alternate = {"avatar_path"})
     public String avatarUrl;
 
     @SerializedName("date_register")
@@ -39,8 +49,24 @@ public class User implements Serializable {
     @SerializedName("last_login")
     public String lastLogin;
 
-    @SerializedName("email_verified_at")
-    public String emailVerifiedAt;
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof User)) return false;
+
+        User user = (User) obj;
+        return age == user.age &&
+                id == user.id &&
+                Objects.equals(name, user.name) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(rol, user.rol) &&
+                Objects.equals(alias, user.alias) &&
+                Objects.equals(country, user.country) &&
+                Objects.equals(language, user.language) &&
+                Objects.equals(emailVerifiedAt, user.emailVerifiedAt) &&
+                Objects.equals(avatarUrl, user.avatarUrl);
+    }
 
 
     public String getAlias() {

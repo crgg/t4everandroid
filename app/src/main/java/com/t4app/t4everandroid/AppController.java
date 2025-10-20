@@ -11,6 +11,8 @@ public class AppController extends Application {
 //    private static AppDatabase database;
     private static AppDatabase database;
 
+    private static ApiServices apiServices = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -21,7 +23,10 @@ public class AppController extends Application {
     }
 
     public static ApiServices getApiServices(){
-        return RetrofitClient.getRetrofitClient().create(ApiServices.class);
+        if (apiServices == null){
+            apiServices = RetrofitClient.getRetrofitClient().create(ApiServices.class);
+        }
+        return apiServices;
     }
 
     public static AppDatabase getDatabase() {

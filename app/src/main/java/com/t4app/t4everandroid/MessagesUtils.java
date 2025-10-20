@@ -8,12 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.t4app.t4everandroid.Login.T4EverLoginActivity;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 
@@ -482,4 +485,64 @@ public class MessagesUtils {
             currentDialog.show();
         });
     }
+
+
+    public static void showPreviewImage(Context context, Uri uri, boolean isGallery,
+                                        ListenersUtils.OnActionPreviewImageListener listener) {
+        if (isDialogShowing){
+            return;
+        }
+        isDialogShowing = true;
+
+        if (currentDialog != null && currentDialog.isShowing()) {
+            currentDialog.dismiss();
+        }
+
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            Activity activity = (Activity) context;
+            LayoutInflater inflater = activity.getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.preview_captured_image_layout, null);
+            builder.setView(dialogView)
+                    .setCancelable(false);
+
+            currentDialog = builder.create();
+            Objects.requireNonNull(currentDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            ImageView imagePreview = dialogView.findViewById(R.id.image_preview);
+            MaterialButton takeAnotherBtn = dialogView.findViewById(R.id.take_another_btn);
+            MaterialButton saveBtn = dialogView.findViewById(R.id.save_btn);
+            if (isGallery){
+                takeAnotherBtn.setText(R.string.select_another_image);
+            }else{
+                takeAnotherBtn.setText(R.string.take_another_photo);
+            }
+
+            imagePreview.setImageURI(uri);
+
+            saveBtn.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    listener.onSaveImage();
+                    currentDialog.dismiss();
+                    isDialogShowing = false;
+                }
+            });
+
+            takeAnotherBtn.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    listener.onTakeAnother();
+                    currentDialog.dismiss();
+                    isDialogShowing = false;
+                }
+            });
+
+            currentDialog.show();
+        } catch (Exception e) {
+
+            isDialogShowing = false;
+        }
+    }
+
 }

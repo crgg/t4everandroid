@@ -3,12 +3,16 @@ package com.t4app.t4everandroid;
 import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.QuestionTest;
 
 public class ListenersUtils {
 
     public interface ConfirmationCallback {
         void onResult(boolean confirmed);
+    }
+
+    public interface OnActionPreviewImageListener {
+        void onSaveImage();
+        void onTakeAnother();
     }
 
     public interface OnUserUpdateListener{
