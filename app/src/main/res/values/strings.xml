@@ -208,4 +208,7 @@
     <string name="save_conversation">Save Conversation</string>
     <string name="start_recording">Start Recording</string>
     <string name="record_first_conversation">Record First Conversation</string>
+    <string name="press_the_button_to_stop_recording_audio">Press the button to stop recording audio.</string>
+    <string name="press_the_button_to_record_the_audio">Press the button to record the audio.</string>
+    <string name="microphone_permission_denied">Microphone permission denied</string>
 </resources>

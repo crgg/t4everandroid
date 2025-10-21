@@ -1,16 +1,25 @@
 package com.t4app.t4everandroid.main.ui;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -21,7 +30,15 @@ import com.google.android.material.button.MaterialButton;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 
+import java.io.IOException;
+
 public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
+
+    private MaterialButton recordAudioBtn;
+    private MaterialButton recordVideoBtn;
+
+    private ActivityResultLauncher<Intent> launcher;
+    private AudioPlayerView audioPlayerView;
 
     @Nullable
     @Override
@@ -35,8 +52,10 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
         LinearLayout optionVideo = view.findViewById(R.id.option_video);
 
         LinearLayout containerText = view.findViewById(R.id.container_text);
-        MaterialButton recordAudioBtn = view.findViewById(R.id.start_record_audio);
-        MaterialButton recordVideoBtn = view.findViewById(R.id.start_record_video);
+        recordAudioBtn = view.findViewById(R.id.start_record_audio);
+        recordVideoBtn = view.findViewById(R.id.start_record_video);
+
+        audioPlayerView = view.findViewById(R.id.audioPlayer);
 
         ImageView textIcon = view.findViewById(R.id.icon_text);
         ImageView audioIcon = view.findViewById(R.id.icon_audio);
@@ -168,6 +187,49 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
         }
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        launcher =
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        String uriString = result.getData().getStringExtra("audio_uri");
+                        Uri uri = Uri.parse(uriString);
+                        setupAudioPlayer(uri);
+//                        MediaPlayer player = MediaPlayer.create(this, audioUri);
+//                        player.start();
+                    }
+                });
+
+        recordAudioBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                Intent intent = new Intent(requireActivity(), RecordAudioActivity.class);
+                launcher.launch(intent);
+            }
+        });
+
+        recordVideoBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+
+            }
+        });
+    }
+
+    public void setupAudioPlayer(Uri audioUri) {
+        if (audioPlayerView != null) {
+            audioPlayerView.setVisibility(View.VISIBLE);
+            audioPlayerView.setAudioUri(audioUri);
+        }
+    }
+
+    public void hideAudioPlayer() {
+        if (audioPlayerView != null) {
+            audioPlayerView.setVisibility(View.GONE);
+            audioPlayerView.stopPlayback();
+        }
     }
 
 }

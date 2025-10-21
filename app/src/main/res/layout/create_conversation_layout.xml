@@ -200,6 +200,12 @@
         app:rippleColor="@color/red"
         android:textColor="@color/white" />
 
+    <com.t4app.t4everandroid.main.ui.AudioPlayerView
+        android:id="@+id/audioPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:visibility="gone"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/start_record_video"

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="#27042156"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".main.ui.RecordAudioActivity">
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/back_record_btn"
+        android:src="@drawable/ic_back_arrow"
+        android:scaleType="centerCrop"
+        android:background="@null"
+        app:tint="@color/second_login_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="48dp"
+        android:layout_height="48dp"/>
+
+    <LinearLayout
+        android:id="@+id/container_record_audio"
+        app:layout_constraintTop_toBottomOf="@id/back_record_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/start_recording_btn"
+            android:src="@drawable/ic_conversations"
+            android:tint="@color/white"
+            android:background="@drawable/bg_profile"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"/>
+
+        <TextView
+            android:text="@string/press_the_button_to_record_the_audio"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/container_stop_record"
+        app:layout_constraintTop_toBottomOf="@id/back_record_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/stop_record_audio"
+            android:src="@drawable/ic_stop_48_dp"
+            android:tint="@color/white"
+            android:background="@drawable/bg_profile"
+            android:backgroundTint="@color/gray_hint"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"/>
+
+        <TextView
+            android:text="@string/press_the_button_to_stop_recording_audio"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
