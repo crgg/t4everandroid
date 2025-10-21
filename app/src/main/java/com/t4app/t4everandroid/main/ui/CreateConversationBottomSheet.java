@@ -174,6 +174,7 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
                 recordAudioBtn.setVisibility(View.GONE);
                 recordVideoBtn.setVisibility(View.VISIBLE);
 
+                hideAudioPlayer();
                 text.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
                 audio.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
                 video.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
