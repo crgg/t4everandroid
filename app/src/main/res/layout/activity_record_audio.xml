@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:padding="16dp"
     android:orientation="vertical"
-    android:background="#27042156"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".main.ui.RecordAudioActivity">
@@ -70,9 +70,18 @@
             android:background="@drawable/bg_profile"
             android:backgroundTint="@color/gray_hint"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
             android:layout_width="120dp"
             android:layout_height="120dp"/>
+
+        <TextView
+            android:id="@+id/time_record"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            android:layout_gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:text="@string/press_the_button_to_stop_recording_audio"

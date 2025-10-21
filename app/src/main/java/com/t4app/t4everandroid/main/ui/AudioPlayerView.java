@@ -154,7 +154,7 @@ public class AudioPlayerView extends LinearLayout {
     private void startAudioPlayback() {
         mediaPlayer.start();
         isPlaying = true;
-        btnPlayPause.setImageResource(R.drawable.ic_stop);
+        btnPlayPause.setImageResource(R.drawable.ic_pause);
         handler.postDelayed(updateProgress, 100);
     }
 
@@ -173,7 +173,7 @@ public class AudioPlayerView extends LinearLayout {
             if (mediaPlayer != null && isPlaying) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
                 seekBarAudio.setProgress(currentPosition);
-                tvCurrentTime.setText(formatTime(currentPosition / 1000));
+                tvCurrentTime.setText(formatTime(currentPosition / 1000) + " / ");
                 handler.postDelayed(this, 100);
             }
         }
@@ -186,7 +186,7 @@ public class AudioPlayerView extends LinearLayout {
             mediaPlayer.seekTo(0);
         }
         seekBarAudio.setProgress(0);
-        tvCurrentTime.setText("0:00 / ");
+        tvCurrentTime.setText(R.string._0_00);
         handler.removeCallbacks(updateProgress);
     }
 

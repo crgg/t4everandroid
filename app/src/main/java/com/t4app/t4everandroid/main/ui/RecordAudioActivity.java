@@ -7,6 +7,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -36,6 +37,26 @@ public class RecordAudioActivity extends AppCompatActivity {
     private MediaRecorder recorder;
     private File audioFile;
     private boolean isRecording = false;
+
+    private Handler handler = new Handler();
+    private boolean isRunning = false;
+    private long startTime = 0L;
+
+    private final Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            long elapsed = System.currentTimeMillis() - startTime;
+
+            int seconds = (int) (elapsed / 1000);
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+
+            String time = String.format("%02d:%02d", minutes, seconds);
+            binding.timeRecord.setText(time);
+
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     private final ActivityResultLauncher<String> permissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -70,6 +91,9 @@ public class RecordAudioActivity extends AppCompatActivity {
                 }else{
                     checkPermissionAndStart();
                 }
+                startTime = System.currentTimeMillis();
+                handler.post(timerRunnable);
+                isRunning = true;
                 binding.containerStopRecord.setVisibility(View.VISIBLE);
                 binding.containerRecordAudio.setVisibility(View.GONE);
             }
@@ -78,6 +102,9 @@ public class RecordAudioActivity extends AppCompatActivity {
         binding.stopRecordAudio.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
+                handler.removeCallbacks(timerRunnable);
+                isRunning = false;
+
                 binding.containerStopRecord.setVisibility(View.GONE);
                 binding.containerRecordAudio.setVisibility(View.VISIBLE);
                 finishAndReturn();

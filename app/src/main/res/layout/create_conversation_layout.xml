@@ -155,12 +155,12 @@
             android:layout_height="wrap_content"/>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/question_layout"
+            android:id="@+id/conversation_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/question_value"
+                android:id="@+id/conversation_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="230dp"
@@ -220,7 +220,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:iconGravity="textStart"
-        app:icon="@drawable/ic_conversation_24_dp"
+        app:icon="@drawable/ic_video"
         app:iconTint="@color/white"
         android:textSize="13sp"
         app:cornerRadius="8dp"
@@ -228,6 +228,29 @@
         app:strokeColor="@color/red"
         app:strokeWidth="2dp"
         app:rippleColor="@color/red"
+        android:textColor="@color/white" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/video_player"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="43dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:text="@string/play_video"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:iconGravity="textStart"
+        app:icon="@drawable/ic_play"
+        app:iconTint="@color/white"
+        android:textSize="13sp"
+        app:cornerRadius="8dp"
+        android:backgroundTint="@color/border_color_buttons"
+        app:strokeColor="@color/border_color_buttons"
+        app:strokeWidth="2dp"
+        app:rippleColor="@color/border_color_buttons"
         android:textColor="@color/white" />
 
 

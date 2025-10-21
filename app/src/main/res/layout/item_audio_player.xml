@@ -5,7 +5,8 @@
     android:layout_marginTop="15dp"
     android:orientation="horizontal"
     android:padding="12dp"
-    android:background="@drawable/bg_audio_player">
+    android:background="@drawable/bg_rounded"
+    android:backgroundTint="@color/soft_gray">
 
     <ImageButton
         android:id="@+id/btnPlayPause"
@@ -28,8 +29,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:progressBackgroundTint="@color/gray_hint"
-            android:progressTint="@color/green_success"
-            android:thumbTint="@color/green_success"
+            android:progressTint="@color/second_login_color"
+            android:thumbTint="@color/second_login_color"
             android:max="100"
             android:progress="0" />
 
@@ -44,7 +45,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="0:45"
                 android:textSize="12sp"
                 android:textColor="@color/gray_hint" />
 
@@ -52,7 +52,6 @@
                 android:id="@+id/tvTotalTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" / 2:15"
                 android:textSize="12sp"
                 android:textColor="@color/gray_hint" />
 

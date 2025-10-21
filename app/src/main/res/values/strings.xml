@@ -211,4 +211,8 @@
     <string name="press_the_button_to_stop_recording_audio">Press the button to stop recording audio.</string>
     <string name="press_the_button_to_record_the_audio">Press the button to record the audio.</string>
     <string name="microphone_permission_denied">Microphone permission denied</string>
+    <string name="_0_00">"0:00 / "</string>
+    <string name="play_video">Play Video</string>
+    <string name="total">Total</string>
+    <string name="the_text_cannot_be_empty">The text cannot be empty.</string>
 </resources>

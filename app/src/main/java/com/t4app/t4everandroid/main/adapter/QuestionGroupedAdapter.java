@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,6 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.ListItem;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.QuestionTest;
 
 import java.util.List;
 
