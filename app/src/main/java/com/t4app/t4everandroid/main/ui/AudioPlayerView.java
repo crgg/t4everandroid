@@ -159,11 +159,13 @@ public class AudioPlayerView extends LinearLayout {
     }
 
     private void pauseAudioPlayback() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            isPlaying = false;
-            btnPlayPause.setImageResource(R.drawable.ic_play);
-            handler.removeCallbacks(updateProgress);
+        if (mediaPlayer != null){
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+                isPlaying = false;
+                btnPlayPause.setImageResource(R.drawable.ic_play);
+                handler.removeCallbacks(updateProgress);
+            }
         }
     }
 
