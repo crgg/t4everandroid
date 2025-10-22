@@ -16,7 +16,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.t4app.t4everandroid.Login.adapter.OnboardingAdapter;
 import com.t4app.t4everandroid.Login.models.OnboardingItem;
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.ActivityT4EverOnboardingBinding;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,16 @@ public class T4EverOnboardingActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         if (hasSeenOnboarding()) {
-            goToLogin();
+            SessionManager sessionManager = SessionManager.getInstance();
+
+            if (sessionManager.getIsLogged()){
+                Intent intent = new Intent(T4EverOnboardingActivity.this, T4EverMainActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            }else{
+                goToLogin();
+            }
             return;
         }
 
