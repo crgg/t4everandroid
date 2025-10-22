@@ -1,15 +1,27 @@
-package com.t4app.t4everandroid.Login;
+package com.t4app.t4everandroid.Login.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.credentials.Credential;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.credentials.exceptions.GetCredentialProviderConfigurationException;
+import androidx.credentials.exceptions.NoCredentialException;
 
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.AppUtils;
 import com.t4app.t4everandroid.ErrorUtils;
@@ -20,20 +32,26 @@ import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
-import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.databinding.ActivityT4EverLoginBinding;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
+import com.t4app.t4everandroid.network.ApiConfig;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class T4EverLoginActivity extends AppCompatActivity {
-
+    private static final String TAG = "LOGIN_ACT";
     private ActivityT4EverLoginBinding binding;
+
+    private CredentialManager credentialManager;
+    private Executor executor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +76,8 @@ public class T4EverLoginActivity extends AppCompatActivity {
             }
         });
 
+        credentialManager = CredentialManager.create(this);
+
         binding.signIn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
@@ -74,6 +94,81 @@ public class T4EverLoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        binding.signInWithGoogle.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                signInWithGoogle();
+            }
+        });
+    }
+
+    private void signInWithGoogle(){
+        Log.d(TAG, "signInWithGoogle: ");
+        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(ApiConfig.CLIENT_ID)
+                .build();
+
+        GetCredentialRequest request = new GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build();
+
+        executor.execute(() -> {
+            try {
+                credentialManager.getCredentialAsync(
+                        T4EverLoginActivity.this,
+                        request,
+                        null,
+                        executor,
+                        new CredentialManagerCallback<>() {
+                            @Override
+                            public void onResult(GetCredentialResponse response) {
+                                handleSignIn(response);
+                            }
+
+                            @Override
+                            public void onError(@NonNull GetCredentialException e) {
+                                Log.e(TAG, "onError: ", e);
+                                if(e instanceof NoCredentialException){
+                                    runOnUiThread(() -> {
+                                        MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
+                                                getString(R.string.your_device_does_not_support_quick_start_with_google_please_use_manual_login));
+                                    });
+                                }else if (e instanceof GetCredentialProviderConfigurationException){
+                                    Log.e(TAG, "PROVIDER ERROR NO CONFIG: ", e);
+                                }else{
+                                    runOnUiThread(() -> {
+                                        MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
+                                                getString(R.string.error_starting_session));
+                                    });
+                                    Log.e(TAG, "ERROR START SESSION", e);
+                                }
+                            }
+                        });
+            }catch (Exception e){
+                Log.e(TAG, "run: ", e);
+            }
+        });
+    }
+
+
+    private void handleSignIn(GetCredentialResponse result) {
+        Credential credential = result.getCredential();
+
+        if (credential.getType().equals(GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL)) {
+            GoogleIdTokenCredential googleIdCredential = GoogleIdTokenCredential.createFrom(credential.getData());
+
+            String id = googleIdCredential.getId();
+            String name = googleIdCredential.getDisplayName();
+            String email = googleIdCredential.getId();
+            String picture = googleIdCredential.getProfilePictureUri() != null
+                    ? googleIdCredential.getProfilePictureUri().toString()
+                    : "";
+
+            Log.d(TAG, "handleSignIn: " + id + name + email + picture);
+            String token = googleIdCredential.getIdToken();
+        }
     }
 
     private void login(Map<String, Object> data){

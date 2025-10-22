@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleGroup"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:checkedButton="@id/btnOption1">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOption1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/toggle_button_bg"
+            app:strokeColor="@color/second_login_color"
+            app:strokeWidth="2dp"
+            app:rippleColor="@color/second_login_color"
+            android:textColor="@color/toggle_text_color"
+            app:icon="@drawable/ic_upload"
+            app:iconTint="@color/toggle_text_color"
+            app:iconGravity="textStart"
+            android:text="@string/upload" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOption2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/toggle_button_bg"
+            app:strokeColor="@color/second_login_color"
+            app:strokeWidth="2dp"
+            app:rippleColor="@color/second_login_color"
+            android:textColor="@color/toggle_text_color"
+            android:text="@string/record"
+            app:icon="@drawable/ic_conversation_24_dp"
+            app:iconGravity="textStart"
+            app:iconTint="@color/toggle_text_color"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <FrameLayout
+        android:id="@+id/contentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

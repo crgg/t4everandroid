@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.Login;
+package com.t4app.t4everandroid.Login.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,14 +17,11 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.AppUtils;
 import com.t4app.t4everandroid.ErrorUtils;
-import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
-import com.t4app.t4everandroid.databinding.ActivityT4EverLoginBinding;
 import com.t4app.t4everandroid.databinding.ActivityT4EverRegisterBinding;
 import com.t4app.t4everandroid.network.ApiServices;
-import com.t4app.t4everandroid.network.RetrofitClient;
 
 import java.util.HashMap;
 import java.util.Map;

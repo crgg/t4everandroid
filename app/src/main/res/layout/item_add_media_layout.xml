@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="15dp"
     android:orientation="vertical"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -30,7 +31,7 @@
             android:layout_width="46dp"
             android:layout_height="46dp"/>
     </LinearLayout>
-    
+
     <TextView
         android:textColor="@color/soft_black"
         android:textSize="15sp"
@@ -71,6 +72,36 @@
                 android:maxLines="3"
                 android:textSize="14sp"
                 android:text="@string/text"
+                android:textColor="@color/text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/option_image"
+            android:background="@drawable/bg_border_line_second_color"
+            android:orientation="vertical"
+            android:layout_marginEnd="15dp"
+            android:padding="16dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/icon_image"
+                android:contentDescription="@string/text"
+                android:src="@drawable/ic_gallery"
+                app:tint="@color/second_login_color"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
+
+            <TextView
+                android:id="@+id/image"
+                android:gravity="center"
+                android:maxLines="3"
+                android:textSize="14sp"
+                android:text="@string/image"
                 android:textColor="@color/text_color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -137,122 +168,46 @@
         </LinearLayout>
     </LinearLayout>
 
+
     <LinearLayout
-        android:id="@+id/container_text"
-        android:visibility="gone"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:textSize="14sp"
-            android:text="@string/conversation_content"
-            android:textColor="@color/soft_black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/conversation_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/conversation_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="230dp"
-                android:scrollbars="vertical"
-                android:overScrollMode="always"
-                android:paddingVertical="8dp"
-                android:hint="@string/write_the_conversation_here"
-                android:textColor="@color/text_color"
-                android:textColorHint="@color/gray_hint"
-                android:inputType="textMultiLine|textCapSentences"
-                android:gravity="top|start"
-                android:textSize="15sp"
-                android:scrollHorizontally="false"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/start_record_audio"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:layout_height="43dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/start_recording"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:iconGravity="textStart"
-        app:icon="@drawable/ic_conversation_24_dp"
-        app:iconTint="@color/white"
-        android:textSize="13sp"
-        app:cornerRadius="8dp"
-        android:backgroundTint="@color/red"
-        app:strokeColor="@color/red"
-        app:strokeWidth="2dp"
-        android:visibility="gone"
-        app:rippleColor="@color/red"
-        android:textColor="@color/white" />
-
-    <com.t4app.t4everandroid.main.ui.AudioPlayerView
-        android:id="@+id/audioPlayer"
+        android:id="@+id/container_upload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:visibility="gone"/>
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/dashed_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="30dp"
+        android:visibility="visible">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/start_record_video"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:layout_height="43dp"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"
-        android:text="@string/start_recording"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:iconGravity="textStart"
-        app:icon="@drawable/ic_video"
-        app:iconTint="@color/white"
-        android:textSize="13sp"
-        app:cornerRadius="8dp"
-        android:backgroundTint="@color/red"
-        app:strokeColor="@color/red"
-        app:strokeWidth="2dp"
-        app:rippleColor="@color/red"
-        android:textColor="@color/white" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/video_player"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:layout_height="43dp"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"
-        android:text="@string/play_video"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:iconGravity="textStart"
-        app:icon="@drawable/ic_play"
-        app:iconTint="@color/white"
-        android:textSize="13sp"
-        app:cornerRadius="8dp"
-        android:backgroundTint="@color/border_color_buttons"
-        app:strokeColor="@color/border_color_buttons"
-        app:strokeWidth="2dp"
-        app:rippleColor="@color/border_color_buttons"
-        android:textColor="@color/white" />
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_profile"
+            android:padding="8dp"
+            android:src="@drawable/ic_upload"
+            app:tint="@color/primary_login_color" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Upload a file"
+            android:textColor="@color/soft_black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Click to select file"
+            android:textColor="@color/gray_hint"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_marginTop="35dp"
@@ -262,13 +217,13 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/save_conversation"
+            android:id="@+id/save_media"
             android:layout_marginStart="5dp"
             android:layout_width="0dp"
             android:layout_height="43dp"
             android:layout_weight="1"
             android:layout_marginEnd="15dp"
-            android:text="@string/save_conversation"
+            android:text="@string/save_media"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:paddingTop="8dp"

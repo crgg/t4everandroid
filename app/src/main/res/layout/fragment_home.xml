@@ -26,8 +26,8 @@
             layout="@layout/item_questions_answered" />
 
         <include
-            android:id="@+id/conversations_item"
-            layout="@layout/item_conversations" />
+            android:id="@+id/media_item"
+            layout="@layout/item_media_layout" />
 
         <include
             android:id="@+id/scheduled_messages_item"

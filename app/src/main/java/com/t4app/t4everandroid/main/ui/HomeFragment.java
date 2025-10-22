@@ -17,6 +17,7 @@ import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentHomeBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
+import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import retrofit2.Call;
@@ -57,7 +58,7 @@ public class HomeFragment extends Fragment {
             binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(GlobalDataCache.legacyProfiles.size()));
             binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
             binding.scheduledMessagesItem.countMessages.setText("0");
-            binding.conversationsItem.countConversations.setText("0");
+            binding.mediaItem.countMedia.setText("0");
         }
 
         return view;
@@ -81,10 +82,10 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        binding.conversationsItem.getRoot().setOnClickListener(new SafeClickListener() {
+        binding.mediaItem.getRoot().setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                showFragment(new ConversationsFragment());
+                showFragment(new MediaFragment());
             }
         });
 
@@ -112,7 +113,7 @@ public class HomeFragment extends Fragment {
         binding.itemQuickActions.itemRecordConversation.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                showFragment(new ConversationsFragment());
+                showFragment(new MediaFragment());
             }
         });
 
@@ -138,7 +139,7 @@ public class HomeFragment extends Fragment {
                             if (body.getData() != null) {
                                 GlobalDataCache.legacyProfiles = body.getData();
                                 if (body.getData().isEmpty()) {
-                                    binding.conversationsItem.countConversations.setText("0");
+                                    binding.mediaItem.countMedia.setText("0");
                                     binding.legacyProfilesItem.countLegacyProfiles.setText("0");
                                     binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
                                     binding.scheduledMessagesItem.countMessages.setText("0");
@@ -146,7 +147,7 @@ public class HomeFragment extends Fragment {
                                     binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
                                     binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
                                     binding.scheduledMessagesItem.countMessages.setText("0");
-                                    binding.conversationsItem.countConversations.setText("0");
+                                    binding.mediaItem.countMedia.setText("0");
                                 }
                             }
                         }

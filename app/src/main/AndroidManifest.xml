@@ -33,13 +33,16 @@
             android:name=".main.ui.CreateLegacyProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".Login.T4EverRegisterActivity"
+            android:name=".Login.ui.T4EverRegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".Login.T4EverLoginActivity"
+            android:name=".Login.ui.T4EverLoginActivity"
             android:exported="false" />
         <activity
             android:name=".main.T4EverMainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Login.ui.T4EverOnboardingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

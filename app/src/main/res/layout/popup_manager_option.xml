@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_marginTop="10dp"
+    android:baselineAligned="false"
+    android:padding="10dp"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="@string/new_conversation"
+            android:textSize="17sp"
+            android:textColor="@color/soft_black"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_close"
+            android:src="@drawable/ic_close"
+            android:background="@null"
+            android:tint="@color/soft_black"
+            android:layout_width="46dp"
+            android:layout_height="46dp"/>
+    </LinearLayout>
+
+
+    <TextView
+        android:text="@string/select_an_option"
+        android:textColor="@color/soft_black"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/option_upload_media"
+            android:background="@drawable/bg_border_line_second_color"
+            android:orientation="vertical"
+            android:layout_marginEnd="15dp"
+            android:padding="16dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/icon_text"
+                android:contentDescription="@string/text"
+                android:src="@drawable/ic_upload"
+                app:tint="@color/second_login_color"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
+
+            <TextView
+                android:id="@+id/text"
+                android:gravity="center"
+                android:maxLines="3"
+                android:textSize="14sp"
+                android:text="Upload Media"
+                android:textColor="@color/text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/option_record_media"
+            android:background="@drawable/bg_border_line_second_color"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp"
+            android:padding="16dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/icon_audio"
+                android:contentDescription="@string/text"
+                android:src="@drawable/ic_conversations"
+                app:tint="@color/second_login_color"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
+
+            <TextView
+                android:id="@+id/audio"
+                android:gravity="center"
+                android:maxLines="3"
+                android:textSize="14sp"
+                android:text="Record Media"
+                android:textColor="@color/text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_marginTop="20dp"
+        android:id="@+id/cancel_btn"
+        android:layout_gravity="end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/cancel"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="13sp"
+        app:cornerRadius="8dp"
+        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+        app:strokeColor="@color/red"
+        app:strokeWidth="2dp"
+        app:rippleColor="@color/second_login_color"
+        android:textColor="@color/red" />
+
+</LinearLayout>

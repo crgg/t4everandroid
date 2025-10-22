@@ -2,7 +2,7 @@ package com.t4app.t4everandroid.main.Models;
 
 import android.net.Uri;
 
-public class ConversationTest {
+public class MediaTest {
     private String type;
     private Uri uri;
     private String text;

@@ -1,15 +1,13 @@
 package com.t4app.t4everandroid.main.ui;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+
 import com.t4app.t4everandroid.R;
-import com.t4app.t4everandroid.databinding.FragmentConversationsBinding;
 import com.t4app.t4everandroid.databinding.FragmentMessagesBinding;
 
 /**

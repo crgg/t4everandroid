@@ -2,6 +2,7 @@ package com.t4app.t4everandroid.network;
 
 public class ApiConfig {
     public static final String BASE_URL = "https://backend.t4ever.com/";
+    public static final String CLIENT_ID = "395482359077-q47be5ha9cp073r4qlpm48ip9ggm5rdc.apps.googleusercontent.com";
 
     public static final String LOGIN_URL = "api/auth/login";
     public static final String LOGOUT_URL = "api/auth/logout";

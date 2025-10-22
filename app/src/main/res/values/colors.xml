@@ -6,6 +6,7 @@
     <color name="text_color">#4C4C4C</color>
     <color name="gray_hint">#7C7A7A</color>
     <color name="soft_gray">#DDDCDC</color>
+    <color name="gray">#C6C2C2</color>
     <color name="sign_in_color">#415A77</color>
     <color name="primary_login_color">#09203D</color>
     <color name="second_login_color">#2C4563</color>

@@ -6,7 +6,7 @@
     android:background="@drawable/bg_login_gradient"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Login.T4EverLoginActivity">
+    tools:context=".Login.ui.T4EverLoginActivity">
 
     <androidx.cardview.widget.CardView
         android:fitsSystemWindows="true"
@@ -194,9 +194,47 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
+
+
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <View
+                    android:layout_weight="1"
+                    android:background="@color/gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"/>
+
+                <TextView
+                    android:layout_marginHorizontal="10dp"
+                    android:text="@string/or"
+                    android:textColor="@color/gray_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:layout_weight="1"
+                    android:background="@color/gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"/>
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/sign_in_with_google"
+                android:drawableStart="@drawable/ic_google_logo"
+                android:text="@string/sign_in_with_google"
+                android:background="@drawable/bg_border_line_second_color"
+                android:textColor="@color/second_login_color"
+                android:textSize="15sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
         </LinearLayout>
-
-
 
     </androidx.cardview.widget.CardView>
 

@@ -73,6 +73,13 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
 
         initViews();
 
+        binding.backBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                finish();
+            }
+        });
+
         if (isUpdate){
             profile = (LegacyProfile) getIntent().getSerializableExtra("legacy_profile");
             if (profile != null){

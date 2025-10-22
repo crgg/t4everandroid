@@ -17,10 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
-import com.t4app.t4everandroid.Login.T4EverLoginActivity;
+import com.t4app.t4everandroid.Login.ui.T4EverLoginActivity;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 public class MessagesUtils {

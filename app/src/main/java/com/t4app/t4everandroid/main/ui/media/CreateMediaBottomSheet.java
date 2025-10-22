@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.main.ui;
+package com.t4app.t4everandroid.main.ui.media;
 
 
 import android.app.Activity;
@@ -31,14 +31,18 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.t4app.t4everandroid.CameraPermissionManager;
 import com.t4app.t4everandroid.ListenersUtils;
+import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
-import com.t4app.t4everandroid.main.Models.ConversationTest;
+import com.t4app.t4everandroid.main.Models.MediaTest;
+import com.t4app.t4everandroid.main.ui.AudioPlayerView;
+import com.t4app.t4everandroid.main.ui.RecordAudioActivity;
 
 import java.io.File;
 
-public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
+public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "CREATE_CONVERSATION";
     private MaterialButton recordAudioBtn;
     private MaterialButton recordVideoBtn;
@@ -60,8 +64,18 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
 
     private ListenersUtils.OnConversationAddedListener listener;
 
+    private ActivityResultLauncher<String> cameraPermissionLauncher;
+    private CameraPermissionManager.PermissionCallback permissionCallback;
+
     public void setListener(ListenersUtils.OnConversationAddedListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setupPermissionCallback();
+        setupPermissionLauncher();
     }
 
     @Nullable
@@ -69,7 +83,7 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.create_conversation_layout, container, false);
+        View view = inflater.inflate(R.layout.create_media_layout, container, false);
 
         LinearLayout optionText = view.findViewById(R.id.option_text);
         LinearLayout optionAudio = view.findViewById(R.id.option_audio);
@@ -270,19 +284,26 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
         recordVideoBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                startVideoCapture();
+                if (CameraPermissionManager.hasCameraPermission(requireContext())){
+                    startVideoCapture();
+                }else{
+                    CameraPermissionManager.requestCameraPermission(
+                            requireActivity(),
+                            cameraPermissionLauncher,
+                            permissionCallback);
+                }
             }
         });
 
         saveConversation.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                ConversationTest conversationTest = new ConversationTest();
-                conversationTest.setType(type);
+                MediaTest mediaTest = new MediaTest();
+                mediaTest.setType(type);
                 if (type.equalsIgnoreCase("audio")){
-                    conversationTest.setUri(audioUri);
+                    mediaTest.setUri(audioUri);
                 } else if (type.equalsIgnoreCase("video")) {
-                    conversationTest.setUri(videoUri);
+                    mediaTest.setUri(videoUri);
                 }else {
                     textConversationValue = conversationText.getText().toString().trim();
                     if (textConversationValue.isEmpty()){
@@ -291,16 +312,17 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
                         conversationText.requestFocus();
                         return;
                     }else{
-                        conversationTest.setText(textConversationValue);
+                        mediaTest.setText(textConversationValue);
                     }
 
                 }
                 conversationText.setText("");
-                listener.onAddConversation(conversationTest);
+                listener.onAddConversation(mediaTest);
                 dismiss();
             }
         });
     }
+
 
     private void startVideoCapture() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -375,6 +397,32 @@ public class CreateConversationBottomSheet extends BottomSheetDialogFragment {
                 .create();
 
         dialog.show();
+    }
+
+    private void setupPermissionCallback() {
+        permissionCallback = new CameraPermissionManager.PermissionCallback() {
+            @Override
+            public void onPermissionGranted() {
+                startVideoCapture();
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                MessagesUtils.showErrorDialog(requireActivity(),getString(R.string.permission_to_use_camera_denied));
+            }
+
+            @Override
+            public void onPermissionPermanentlyDenied() {
+                CameraPermissionManager.showPermanentlyDeniedDialog(requireContext());
+            }
+        };
+    }
+
+    private void setupPermissionLauncher() {
+        cameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> CameraPermissionManager.handlePermissionResult(
+                        isGranted, requireContext(), permissionCallback));
     }
 
     @Override

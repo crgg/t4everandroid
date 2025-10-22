@@ -9,7 +9,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
@@ -25,7 +24,7 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
-import com.t4app.t4everandroid.Login.T4EverLoginActivity;
+import com.t4app.t4everandroid.Login.ui.T4EverLoginActivity;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
@@ -34,10 +33,9 @@ import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
 import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
-import com.t4app.t4everandroid.main.ui.ConversationsFragment;
+import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.main.ui.HomeFragment;
 import com.t4app.t4everandroid.main.ui.LegacyProfilesFragment;
-import com.t4app.t4everandroid.main.ui.MediaFragment;
 import com.t4app.t4everandroid.main.ui.MessagesFragment;
 import com.t4app.t4everandroid.main.ui.QuestionsFragment;
 import com.t4app.t4everandroid.main.ui.SettingsFragment;
@@ -140,8 +138,6 @@ public class T4EverMainActivity extends AppCompatActivity {
                 showFragment(new LegacyProfilesFragment());
             }else  if (id == R.id.nav_questions) {
                 showFragment(new QuestionsFragment());
-            }else  if (id == R.id.nav_conversations) {
-                showFragment(new ConversationsFragment());
             }else  if (id == R.id.nav_messages) {
                 showFragment(new MessagesFragment());
             }else  if (id == R.id.nav_chat) {
