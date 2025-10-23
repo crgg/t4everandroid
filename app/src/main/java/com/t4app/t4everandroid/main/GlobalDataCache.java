@@ -2,7 +2,6 @@ package com.t4app.t4everandroid.main;
 
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.QuestionTest;
 
 import java.util.ArrayList;
 import java.util.List;

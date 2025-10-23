@@ -197,7 +197,7 @@
     <string name="image_preview">Image Preview</string>
     <string name="take_another_photo">Take Another Photo</string>
     <string name="select_another_image">Select Another Image</string>
-    <string name="new_conversation">New Conversation</string>
+    <string name="new_conversation">New Media</string>
     <string name="conversation_type">Conversation Type</string>
     <string name="text">Text</string>
     <string name="video">Video</string>
@@ -232,4 +232,16 @@
     <string name="welcome_to_t4ever">Welcome to T4Ever</string>
     <string name="continue_text">Continue</string>
     <string name="finish">Finish</string>
+    <string name="click_to_select_mp4_webm_ogg_up_to_100mb">Click To Select MP4, WEBM, OGG up to 100MB</string>
+    <string name="upload_a_video">Upload a Video</string>
+    <string name="click_to_select_png_jpg_up_to_5mb">Click To Select PNG, JPG up to 5MB</string>
+    <string name="upload_an_audio">Upload an Audio</string>
+    <string name="click_to_select_mp3_wav_ogg_up_to_50mb">Click To Select MP3, WAV, OGG up to 50MB</string>
+    <string name="upload_a_file">Upload a file</string>
+    <string name="click_to_select_txt_up_to_50mb">Click To Select TXT up to 50MB</string>
+    <string name="error_get_media">"Error Get Media "</string>
+    <string name="play">Play</string>
+    <string name="download">Download</string>
+    <string name="type_content">Type Content</string>
+    <string name="email_inbox">Email Inbox</string>
 </resources>

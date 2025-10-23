@@ -14,5 +14,6 @@ public class ApiConfig {
     public static final String UPDATE_PROFILE_URL = "api/update-user-info";
     public static final String CHANGE_PASSWORD_URL = "api/change-password";
     public static final String UPLOAD_PROFILE_IMAGE_URL = "api/upload-avatar-picture";
+    public static final String UPLOAD_MEDIA = "api/media";
 
 }

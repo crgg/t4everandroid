@@ -17,7 +17,9 @@ import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentHomeBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
+import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import retrofit2.Call;

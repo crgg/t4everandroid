@@ -18,16 +18,18 @@
         <ImageView
             android:contentDescription="@string/type_conversation"
             app:tint="@color/second_login_color"
+            android:padding="5dp"
             android:id="@+id/icon_type"
-            android:layout_width="30dp"
-            android:layout_height="30dp"/>
+            android:layout_width="34dp"
+            android:layout_height="34dp"/>
 
         <TextView
-            android:id="@+id/txtConversation"
+            android:id="@+id/txtType"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@color/black"
+            android:layout_marginStart="10dp"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -41,18 +43,62 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginStart="15dp"
         android:orientation="vertical"
+        android:padding="10dp"
+        android:background="@drawable/bg_rounded"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/textConversation"
+        <ImageView
+            android:id="@+id/icon_type_content"
+            android:contentDescription="@string/type_content"
             android:textSize="15sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_color"
-            android:layout_marginTop="4dp"/>
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_doc"
+            app:tint="@color/white"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="15dp"/>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/date_upload"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:layout_weight="1"
+                android:layout_gravity="start|center_vertical"
+                android:text="Oct 23, 2025 04:22 AM"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:id="@+id/icon_play"
+                android:contentDescription="@string/play"
+                android:src="@drawable/ic_play_rounded"
+                app:tint="@color/white"
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp"
+                android:padding="12dp"
+                android:layout_width="46dp"
+                android:layout_height="46dp"/>
+
+            <ImageView
+                android:id="@+id/icon_download"
+                android:contentDescription="@string/download"
+                android:src="@drawable/ic_download"
+                android:layout_gravity="end"
+                android:padding="10dp"
+                android:layout_width="46dp"
+                android:layout_height="46dp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -8,7 +8,7 @@
     android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.ui.RecordAudioActivity">
+    tools:context=".main.ui.media.RecordAudioActivity">
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/back_record_btn"

@@ -2,6 +2,7 @@ package com.t4app.t4everandroid.main.adapter;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +16,26 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
-import com.t4app.t4everandroid.main.Models.MediaTest;
+import com.t4app.t4everandroid.main.Models.Media;
 
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<MediaTest> items;
+    private List<Media> items;
     private Context context;
-    private static ListenersUtils.OnConversationActionsListener listener;
+    private static ListenersUtils.OnMediaActionsListener listener;
 
-    public MediaAdapter(Context context, List<MediaTest> items,
-                        ListenersUtils.OnConversationActionsListener listener) {
+    public MediaAdapter(Context context, List<Media> items,
+                        ListenersUtils.OnMediaActionsListener listener) {
         this.context = context;
         this.items = items;
         this.listener = listener;
@@ -46,7 +55,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        MediaTest item = items.get(position);
+        Media item = items.get(position);
         ((ConversationViewHolder) holder).bind(item);
     }
 
@@ -55,42 +64,71 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     static class ConversationViewHolder extends RecyclerView.ViewHolder {
-        TextView txtConversation, txtAnswer, txtNoAnswer;
+        TextView txtType, txtDate ;
         AppCompatImageButton btnDelete;
-        ImageView iconType;
+        ImageView iconType, iconTypeContent, iconPlay, iconDownload;
         ConversationViewHolder(View v) {
             super(v);
-            txtConversation = v.findViewById(R.id.txtConversation);
-            txtAnswer = v.findViewById(R.id.textConversation);
-            txtNoAnswer = v.findViewById(R.id.text_no_answer);
+            txtType = v.findViewById(R.id.txtType);
+            txtDate = v.findViewById(R.id.date_upload);
             btnDelete = v.findViewById(R.id.btn_delete_conversation);
             iconType = v.findViewById(R.id.icon_type);
+            iconPlay = v.findViewById(R.id.icon_play);
+            iconDownload = v.findViewById(R.id.icon_download);
+            iconTypeContent = v.findViewById(R.id.icon_type_content);
         }
-        void bind(MediaTest mediaTest) {
-            txtConversation.setText(mediaTest.getType());
 
-            switch (mediaTest.getType()){
+        void bind(Media media) {
+            txtType.setText(media.getType());
+
+            switch (media.getType()){
                 case "text":
                     iconType.setImageResource(R.drawable.ic_doc);
+                    iconPlay.setImageResource(R.drawable.ic_eye);
                     break;
                 case "video":
                     iconType.setImageResource(R.drawable.ic_video);
+                    iconPlay.setImageResource(R.drawable.ic_play_rounded);
+                    break;
+                case "image":
+                    iconType.setImageResource(R.drawable.ic_gallery);
+                    iconPlay.setImageResource(R.drawable.ic_eye);
                     break;
                 case "audio":
                     iconType.setImageResource(R.drawable.ic_conversations);
+                    iconPlay.setImageResource(R.drawable.ic_play_rounded);
                     break;
 
             }
 
-            if (mediaTest.getType().equalsIgnoreCase("text")) {
-                txtAnswer.setText(mediaTest.getText());
-            }
+            txtDate.setText(parseDate(media.getDateUpload()));
+
+            iconPlay.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    int currentPos = getAdapterPosition();
+                    if (currentPos != RecyclerView.NO_POSITION){
+                        listener.onView(media, currentPos);
+                    }
+                }
+            });
+
+            iconDownload.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    int currentPos = getAdapterPosition();
+                    if (currentPos != RecyclerView.NO_POSITION){
+                        listener.onDownload(media, currentPos);
+                    }
+                }
+            });
+
             btnDelete.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
                     int currentPos = getAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
-                        listener.onDelete(mediaTest, currentPos);
+                        listener.onDelete(media, currentPos);
                     }
                 }
             });
@@ -98,14 +136,30 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
-    public void addItem(MediaTest newItem) {
+    public void addItem(Media newItem) {
         items.add(newItem);
         notifyItemInserted(items.size() - 1);
     }
 
-    public void updateList(List<MediaTest> newList) {
+    public void updateList(List<Media> newList) {
         this.items = newList;
         notifyDataSetChanged();
+    }
+
+
+    public static String parseDate(String dateString) {
+        try {
+            String dateClean = dateString.replaceAll(":(?=[0-9]{2}$)", "");
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH);
+            Date date = isoFormat.parse(dateClean);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy, hh:mm a", Locale.ENGLISH);
+            outputFormat.setTimeZone(TimeZone.getDefault());
+            return outputFormat.format(date);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return dateString;
+        }
     }
 
 }

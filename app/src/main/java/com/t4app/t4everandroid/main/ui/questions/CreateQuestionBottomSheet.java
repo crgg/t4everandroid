@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.main.ui;
+package com.t4app.t4everandroid.main.ui.questions;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -22,7 +22,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.QuestionTest;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 
 import java.text.SimpleDateFormat;

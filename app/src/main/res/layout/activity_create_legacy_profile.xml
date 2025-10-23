@@ -6,7 +6,7 @@
     android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
-    tools:context=".main.ui.CreateLegacyProfileActivity">
+    tools:context=".main.ui.legacyProfile.CreateLegacyProfileActivity">
 
     <LinearLayout
         android:id="@+id/main"

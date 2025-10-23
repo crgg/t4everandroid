@@ -51,8 +51,39 @@
             app:rippleColor="@color/second_login_color"
             android:textColor="@color/white" />
 
+
+        <androidx.cardview.widget.CardView
+            app:cardUseCompatPadding="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="12dp">
+            <LinearLayout
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/total_medias"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="@string/total"
+                    android:textColor="@color/text_color"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <LinearLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -69,11 +100,11 @@
                     android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="13dp"
+                    android:padding="10dp"
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/total_medias"
+                        android:id="@+id/total_images"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         android:textSize="18sp"
@@ -81,7 +112,7 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="@string/total"
+                        android:text="@string/image"
                         android:textColor="@color/text_color"
                         android:textSize="14sp"
                         android:layout_width="wrap_content"
@@ -102,7 +133,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:padding="13dp"
+                    android:padding="10dp"
                     android:background="@drawable/bg_button"
                     android:backgroundTint="@color/white">
 
@@ -144,7 +175,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:padding="13dp">
+                    android:padding="10dp">
 
                     <TextView
                         android:id="@+id/total_video"
@@ -177,7 +208,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:padding="13dp">
+                    android:padding="10dp">
 
                     <TextView
                         android:id="@+id/total_text"

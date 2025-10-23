@@ -2,12 +2,15 @@ package com.t4app.t4everandroid.Login.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -21,6 +24,7 @@ import androidx.credentials.exceptions.GetCredentialProviderConfigurationExcepti
 import androidx.credentials.exceptions.NoCredentialException;
 
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.AppUtils;
@@ -51,7 +55,7 @@ public class T4EverLoginActivity extends AppCompatActivity {
     private ActivityT4EverLoginBinding binding;
 
     private CredentialManager credentialManager;
-    private Executor executor = Executors.newSingleThreadExecutor();
+    private final Executor executor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,58 +102,73 @@ public class T4EverLoginActivity extends AppCompatActivity {
         binding.signInWithGoogle.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                signInWithGoogle();
+                signInWithGoogle(true);
             }
         });
     }
 
-    private void signInWithGoogle(){
+    private void signInWithGoogle(boolean firstAttempt){
         Log.d(TAG, "signInWithGoogle: ");
+        GetSignInWithGoogleOption googleOption =
+                new GetSignInWithGoogleOption.Builder(ApiConfig.CLIENT_ID).build();
+
         GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
                 .setServerClientId(ApiConfig.CLIENT_ID)
+                .setAutoSelectEnabled(false)
                 .build();
 
-        GetCredentialRequest request = new GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build();
+        GetCredentialRequest request;
+        if (firstAttempt){
+            request = new GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
+                    .build();
+        }else{
+            request = new GetCredentialRequest.Builder()
+                    .addCredentialOption(googleOption)
+                    .build();
+        }
 
-        executor.execute(() -> {
-            try {
-                credentialManager.getCredentialAsync(
-                        T4EverLoginActivity.this,
-                        request,
-                        null,
-                        executor,
-                        new CredentialManagerCallback<>() {
-                            @Override
-                            public void onResult(GetCredentialResponse response) {
-                                handleSignIn(response);
-                            }
+        try {
+            credentialManager.getCredentialAsync(
+                    this,
+                    request,
+                    null,
+                    ContextCompat.getMainExecutor(this),
+                    new CredentialManagerCallback<>() {
+                        @Override
+                        public void onResult(GetCredentialResponse response) {
+                            handleSignIn(response);
+                        }
 
-                            @Override
-                            public void onError(@NonNull GetCredentialException e) {
-                                Log.e(TAG, "onError: ", e);
-                                if(e instanceof NoCredentialException){
+                        @Override
+                        public void onError(@NonNull GetCredentialException e) {
+                            Log.e(TAG, "onError: " + e.getMessage(), e);
+                            if(e instanceof NoCredentialException){
+                                if (firstAttempt){
+                                    new Handler(Looper.getMainLooper()).postDelayed(
+                                            () -> signInWithGoogle(false), 300
+                                    );
+                                }else{
                                     runOnUiThread(() -> {
                                         MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
                                                 getString(R.string.your_device_does_not_support_quick_start_with_google_please_use_manual_login));
                                     });
-                                }else if (e instanceof GetCredentialProviderConfigurationException){
-                                    Log.e(TAG, "PROVIDER ERROR NO CONFIG: ", e);
-                                }else{
-                                    runOnUiThread(() -> {
-                                        MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
-                                                getString(R.string.error_starting_session));
-                                    });
-                                    Log.e(TAG, "ERROR START SESSION", e);
                                 }
+                            }else if (e instanceof GetCredentialProviderConfigurationException){
+                                Log.e(TAG, "PROVIDER ERROR NO CONFIG: " + e.getMessage(), e);
+                            }else{
+                                runOnUiThread(() -> {
+                                    MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
+                                            getString(R.string.error_starting_session));
+                                });
+                                Log.e(TAG, "ERROR START SESSION" + e.getMessage(), e);
                             }
-                        });
-            }catch (Exception e){
-                Log.e(TAG, "run: ", e);
-            }
-        });
+                        }
+                    });
+        }catch (Exception e){
+            Log.e(TAG, "run: ", e);
+        }
     }
 
 

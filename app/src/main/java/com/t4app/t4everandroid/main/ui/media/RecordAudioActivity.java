@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.main.ui;
+package com.t4app.t4everandroid.main.ui.media;
 
 import android.Manifest;
 import android.content.Intent;
@@ -24,7 +24,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
-import com.t4app.t4everandroid.databinding.ActivityCreateLegacyProfileBinding;
 import com.t4app.t4everandroid.databinding.ActivityRecordAudioBinding;
 
 import java.io.File;

@@ -4,14 +4,17 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.Login.models.LoginResponse;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
+import com.t4app.t4everandroid.main.Models.ResponseCreateMedia;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
+import com.t4app.t4everandroid.main.Models.ResponseGetMedia;
 import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.Models.ResponseUpdateProfile;
 
 import java.util.Map;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -66,6 +69,12 @@ public interface ApiServices {
             @Query("assistant_id") String uuid
     );
 
+    @GET(ApiConfig.UPLOAD_MEDIA)
+    Call<ResponseGetMedia> getMediaAssistant(
+            @Query("assistant_id") String uuid,
+            @Query("type") String type
+    );
+
     @POST(ApiConfig.UPDATE_PROFILE_URL)
     @FormUrlEncoded
     Call<ResponseUpdateProfile> updateProfile(
@@ -80,6 +89,14 @@ public interface ApiServices {
     Call<ResponseUpdateProfile> uploadImageProfile(
             @Part MultipartBody.Part file
             );
+
+    @POST(ApiConfig.UPLOAD_MEDIA)
+    @Multipart
+    Call<ResponseCreateMedia> uploadMedia(
+            @Part MultipartBody.Part file,
+            @Part("type") RequestBody type,
+            @Part("assistant_id") RequestBody assistantId
+    );
 
     @POST(ApiConfig.CHANGE_PASSWORD_URL)
     @FormUrlEncoded

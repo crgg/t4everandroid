@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.main.ui;
+package com.t4app.t4everandroid.main.ui.legacyProfile;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;

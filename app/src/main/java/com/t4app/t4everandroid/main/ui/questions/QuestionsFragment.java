@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.main.ui;
+package com.t4app.t4everandroid.main.ui.questions;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -24,10 +24,10 @@ import com.t4app.t4everandroid.databinding.FragmentQuestionsBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.ListItem;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.QuestionTest;
 import com.t4app.t4everandroid.main.Models.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.QuestionGroupedAdapter;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import java.util.ArrayList;

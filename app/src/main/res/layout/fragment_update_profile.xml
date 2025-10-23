@@ -14,7 +14,7 @@
         android:background="@color/soft_gray"
         android:padding="20dp"
 
-        tools:context=".main.ui.CreateLegacyProfileActivity">
+        tools:context=".main.ui.legacyProfile.CreateLegacyProfileActivity">
 
     <TextView
         android:text="@string/profile"

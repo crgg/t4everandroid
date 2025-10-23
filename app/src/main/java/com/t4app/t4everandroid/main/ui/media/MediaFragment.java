@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,21 +17,33 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.button.MaterialButton;
+import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.ErrorUtils;
+import com.t4app.t4everandroid.ListenersUtils;
+import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentMediaBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
-import com.t4app.t4everandroid.main.Models.MediaTest;
+import com.t4app.t4everandroid.main.Models.Media;
+import com.t4app.t4everandroid.main.Models.ResponseGetMedia;
 import com.t4app.t4everandroid.main.adapter.MediaAdapter;
-import com.t4app.t4everandroid.main.ui.LegacyProfilesFragment;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
+import com.t4app.t4everandroid.network.ApiServices;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MediaFragment extends Fragment {
+    private static final String TAG = "MEDIA_FRAG";
+
     private FragmentMediaBinding binding;
 
-    private List<MediaTest> mediaTestList;
+    private List<Media> mediaTestList;
     private MediaAdapter adapter;
 
     private CreateMediaBottomSheet createMediaBottomSheet;
@@ -87,10 +100,23 @@ public class MediaFragment extends Fragment {
             }
         });
         mediaTestList = new ArrayList<>();
-        adapter = new MediaAdapter(requireContext(), mediaTestList,
-                (mediaTest, pos) -> {
+        adapter = new MediaAdapter(requireContext(), mediaTestList, new ListenersUtils.OnMediaActionsListener() {
+            @Override
+            public void onDelete(Media mediaTest, int pos) {
 
+            }
+
+            @Override
+            public void onDownload(Media mediaTest, int pos) {
+
+            }
+
+            @Override
+            public void onView(Media mediaTest, int pos) {
+
+            }
         });
+
         binding.mediaRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.mediaRv.setAdapter(adapter);
         calculateMedias(mediaTestList);
@@ -101,6 +127,14 @@ public class MediaFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         createMediaBottomSheet = getCreateMediaBottomSheet();
         uploadMediaBottomSheet = new UploadMediaBottomSheet();
+        uploadMediaBottomSheet.setListener(mediaTest -> {
+            if (binding.mediaRv.getVisibility() == View.GONE){
+                binding.mediaRv.setVisibility(View.VISIBLE);
+                binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
+            }
+            adapter.addItem(mediaTest);
+            calculateMedias(mediaTestList);
+        });
         binding.createNewMediaBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
@@ -114,6 +148,9 @@ public class MediaFragment extends Fragment {
                 showCustomDialog();
             }
         });
+        if (GlobalDataCache.legacyProfileSelected != null){
+            getMedia();
+        }
     }
 
     private void showCustomDialog() {
@@ -128,6 +165,8 @@ public class MediaFragment extends Fragment {
 
         AppCompatImageButton btnClose = dialogView.findViewById(R.id.btn_close);
         MaterialButton btnCancel = dialogView.findViewById(R.id.cancel_btn);
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         btnClose.setOnClickListener(new SafeClickListener() {
             @Override
@@ -166,12 +205,12 @@ public class MediaFragment extends Fragment {
     @NonNull
     private CreateMediaBottomSheet getCreateMediaBottomSheet() {
         CreateMediaBottomSheet bottomSheet = new CreateMediaBottomSheet();
-        bottomSheet.setListener(mediaTest -> {
+        bottomSheet.setListener(media -> {
             if (binding.mediaRv.getVisibility() == View.GONE){
                 binding.mediaRv.setVisibility(View.VISIBLE);
                 binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
             }
-            adapter.addItem(mediaTest);
+            adapter.addItem(media);
             calculateMedias(mediaTestList);
 //            mediaTestList.add(mediaTest);
 
@@ -179,17 +218,20 @@ public class MediaFragment extends Fragment {
         return bottomSheet;
     }
 
-    private void calculateMedias(List<MediaTest> mediaTestList){
+    private void calculateMedias(List<Media> mediaTestList){
         int typeText = 0;
         int typeAudio = 0;
         int typeVideo = 0;
-        for (MediaTest mediaTest : mediaTestList){
+        int typeImage = 0;
+        for (Media mediaTest : mediaTestList){
             if (mediaTest.getType().equalsIgnoreCase("text")){
                 typeText++;
             }else if (mediaTest.getType().equalsIgnoreCase("audio")){
                 typeAudio++;
             }else if (mediaTest.getType().equalsIgnoreCase("video")){
                 typeVideo++;
+            }else if (mediaTest.getType().equalsIgnoreCase("image")){
+                typeImage++;
             }
         }
 
@@ -197,6 +239,41 @@ public class MediaFragment extends Fragment {
         binding.totalAudio.setText(String.valueOf(typeAudio));
         binding.totalVideo.setText(String.valueOf(typeVideo));
         binding.totalText.setText(String.valueOf(typeText));
+        binding.totalImages.setText(String.valueOf(typeImage));
+    }
+
+    private void getMedia(){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseGetMedia> call = apiServices.getMediaAssistant(GlobalDataCache.legacyProfileSelected.getId(), "All");
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseGetMedia> call, Response<ResponseGetMedia> response) {
+                if (response.isSuccessful()){
+                    ResponseGetMedia body = response.body();
+                    if (body != null){
+                        if (body.isStatus()){
+                            if (body.getData() != null){
+                                adapter.updateList(body.getData());
+                                calculateMedias(body.getData());
+                                if (!body.getData().isEmpty()){
+                                    if (binding.mediaRv.getVisibility() == View.GONE){
+                                        binding.mediaRv.setVisibility(View.VISIBLE);
+                                        binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseGetMedia> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: GET MEDIA " + throwable.getMessage());
+                MessagesUtils.showErrorDialog(requireContext(),
+                        getString(R.string.error_get_media) + ErrorUtils.parseError(throwable));
+            }
+        });
     }
 
     private void showFragment(Fragment fragment) {

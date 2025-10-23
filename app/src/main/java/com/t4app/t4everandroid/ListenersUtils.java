@@ -1,7 +1,7 @@
 package com.t4app.t4everandroid;
 
 import com.t4app.t4everandroid.Login.models.User;
-import com.t4app.t4everandroid.main.Models.MediaTest;
+import com.t4app.t4everandroid.main.Models.Media;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Question;
 
@@ -32,12 +32,14 @@ public class ListenersUtils {
         void onEdit(Question questionTest, int pos);
     }
 
-    public interface OnConversationActionsListener{
-        void onDelete(MediaTest mediaTest, int pos);
+    public interface OnMediaActionsListener {
+        void onDelete(Media mediaTest, int pos);
+        void onDownload(Media mediaTest, int pos);
+        void onView(Media mediaTest, int pos);
     }
 
-    public interface OnConversationAddedListener{
-        void onAddConversation(MediaTest mediaTest);
+    public interface OnMediaAddedListener {
+        void onAddConversation(Media mediaTest);
     }
 
 }

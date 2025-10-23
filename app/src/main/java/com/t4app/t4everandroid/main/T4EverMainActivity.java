@@ -35,9 +35,9 @@ import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.main.ui.HomeFragment;
-import com.t4app.t4everandroid.main.ui.LegacyProfilesFragment;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.main.ui.MessagesFragment;
-import com.t4app.t4everandroid.main.ui.QuestionsFragment;
+import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
 import com.t4app.t4everandroid.main.ui.SettingsFragment;
 import com.t4app.t4everandroid.main.ui.UpdateProfileFragment;
 import com.t4app.t4everandroid.network.ApiServices;
@@ -83,7 +83,7 @@ public class T4EverMainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
             return;
-        }else if (!sessionManager.getRememberMe()){
+        }else if (!sessionManager.getRememberMe() && !sessionManager.getIsLogged()){
             Intent intent = new Intent(T4EverMainActivity.this, T4EverLoginActivity.class);
             startActivity(intent);
             finish();

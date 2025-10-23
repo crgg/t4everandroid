@@ -1,4 +1,4 @@
-package com.t4app.t4everandroid.main.ui;
+package com.t4app.t4everandroid.main.ui.media;
 
 import android.content.Context;
 import android.media.MediaPlayer;

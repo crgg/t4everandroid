@@ -3,12 +3,15 @@ package com.t4app.t4everandroid.main.ui.media;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,16 +34,30 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.CameraPermissionManager;
+import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
-import com.t4app.t4everandroid.main.Models.MediaTest;
-import com.t4app.t4everandroid.main.ui.AudioPlayerView;
-import com.t4app.t4everandroid.main.ui.RecordAudioActivity;
+import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.Media;
+import com.t4app.t4everandroid.main.Models.ResponseCreateMedia;
+import com.t4app.t4everandroid.network.ApiServices;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "CREATE_CONVERSATION";
@@ -59,15 +76,18 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
     private String type;
     private String textConversationValue;
 
+    private LinearLayout dataContainer;
+    private LinearLayout loadContainer;
+
     private TextInputEditText conversationText;
     private TextInputLayout conversationTextLayout;
 
-    private ListenersUtils.OnConversationAddedListener listener;
+    private ListenersUtils.OnMediaAddedListener listener;
 
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private CameraPermissionManager.PermissionCallback permissionCallback;
 
-    public void setListener(ListenersUtils.OnConversationAddedListener listener) {
+    public void setListener(ListenersUtils.OnMediaAddedListener listener) {
         this.listener = listener;
     }
 
@@ -94,6 +114,9 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
         conversationTextLayout = view.findViewById(R.id.conversation_layout);
         recordAudioBtn = view.findViewById(R.id.start_record_audio);
         recordVideoBtn = view.findViewById(R.id.start_record_video);
+
+        loadContainer = view.findViewById(R.id.load_container);
+        dataContainer = view.findViewById(R.id.data_container);
 
         audioPlayerView = view.findViewById(R.id.audioPlayer);
         videoView = view.findViewById(R.id.video_player);
@@ -298,13 +321,13 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
         saveConversation.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                MediaTest mediaTest = new MediaTest();
-                mediaTest.setType(type);
+                loadContainer.setVisibility(View.VISIBLE);
+                dataContainer.setVisibility(View.GONE);
                 if (type.equalsIgnoreCase("audio")){
-                    mediaTest.setUri(audioUri);
-                } else if (type.equalsIgnoreCase("video")) {
-                    mediaTest.setUri(videoUri);
-                }else {
+                    uploadMedia(audioUri);
+                }else if (type.equalsIgnoreCase("video")) {
+                    uploadMedia(videoUri);
+                }else if (type.equalsIgnoreCase("text")){
                     textConversationValue = conversationText.getText().toString().trim();
                     if (textConversationValue.isEmpty()){
                         conversationTextLayout.setError(getString(R.string.the_text_cannot_be_empty));
@@ -312,15 +335,136 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
                         conversationText.requestFocus();
                         return;
                     }else{
-                        mediaTest.setText(textConversationValue);
+                        String fileName = "text_" + System.currentTimeMillis() + ".txt";
+                        Uri uri = createFileTxt(requireContext(), fileName, textConversationValue);
+                        uploadMedia(uri);
                     }
-
                 }
-                conversationText.setText("");
-                listener.onAddConversation(mediaTest);
-                dismiss();
             }
         });
+    }
+
+
+    private void uploadMedia(Uri uri){
+        ApiServices apiServices = AppController.getApiServices();
+
+        String mimeType = requireActivity().getContentResolver().getType(uri);
+        String fileName = getFileName(requireContext(), uri);
+
+        try {
+            RequestBody requestBody = createRequestBodyFromUri(requireContext(), uri, mimeType);
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", fileName, requestBody);
+
+            RequestBody typePart = RequestBody.create(type, MediaType.parse("text/plain"));
+            RequestBody assistantId = RequestBody.create(GlobalDataCache.legacyProfileSelected.getId(),MediaType.parse("text/plain"));
+
+            Call<ResponseCreateMedia> call = apiServices.uploadMedia(filePart, typePart, assistantId);
+            call.enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseCreateMedia> call, @NonNull Response<ResponseCreateMedia> response) {
+                    if (response.isSuccessful()){
+                        ResponseCreateMedia body = response.body();
+                        if (body != null){
+                            if (body.isStatus()){
+                                if (body.getData() != null){
+                                    listener.onAddConversation(body.getData());
+                                    dismiss();
+                                }
+                            }else{
+                                loadContainer.setVisibility(View.GONE);
+                                dataContainer.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ResponseCreateMedia> call, @NonNull Throwable throwable) {
+                    Log.e(TAG, "onFailure: UPLOAD FILE ERROR " + throwable.getMessage());
+                    MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+                    loadContainer.setVisibility(View.GONE);
+                    dataContainer.setVisibility(View.VISIBLE);
+                }
+            });
+        }catch (Exception e){
+            Log.e(TAG, "uploadMedia: Error ",e);
+            loadContainer.setVisibility(View.GONE);
+            dataContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public Uri createFileTxt(Context context, String fileName, String content) {
+        try {
+            File folder = new File(context.getExternalFilesDir(null), "Text");
+            if (!folder.exists()) folder.mkdirs();
+
+            File file = new File(folder, fileName);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(content.getBytes());
+            fos.close();
+
+            return FileProvider.getUriForFile(
+                    context,
+                    context.getPackageName() + ".provider",
+                    file
+            );
+
+        } catch (IOException e) {
+            Log.e(TAG, "createFileTxt: ", e);
+            return null;
+        }
+    }
+
+
+    private RequestBody createRequestBodyFromUri(Context context, Uri uri, String mimeType) throws IOException {
+        InputStream inputStream = context.getContentResolver().openInputStream(uri);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[8192];
+        int nRead;
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return RequestBody.create(buffer.toByteArray(), MediaType.parse(mimeType));
+    }
+
+    private String getFileName(Context context, Uri uri) {
+        String result = null;
+
+        if ("content".equals(uri.getScheme())) {
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver().query(uri, null, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex != -1) {
+                        result = cursor.getString(nameIndex);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "getFileName: ", e);
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+
+        if (result == null) {
+            String path = uri.getPath();
+            if (path != null) {
+                int cut = path.lastIndexOf('/');
+                if (cut != -1 && cut < path.length() - 1) {
+                    result = path.substring(cut + 1);
+                } else {
+                    result = "archivo_desconocido";
+                }
+            } else {
+                result = "archivo_desconocido";
+            }
+        }
+
+        return result;
     }
 
 
