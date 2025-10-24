@@ -1,14 +1,23 @@
 package com.t4app.t4everandroid.main.ui.media;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +26,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
@@ -31,9 +42,16 @@ import com.t4app.t4everandroid.main.adapter.MediaAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,6 +63,8 @@ public class MediaFragment extends Fragment {
 
     private List<Media> mediaTestList;
     private MediaAdapter adapter;
+
+    private Snackbar snackbar;
 
     private CreateMediaBottomSheet createMediaBottomSheet;
     private UploadMediaBottomSheet uploadMediaBottomSheet;
@@ -100,20 +120,30 @@ public class MediaFragment extends Fragment {
             }
         });
         mediaTestList = new ArrayList<>();
+
+        ViewerDocumentBottomSheet viewerDocumentBottomSheet = new ViewerDocumentBottomSheet();
         adapter = new MediaAdapter(requireContext(), mediaTestList, new ListenersUtils.OnMediaActionsListener() {
             @Override
             public void onDelete(Media mediaTest, int pos) {
-
+                MessagesUtils.showMessageConfirmation(requireActivity(), getString(R.string.are_you_sure_you_won_t_be_able_to_undo_this), new ListenersUtils.ConfirmationCallback() {
+                    @Override
+                    public void onResult(boolean confirmed) {
+                        if (confirmed){
+                            deleteMedia(mediaTest, pos);
+                        }
+                    }
+                });
             }
 
             @Override
             public void onDownload(Media mediaTest, int pos) {
-
+                downloadFile(requireActivity(), mediaTest.getStorageUrl());
             }
 
             @Override
             public void onView(Media mediaTest, int pos) {
-
+                viewerDocumentBottomSheet.setMedia(mediaTest);
+                viewerDocumentBottomSheet.show(getChildFragmentManager(), "viewer_doc");
             }
         });
 
@@ -247,7 +277,7 @@ public class MediaFragment extends Fragment {
         Call<ResponseGetMedia> call = apiServices.getMediaAssistant(GlobalDataCache.legacyProfileSelected.getId(), "All");
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<ResponseGetMedia> call, Response<ResponseGetMedia> response) {
+            public void onResponse(@NonNull Call<ResponseGetMedia> call, @NonNull Response<ResponseGetMedia> response) {
                 if (response.isSuccessful()){
                     ResponseGetMedia body = response.body();
                     if (body != null){
@@ -268,13 +298,156 @@ public class MediaFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ResponseGetMedia> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<ResponseGetMedia> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "onFailure: GET MEDIA " + throwable.getMessage());
                 MessagesUtils.showErrorDialog(requireContext(),
                         getString(R.string.error_get_media) + ErrorUtils.parseError(throwable));
             }
         });
     }
+
+    private void showDownloadProgress(){
+        snackbar = Snackbar.make(binding.linearMain,
+                R.string.downloading_file,
+                Snackbar.LENGTH_LONG);
+
+
+        ProgressBar progressBar = new ProgressBar(requireContext());
+        progressBar.setIndeterminate(true);
+        progressBar.setPadding(16, 16, 16, 16);
+
+        binding.linearMain.addView(progressBar);
+
+        snackbar.show();
+    }
+
+    private void deleteMedia(Media media, int pos){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<JsonObject> call = apiServices.deleteMedia(media.getId());
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    JsonObject body = response.body();
+                    if (body != null) {
+                        if (body.has("status")) {
+                            if (body.get("status").getAsBoolean()) {
+                                adapter.deleteItem(pos);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure ERROR DELETE MEDIA ", throwable);
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+
+    public void downloadFile(Context context, String fileUrl) {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(fileUrl)
+                .build();
+
+        showDownloadProgress();
+
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(context, R.string.error_download_file, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String fileName = extractFileName(fileUrl);
+
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+
+                try {
+                    inputStream = response.body().byteStream();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
+                        values.put(MediaStore.Downloads.MIME_TYPE, guessMimeType(fileName));
+                        values.put(MediaStore.Downloads.IS_PENDING, 1);
+
+                        Uri uri = context.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                        outputStream = context.getContentResolver().openOutputStream(uri);
+
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+
+                        values.clear();
+                        values.put(MediaStore.Downloads.IS_PENDING, 0);
+                        context.getContentResolver().update(uri, values, null, null);
+
+                    } else {
+                        File downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                        File outFile = new File(downloadsFolder, fileName);
+                        outputStream = new FileOutputStream(outFile);
+
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                    }
+
+                    new android.os.Handler(context.getMainLooper()).post(() -> {
+                        Toast.makeText(context, getString(R.string.downloaded_file) + fileName, Toast.LENGTH_SHORT).show();
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (inputStream != null) inputStream.close();
+                    if (outputStream != null) outputStream.close();
+                }
+            }
+        });
+    }
+
+    public String guessMimeType(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i + 1).toLowerCase();
+        }
+
+        switch (extension) {
+            case "mp4": return "video/mp4";
+            case "mp3": return "audio/mpeg";
+            case "txt": return "text/plain";
+            case "jpg":
+            case "jpeg": return "image/jpeg";
+            case "png": return "image/png";
+            default: return "*/*";
+        }
+    }
+
+    public String extractFileName(String url) {
+        if (url == null || url.isEmpty()) return "file";
+        int lastSlash = url.lastIndexOf('/');
+        return lastSlash == -1 ? url : url.substring(lastSlash + 1);
+    }
+
+
 
     private void showFragment(Fragment fragment) {
         requireActivity().getSupportFragmentManager()

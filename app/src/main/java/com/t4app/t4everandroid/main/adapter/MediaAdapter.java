@@ -2,7 +2,7 @@ package com.t4app.t4everandroid.main.adapter;
 
 
 import android.content.Context;
-import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +19,13 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.Media;
 
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
+    private static final String TAG ="MEDIA_ADAPTER";
     private List<Media> items;
     private Context context;
     private static ListenersUtils.OnMediaActionsListener listener;
@@ -84,18 +80,22 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             switch (media.getType()){
                 case "text":
                     iconType.setImageResource(R.drawable.ic_doc);
+                    iconTypeContent.setImageResource(R.drawable.ic_doc);
                     iconPlay.setImageResource(R.drawable.ic_eye);
                     break;
                 case "video":
                     iconType.setImageResource(R.drawable.ic_video);
+                    iconTypeContent.setImageResource(R.drawable.ic_video);
                     iconPlay.setImageResource(R.drawable.ic_play_rounded);
                     break;
                 case "image":
                     iconType.setImageResource(R.drawable.ic_gallery);
+                    iconTypeContent.setImageResource(R.drawable.ic_gallery);
                     iconPlay.setImageResource(R.drawable.ic_eye);
                     break;
                 case "audio":
-                    iconType.setImageResource(R.drawable.ic_conversations);
+                    iconType.setImageResource(R.drawable.ic_headset);
+                    iconTypeContent.setImageResource(R.drawable.ic_headset);
                     iconPlay.setImageResource(R.drawable.ic_play_rounded);
                     break;
 
@@ -157,9 +157,18 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return outputFormat.format(date);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "parseDate: ", e);
             return dateString;
         }
     }
+
+    public void deleteItem(int position) {
+        if (position >= 0 && position < items.size()) {
+            items.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, items.size());
+        }
+    }
+
 
 }

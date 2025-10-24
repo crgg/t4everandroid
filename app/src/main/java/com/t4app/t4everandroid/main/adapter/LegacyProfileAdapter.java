@@ -16,6 +16,7 @@ import com.google.android.material.button.MaterialButton;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
+import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
     private final ListenersUtils.OnProfileActionListener listener;
     private final Activity activity;
 
-    private Integer lastClicked = RecyclerView.NO_POSITION;
+    private static Integer lastClicked = RecyclerView.NO_POSITION;
 
     public LegacyProfileAdapter(List<LegacyProfile> profileList, Activity activity,ListenersUtils.OnProfileActionListener listener) {
         this.profileList = profileList;

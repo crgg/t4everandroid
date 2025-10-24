@@ -16,6 +16,9 @@ public class Media implements Serializable {
     @SerializedName("type")
     private String type;
 
+    @SerializedName("storage_url")
+    private String storageUrl;
+
     @SerializedName("transcription")
     private String transcription;
 
@@ -27,6 +30,14 @@ public class Media implements Serializable {
 
     private transient Uri uri;
     private transient String text;
+
+    public String getStorageUrl() {
+        return storageUrl;
+    }
+
+    public void setStorageUrl(String storageUrl) {
+        this.storageUrl = storageUrl;
+    }
 
     public String getId() {
         return id;

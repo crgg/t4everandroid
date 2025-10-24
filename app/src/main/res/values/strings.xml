@@ -244,4 +244,26 @@
     <string name="download">Download</string>
     <string name="type_content">Type Content</string>
     <string name="email_inbox">Email Inbox</string>
+    <string name="are_you_sure_you_won_t_be_able_to_undo_this">Are you sure?\nYou won\'t be able to undo this.</string>
+    <string name="media_viewer">Media Viewer</string>
+    <string name="media_type">Media Type</string>
+    <string name="close">Close</string>
+    <string name="downloaded_file">"Downloaded file: "</string>
+    <string name="error_download_file">Error download file.</string>
+    <string name="downloading_file">Downloading file...</string>
+    <string name="compose">Compose</string>
+    <string name="recipes">Recipes</string>
+    <string name="music">Music</string>
+    <string name="travel">Travel</string>
+    <string name="inbox">Inbox</string>
+    <string name="sent">Sent</string>
+    <string name="drafts">Drafts</string>
+    <string name="trash">Trash</string>
+    <string name="spam">Spam</string>
+    <string name="tags">Tags</string>
+    <string name="personal_no_icon">Personal</string>
+    <string name="family_no_icon">Family</string>
+    <string name="career_no_icon">Career</string>
+    <string name="memories_no_icon">Memories</string>
+    <string name="photos">Photos</string>
 </resources>

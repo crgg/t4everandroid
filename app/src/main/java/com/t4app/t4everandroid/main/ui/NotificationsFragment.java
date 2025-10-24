@@ -1,34 +1,32 @@
 package com.t4app.t4everandroid.main.ui;
 
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
-
 import com.t4app.t4everandroid.R;
-import com.t4app.t4everandroid.databinding.FragmentMessagesBinding;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link MessagesFragment#newInstance} factory method to
+ * Use the {@link NotificationsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MessagesFragment extends Fragment {
+public class NotificationsFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private FragmentMessagesBinding binding;
-
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    public MessagesFragment() {
+    public NotificationsFragment() {
         // Required empty public constructor
     }
 
@@ -38,11 +36,11 @@ public class MessagesFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MessagesFragment.
+     * @return A new instance of fragment NotificationsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MessagesFragment newInstance(String param1, String param2) {
-        MessagesFragment fragment = new MessagesFragment();
+    public static NotificationsFragment newInstance(String param1, String param2) {
+        NotificationsFragment fragment = new NotificationsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,9 +61,6 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentMessagesBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
-        binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_profile_messages);
-        return view;
+        return inflater.inflate(R.layout.fragment_notifications, container, false);
     }
 }

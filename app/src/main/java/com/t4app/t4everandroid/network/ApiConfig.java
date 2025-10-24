@@ -15,5 +15,6 @@ public class ApiConfig {
     public static final String CHANGE_PASSWORD_URL = "api/change-password";
     public static final String UPLOAD_PROFILE_IMAGE_URL = "api/upload-avatar-picture";
     public static final String UPLOAD_MEDIA = "api/media";
+    public static final String DELETE_MEDIA = "api/media/{uuid}";
 
 }

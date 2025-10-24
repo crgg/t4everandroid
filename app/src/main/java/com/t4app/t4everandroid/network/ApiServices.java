@@ -53,6 +53,11 @@ public interface ApiServices {
             @Path("uuid")String uuid
     );
 
+    @DELETE(ApiConfig.DELETE_MEDIA)
+    Call<JsonObject> deleteMedia(
+            @Path("uuid")String uuid
+    );
+
     @PUT(ApiConfig.ACTIONS_ASSISTANTS_URL)
     Call<ResponseCreateAssistant> updateAssistant(
             @Path("uuid")String uuid,

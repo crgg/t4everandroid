@@ -94,7 +94,7 @@ public class HomeFragment extends Fragment {
         binding.scheduledMessagesItem.getRoot().setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                showFragment(new MessagesFragment());
+                showFragment(new EmailFragment());
             }
         });
 
@@ -122,7 +122,7 @@ public class HomeFragment extends Fragment {
         binding.itemQuickActions.itemCreateMessage.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                showFragment(new MessagesFragment());
+                showFragment(new EmailFragment());
             }
         });
 

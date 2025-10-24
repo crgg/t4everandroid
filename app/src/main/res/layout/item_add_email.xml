@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:fitsSystemWindows="true"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="8dp"
+    android:background="@color/white"
+    android:layout_marginTop="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/compose_email"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/compose"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:iconGravity="textStart"
+            app:icon="@drawable/ic_add"
+            app:iconTint="@color/white"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            android:backgroundTint="@color/second_login_color"
+            app:strokeColor="@color/second_login_color"
+            app:strokeWidth="2dp"
+            app:rippleColor="@color/second_login_color"
+            android:textColor="@color/white" />
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:background="@drawable/bg_border_line_no_pad"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="@string/inbox"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/white"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/second_login_color"
+                android:textColor="@color/second_login_color" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="@string/sent"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:iconGravity="textStart"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/white"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/second_login_color"
+                android:textColor="@color/second_login_color" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="@string/drafts"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:iconGravity="textStart"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/white"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/second_login_color"
+                android:textColor="@color/second_login_color" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="@string/trash"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:iconGravity="textStart"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/white"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/second_login_color"
+                android:textColor="@color/second_login_color" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="@string/spam"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:iconGravity="textStart"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/white"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/second_login_color"
+                android:textColor="@color/second_login_color" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textColor="@color/soft_black"
+            android:textStyle="bold"
+            android:text="@string/tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:singleSelection="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPersonal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/soft_gray"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/personal_no_icon" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFamily"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/soft_gray"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/family_no_icon" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCareer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/soft_gray"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/career_no_icon" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipMemories"
+                android:backgroundTint="@color/soft_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/memories_no_icon"/>
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:singleSelection="false"
+            app:singleLine="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/soft_gray"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/photos" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipRecipes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/soft_gray"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/recipes" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipMusic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/soft_gray"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/music" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTravel"
+                android:backgroundTint="@color/soft_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:text="@string/travel" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+

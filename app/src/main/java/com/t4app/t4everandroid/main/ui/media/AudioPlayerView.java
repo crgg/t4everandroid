@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,6 +18,7 @@ import com.t4app.t4everandroid.R;
 import java.io.IOException;
 
 public class AudioPlayerView extends LinearLayout {
+    private static final String TAG = "AUDIO_PLAYER_VIEW";
 
     private ImageButton btnPlayPause;
     private SeekBar seekBarAudio;
@@ -103,6 +105,33 @@ public class AudioPlayerView extends LinearLayout {
             seekBarAudio.setMax(mediaPlayer.getDuration());
             tvTotalTime.setText(formatTime(duration));
             tvCurrentTime.setText("0:00 / ");
+        }
+    }
+
+    public void setAudioUrl(String url) {
+        cleanupMediaPlayer();
+
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(url);
+            mediaPlayer.prepareAsync();
+
+            mediaPlayer.setOnPreparedListener(mp -> {
+                isPrepared = true;
+                setupAudioPlayer();
+                btnPlayPause.setEnabled(true);
+                seekBarAudio.setEnabled(true);
+                setEnabled(true);
+            });
+
+            mediaPlayer.setOnCompletionListener(mp -> resetPlayer());
+            mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                resetPlayer();
+                return false;
+            });
+
+        } catch (IOException e) {
+            Log.e(TAG, "setAudioUrl: ", e);
         }
     }
 
