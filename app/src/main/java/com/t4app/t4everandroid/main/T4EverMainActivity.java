@@ -33,6 +33,7 @@ import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
 import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
+import com.t4app.t4everandroid.main.ui.NotificationsFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.main.ui.HomeFragment;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
@@ -145,7 +146,7 @@ public class T4EverMainActivity extends AppCompatActivity {
             }else  if (id == R.id.nav_media) {
                 showFragment(new MediaFragment());
             }else  if (id == R.id.nav_notifications) {
-                showFragment(new MediaFragment());
+                showFragment(new NotificationsFragment());
             }else  if (id == R.id.nav_email) {
                 showFragment(new EmailFragment());
             }else  if (id == R.id.nav_settings) {

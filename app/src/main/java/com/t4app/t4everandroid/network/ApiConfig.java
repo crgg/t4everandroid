@@ -5,6 +5,7 @@ public class ApiConfig {
     public static final String CLIENT_ID = "395482359077-q47be5ha9cp073r4qlpm48ip9ggm5rdc.apps.googleusercontent.com";
 
     public static final String LOGIN_URL = "api/auth/login";
+    public static final String LOGIN_WITH_GOOGLE_URL = "api/auth/google/redirect";
     public static final String LOGOUT_URL = "api/auth/logout";
     public static final String REGISTER_URL = "api/auth/register";
     public static final String ASSISTANTS_URL = "api/assistants";

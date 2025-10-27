@@ -2,10 +2,10 @@ package com.t4app.t4everandroid.main.adapter;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.EmailTest;
 
 import java.util.List;
@@ -60,8 +61,31 @@ public class EmailAdapter  extends RecyclerView.Adapter<EmailAdapter.ViewHolder>
 
         holder.favoriteEmailIcon.setImageTintList(ColorStateList.valueOf(color));
 
+        holder.favoriteEmailIcon.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                if (email.isFavorite()){
+                    holder.favoriteEmailIcon.setImageResource(R.drawable.ic_star_off);
+                    holder.favoriteEmailIcon.
+                            setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.gray_hint)));
+                    email.setFavorite(false);
+                }else {
+                    holder.favoriteEmailIcon.setImageResource(R.drawable.ic_star);
+                    holder.favoriteEmailIcon.
+                            setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.alert_color)));
+                    email.setFavorite(true);
+                }
+
+            }
+        });
+
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(email, position);
+            if (listener != null){
+                int currentPos = holder.getAdapterPosition();
+                if (currentPos != RecyclerView.NO_POSITION){
+                    listener.onItemClick(email, currentPos);
+                }
+            }
         });
 
     }

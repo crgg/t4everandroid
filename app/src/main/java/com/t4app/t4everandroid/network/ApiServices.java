@@ -36,6 +36,12 @@ public interface ApiServices {
             @FieldMap Map<String, Object> body
     );
 
+    @POST(ApiConfig.LOGIN_URL)
+    @FormUrlEncoded
+    Call<LoginResponse> loginWithGoogle(
+            @FieldMap Map<String, Object> body
+    );
+
     @POST(ApiConfig.LOGOUT_URL)
     Call<JsonObject> logout();
 

@@ -52,7 +52,6 @@
     <string name="questions">Questions</string>
     <string name="legacy_profiles">Legacy Profiles</string>
     <string name="dashboard">Dashboard</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_legacy_profile">Create Legacy Profile</string>
     <string name="continue_building_your_digital_legacy">Continue building your digital legacy. Every Question,\nconversation, and message is a treasure for your loved ones.</string>
@@ -266,4 +265,25 @@
     <string name="career_no_icon">Career</string>
     <string name="memories_no_icon">Memories</string>
     <string name="photos">Photos</string>
+    <string name="t_attach_multiple_files_at_once">\t• 📎Attach multiple files at once</string>
+    <string name="t_share_videos_of_special_moments">\t• 🎬Share videos of special moments</string>
+    <string name="t_record_voice_messages">\t• 🎵Record voice messages</string>
+    <string name="t_upload_photos_to_share_memories">\t• 📷Upload photos to share memories</string>
+    <string name="t_quot_lessons_learned_quot">\t• \"Lessons learned\"</string>
+    <string name="t_quot_family_stories_quot">\t• \"Family stories\"</string>
+    <string name="t_quot_values_and_beliefs_quot">\t• \"Values and beliefs\"</string>
+    <string name="t_quot_life_experiences_quot">\t• \"Life experiences\"</string>
+    <string name="conversation_topics">Conversation topics:</string>
+    <string name="t_quot_how_did_you_meet_person_quot">\t• \"How did you meet [person]?\"</string>
+    <string name="t_quot_what_advice_would_you_give_me_for_life_quot">\t• \"What advice would you give me for life?\"</string>
+    <string name="t_quot_what_is_your_favorite_memory_from_childhood_quot">\t• \"What is your favorite memory from childhood?\"</string>
+    <string name="questions_you_can_ask">Questions you can ask:</string>
+    <string name="tips_for_a_better_conversation">💡 Tips for a better conversation</string>
+    <string name="share_media">Share media:</string>
+    <string name="chat_with_the_digital_version_of">Chat With The digital version of %1$s!</string>
+    <string name="chat_with">Chat With %1$s!</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="all">All</string>
+    <string name="all_type">All Type</string>
+    <string name="mark_all_as_read">Mark all as read</string>
 </resources>

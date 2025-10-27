@@ -187,7 +187,60 @@ public class T4EverLoginActivity extends AppCompatActivity {
 
             Log.d(TAG, "handleSignIn: " + id + name + email + picture);
             String token = googleIdCredential.getIdToken();
+            if (!token.isEmpty()){
+                Map<String, Object> data = new HashMap<>();
+                data.put("code", token);
+                loginWithGoogle(data);
+            }
         }
+    }
+
+    private void loginWithGoogle(Map<String,Object> data){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<LoginResponse> call = apiServices.loginWithGoogle(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                if (response.isSuccessful()) {
+                    LoginResponse body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            Intent intent = new Intent(T4EverLoginActivity.this, T4EverMainActivity.class);
+                            SessionManager sessionManager = SessionManager.getInstance();
+                            Token token = body.getData();
+                            User user = token.getUser();
+                            sessionManager.saveUserDetails(
+                                    user.getId(),
+                                    user.getName(),
+                                    user.getEmail(),
+                                    user.getAvatarUrl(),
+                                    token.getToken(),
+                                    true,
+                                    binding.rememberMe.isChecked());
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            if (body.getError() != null) {
+                                MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
+                                        ErrorUtils.parseErrorApi(body.getError()));
+                            } else {
+                                if (body.getMsg() != null) {
+                                    MessagesUtils.showErrorDialog(T4EverLoginActivity.this, body.getMsg());
+                                } else {
+                                    MessagesUtils.showErrorDialog(T4EverLoginActivity.this,
+                                            getString(R.string.unknown_error_while_attempting_to_log_in));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable throwable) {
+                MessagesUtils.showErrorDialog(T4EverLoginActivity.this, ErrorUtils.parseError(throwable));
+            }
+        });
     }
 
     private void login(Map<String, Object> data){

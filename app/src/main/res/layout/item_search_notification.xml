@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:fitsSystemWindows="true"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="8dp"
+    android:background="@color/white"
+    android:layout_marginTop="3dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/emailLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false"
+            app:startIconDrawable="@drawable/ic_search">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailValue"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:paddingVertical="8dp"
+                android:hint="@string/search_questions"
+                android:textColorHint="@color/gray_hint"
+                android:inputType="text|textEmailAddress"
+                android:textSize="15sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <AutoCompleteTextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/categories_auto"
+            android:inputType="none"
+            android:importantForAutofill="no"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:layout_weight="1"
+            android:text="@string/all"
+            android:background="@drawable/bg_border_line"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:drawableEnd="@drawable/ic_more_info_rotated"/>
+
+        <AutoCompleteTextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/type_notification"
+            android:inputType="none"
+            android:importantForAutofill="no"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:layout_weight="1"
+            android:text="@string/all_type"
+            android:background="@drawable/bg_border_line"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:drawableEnd="@drawable/ic_more_info_rotated"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_new_question_btn"
+            android:layout_width="wrap_content"
+            android:layout_gravity="end"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/mark_all_as_read"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:iconGravity="textStart"
+            app:icon="@drawable/ic_double_check"
+            app:iconTint="@color/gray_hint"
+            android:textSize="13sp"
+            app:cornerRadius="8dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="@color/gray_hint"
+            app:strokeWidth="1dp"
+            app:rippleColor="@color/gray_hint"
+            android:textColor="@color/gray_hint" />
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+

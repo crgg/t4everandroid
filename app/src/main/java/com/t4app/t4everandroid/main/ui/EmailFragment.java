@@ -10,7 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.chip.Chip;
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentEmailBinding;
 import com.t4app.t4everandroid.main.Models.EmailTest;
 import com.t4app.t4everandroid.main.adapter.EmailAdapter;
@@ -62,5 +64,60 @@ public class EmailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        binding.itemAddEmail.inboxBtn.post(() -> binding.itemAddEmail.inboxBtn.performClick());
+
+        Chip chipPersonal = binding.itemAddEmail.chipPersonal;
+        Chip chipCareer = binding.itemAddEmail.chipCareer;
+        Chip chipFamily = binding.itemAddEmail.chipFamily;
+        Chip chipMemories = binding.itemAddEmail.chipMemories;
+        Chip chipMusic = binding.itemAddEmail.chipMusic;
+        Chip chipPhotos = binding.itemAddEmail.chipPhotos;
+        Chip chipTravel = binding.itemAddEmail.chipTravel;
+        Chip chipRecipes = binding.itemAddEmail.chipRecipes;
+
+        chipPersonal.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipPersonal);
+        });
+
+        chipCareer.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipCareer);
+        });
+
+        chipFamily.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipFamily);
+        });
+
+        chipMemories.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipMemories);
+        });
+
+        chipMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipMusic);
+        });
+
+        chipPhotos.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipPhotos);
+        });
+
+        chipTravel.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipTravel);
+        });
+
+        chipRecipes.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            chipCloseBtnVisibility(chipRecipes);
+        });
+
+
+
+
+
+
+
+
+    }
+
+    private void chipCloseBtnVisibility(Chip chip){
+        chip.setCloseIconVisible(chip.isChecked());
     }
 }
