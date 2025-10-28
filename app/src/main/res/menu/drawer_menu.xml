@@ -16,10 +16,6 @@
             android:title="@string/questions"
             android:icon="@drawable/ic_questions"/>
         <item
-            android:id="@+id/nav_messages"
-            android:title="@string/messages"
-            android:icon="@drawable/ic_messages"/>
-        <item
             android:id="@+id/nav_chat"
             android:title="@string/chat"
             android:icon="@drawable/ic_chat_dashboard"/>

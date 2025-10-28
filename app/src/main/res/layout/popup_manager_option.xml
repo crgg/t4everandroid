@@ -18,7 +18,7 @@
     <LinearLayout android:layout_marginTop="10dp"
         android:baselineAligned="false"
         android:padding="10dp"
-        android:background="@null"
+        android:background="@color/white"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

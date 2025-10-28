@@ -9,22 +9,104 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--TODO: COMPLETE THIS DESIGN IN CONFIG-->
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="15dp"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:layout_marginTop="7dp"
-            android:text="@string/verify_email"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:id="@+id/main_container"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="@drawable/bg_rounded"
+            android:backgroundTint="@color/email_verified_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginTop="7dp"
+                android:text="@string/verify_email"
+                android:textColor="@color/soft_black"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/message_verified"
+                android:layout_marginTop="7dp"
+                android:textColor="@color/email_verified_txt"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/email_value"
+                android:layout_marginTop="7dp"
+                android:textColor="@color/email_verified_txt"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/resend_email_btn"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_rounded"
+                    android:padding="8dp"
+                    android:backgroundTint="@color/alert_email_verified"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/iv_email_verified"
+                        android:contentDescription="@string/email_verified"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"/>
+
+                    <TextView
+                        android:id="@+id/txt_email_verified"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:layout_width="0dp"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/change_email_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_height="48dp"
+                    android:visibility="gone"
+                    android:text="@string/change_email"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    app:iconGravity="textEnd"
+                    app:icon="@drawable/ic_edit"
+                    app:iconTint="@color/brown"
+                    android:textSize="13sp"
+                    app:cornerRadius="8dp"
+                    android:backgroundTint="@android:color/transparent"
+                    app:strokeColor="@color/brown"
+                    app:strokeWidth="2dp"
+                    android:textColor="@color/brown" />
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
+
+
 
 </androidx.cardview.widget.CardView>

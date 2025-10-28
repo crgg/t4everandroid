@@ -42,4 +42,9 @@ public class ListenersUtils {
         void onAddConversation(Media mediaTest);
     }
 
+    public interface OnEmailChangeListener{
+        void onEmailChanged(String newEmail);
+    }
+
+
 }

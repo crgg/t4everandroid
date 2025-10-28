@@ -1,8 +1,15 @@
 package com.t4app.t4everandroid.main;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -10,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -130,6 +138,15 @@ public class T4EverMainActivity extends AppCompatActivity {
 
         showFragment(new HomeFragment());
 
+        MenuItem settingsItem = navigationView.getMenu().findItem(R.id.nav_settings);
+
+        if (sessionManager.getEmailVerifiedAt() == null) {
+            settingsItem.setTitle("Settings !");
+        } else {
+            settingsItem.setTitle("Settings");
+        }
+
+
         navigationView.setNavigationItemSelectedListener(item -> {
             int id  = item.getItemId();
 
@@ -139,8 +156,6 @@ public class T4EverMainActivity extends AppCompatActivity {
                 showFragment(new LegacyProfilesFragment());
             }else  if (id == R.id.nav_questions) {
                 showFragment(new QuestionsFragment());
-            }else  if (id == R.id.nav_messages) {
-                showFragment(new EmailFragment());
             }else  if (id == R.id.nav_chat) {
                 showFragment(new ChatFragment());
             }else  if (id == R.id.nav_media) {
@@ -170,9 +185,20 @@ public class T4EverMainActivity extends AppCompatActivity {
                     Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
                     Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
                     setForceIcons.invoke(menuPopupHelper, true);
+
+                    Method getPopup = classPopupHelper.getMethod("getPopup");
+                    Object popupWindow = getPopup.invoke(menuPopupHelper);
+                    if (popupWindow instanceof android.widget.PopupWindow) {
+                        ((android.widget.PopupWindow) popupWindow).setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "onSafeClick: ", e);
                 }
+
+                MenuItem settingsItem = popup.getMenu().findItem(R.id.action_sign_out);
+                SpannableString s = new SpannableString(settingsItem.getTitle());
+                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                settingsItem.setTitle(s);
 
                 popup.setOnMenuItemClickListener(item -> {
                     int id = item.getItemId();

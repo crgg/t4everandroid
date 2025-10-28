@@ -25,6 +25,7 @@
 
 
         <include
+            android:id="@+id/item_email_verification"
             layout="@layout/item_email_verification"/>
 
     </LinearLayout>

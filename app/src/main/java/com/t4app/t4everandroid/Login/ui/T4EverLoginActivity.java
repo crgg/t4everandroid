@@ -215,6 +215,7 @@ public class T4EverLoginActivity extends AppCompatActivity {
                                     user.getEmail(),
                                     user.getAvatarUrl(),
                                     token.getToken(),
+                                    user.getEmailVerifiedAt(),
                                     true,
                                     binding.rememberMe.isChecked());
                             startActivity(intent);
@@ -263,6 +264,7 @@ public class T4EverLoginActivity extends AppCompatActivity {
                                     user.getEmail(),
                                     user.getAvatarUrl(),
                                     token.getToken(),
+                                    user.getEmailVerifiedAt(),
                                     true,
                                     binding.rememberMe.isChecked());
                             startActivity(intent);

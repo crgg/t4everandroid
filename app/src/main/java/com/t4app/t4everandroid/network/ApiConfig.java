@@ -9,6 +9,7 @@ public class ApiConfig {
     public static final String LOGOUT_URL = "api/auth/logout";
     public static final String REGISTER_URL = "api/auth/register";
     public static final String ASSISTANTS_URL = "api/assistants";
+    public static final String RESEND_EMAIL_URL = "api/email/resend";
     public static final String GET_USER_INFO = "api/auth/user";
     public static final String ACTIONS_ASSISTANTS_URL = "api/assistants/{uuid}";
     public static final String GET_QUESTIONS_ASSISTANT = "api/assistant-questions";

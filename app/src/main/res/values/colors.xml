@@ -13,9 +13,15 @@
     <color name="second_login_color">#2C4563</color>
     <color name="border_color_buttons">#057AFF</color>
     <color name="green_success">#4CAF50</color>
+    <color name="email_verified_bg">#D1FAE5</color>
+    <color name="email_verified_txt">#065F46</color>
+    <color name="alert_email_verified">#05AB50</color>
     <color name="text_green">#166534</color>
     <color name="soft_green">#C5F8D6</color>
     <color name="alert_color">#FFC107</color>
+    <color name="alert_email_not_verified">#BD8F05</color>
+    <color name="email_not_verified_bg">#D8F4DA7F</color>
+    <color name="change_email_bg">#F8F2A2</color>
     <color name="red">#C13636</color>
     <color name="purple">#7A22AB</color>
     <color name="pink">#9E3581</color>

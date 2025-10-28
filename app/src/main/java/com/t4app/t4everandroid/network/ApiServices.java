@@ -36,7 +36,7 @@ public interface ApiServices {
             @FieldMap Map<String, Object> body
     );
 
-    @POST(ApiConfig.LOGIN_URL)
+    @POST(ApiConfig.LOGIN_WITH_GOOGLE_URL)
     @FormUrlEncoded
     Call<LoginResponse> loginWithGoogle(
             @FieldMap Map<String, Object> body
@@ -74,6 +74,9 @@ public interface ApiServices {
     Call<ResponseCreateAssistant> createAssistant(
             @Body ProfileRequest body
             );
+
+    @POST(ApiConfig.RESEND_EMAIL_URL)
+    Call<JsonObject> resendEmail();
 
     @GET(ApiConfig.GET_QUESTIONS_ASSISTANT)
     Call<ResponseGetAssistantQuestions> getQuestionsAssistant(

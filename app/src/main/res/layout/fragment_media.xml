@@ -58,12 +58,14 @@
             app:cardUseCompatPadding="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             app:cardElevation="2dp"
             app:cardCornerRadius="12dp">
             <LinearLayout
                 android:layout_gravity="center"
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
+                android:background="@color/white"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:gravity="center">
@@ -100,7 +102,8 @@
                 <LinearLayout
                     android:layout_gravity="center"
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:gravity="center">
@@ -174,7 +177,8 @@
                 <LinearLayout
                     android:layout_gravity="center"
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="10dp">
@@ -207,7 +211,8 @@
                 <LinearLayout
                     android:layout_gravity="center"
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="10dp">

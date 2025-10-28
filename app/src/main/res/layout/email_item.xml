@@ -10,6 +10,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+        android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="8dp"

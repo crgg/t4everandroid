@@ -153,6 +153,13 @@ public class SessionManager {
         editor.apply();
     }
 
+    public void setUserEmail(String email) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putString(KEY_USER_EMAIL, email);
+        editor.apply();
+    }
+
 
 
     public static synchronized void initialize(Context ctx) {
@@ -166,6 +173,7 @@ public class SessionManager {
                                 String userEmail,
                                 String avatarUrl,
                                 String tokenKey,
+                                String emailVerifiedAt,
                                 boolean isLogged,
                                 boolean rememberMe){
         SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
@@ -174,6 +182,7 @@ public class SessionManager {
         editor.putString(KEY_USER_EMAIL, userEmail);
         editor.putString(KEY_NAME, name);
         editor.putString(KEY_TOKEN_USER, tokenKey);
+        editor.putString(KEY_EMAIL_VERIFIED_AT, emailVerifiedAt);
         editor.putString(KEY_AVATAR_URL, avatarUrl);
         editor.putBoolean(KEY_IS_LOGGED, isLogged);
         editor.putBoolean(KEY_REMEMBER, rememberMe);

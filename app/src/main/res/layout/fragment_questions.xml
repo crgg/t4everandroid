@@ -64,27 +64,28 @@
                 app:cardCornerRadius="12dp">
 
                 <LinearLayout
-                    android:layout_gravity="center"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
+                    android:background="@color/white"
                     android:layout_height="wrap_content"
-                    android:padding="13dp"
-                    android:gravity="center">
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="13dp">
 
                     <TextView
                         android:id="@+id/total_questions"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/total_questions"
                         android:textColor="@color/text_color"
-                        android:textSize="14sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -140,7 +141,8 @@
                 <LinearLayout
                     android:layout_gravity="center"
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="13dp">
@@ -174,7 +176,8 @@
                 <LinearLayout
                     android:layout_gravity="center"
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="13dp">

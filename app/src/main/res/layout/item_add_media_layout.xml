@@ -194,7 +194,7 @@
                 android:background="@drawable/bg_profile"
                 android:padding="8dp"
                 android:src="@drawable/ic_upload"
-                app:tint="@color/primary_login_color" />
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@+id/upload_title"

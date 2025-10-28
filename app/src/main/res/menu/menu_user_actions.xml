@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_update_profile"
-        android:title="@string/update_profile"
-        android:icon="@drawable/ic_settings_24"
-        app:iconTint="@color/soft_black"/>
-    <item
-        android:id="@+id/action_sign_out"
-        android:title="@string/sign_out"
-        android:icon="@drawable/ic_exit"
-        app:iconTint="@color/soft_black"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/group_profile">
+        <item
+            android:id="@+id/action_update_profile"
+            android:title="@string/update_profile"
+            android:icon="@drawable/ic_settings_24" />
+        <item
+            android:id="@+id/action_sign_out"
+            android:title="@string/sign_out"
+            android:icon="@drawable/ic_exit" />
+    </group>
+
 </menu>

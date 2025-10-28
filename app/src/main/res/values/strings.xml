@@ -286,4 +286,9 @@
     <string name="all">All</string>
     <string name="all_type">All Type</string>
     <string name="mark_all_as_read">Mark all as read</string>
+    <string name="change_email">Change Email</string>
+    <string name="resend_email">Resend Email</string>
+    <string name="email_verified">Email Verified</string>
+    <string name="txt_email_verified">Your account is verified, You can now use the platform.</string>
+    <string name="txt_email_not_verified">Your account is not verified. Please check your email to confirm your account</string>
 </resources>
