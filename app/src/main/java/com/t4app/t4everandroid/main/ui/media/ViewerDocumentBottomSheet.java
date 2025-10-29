@@ -1,8 +1,7 @@
 package com.t4app.t4everandroid.main.ui.media;
 
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,14 +9,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
@@ -34,16 +35,21 @@ import okhttp3.Response;
 public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "VIEWER_MEDIA";
 
+    private ExoPlayer player;
+
     private TextView textContent;
     private TextView fileName;
     private View itemVideoPlayer;
+    private SeekBar seekBarVideo;
     private AudioPlayerView audioPlayerView;
     private ImageView contentImage;
 
-    private VideoView videoView;
+    private PlayerView videoView;
     private ImageButton btnPlayPause;
     private ImageButton btnForward;
     private ImageButton btnRewind;
+
+    private Handler handler;
 
     private Media media;
 
@@ -74,6 +80,7 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
         btnPlayPause = itemVideoPlayer.findViewById(R.id.btnPlayPause);
         btnForward = itemVideoPlayer.findViewById(R.id.btnForward);
         btnRewind = itemVideoPlayer.findViewById(R.id.btnRewind);
+        seekBarVideo = itemVideoPlayer.findViewById(R.id.seekBarVideo);
 
         view.findViewById(R.id.btn_close).setOnClickListener(new SafeClickListener() {
             @Override
@@ -142,40 +149,16 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
                 return;
             case "video":
                 itemVideoPlayer.setVisibility(View.VISIBLE);
-                videoView.setVideoURI(Uri.parse(media.getStorageUrl()));
+                player = new ExoPlayer.Builder(requireContext()).build();
+                videoView.setPlayer(player);
 
-                videoView.setOnPreparedListener(mp -> {
-                    mp.setLooping(false);
-                    videoView.start();
-                    btnPlayPause.setImageResource(R.drawable.ic_pause_48);
-                });
+                String videoUrl = media.getStorageUrl();
+                MediaItem mediaItem = MediaItem.fromUri(videoUrl);
+                player.setMediaItem(mediaItem);
 
-                btnPlayPause.setOnClickListener(v -> {
-                    if (videoView.isPlaying()) {
-                        videoView.pause();
-                        btnPlayPause.setImageResource(R.drawable.ic_play_48);
-                    } else {
-                        videoView.start();
-                        btnPlayPause.setImageResource(R.drawable.ic_pause_48);
-                    }
-                });
+                player.prepare();
+                player.play();
 
-                btnForward.setOnClickListener(v -> {
-                    int pos = videoView.getCurrentPosition() + 5000;
-                    videoView.seekTo(pos);
-                });
-
-                btnRewind.setOnClickListener(v -> {
-                    int pos = videoView.getCurrentPosition() - 5000;
-                    videoView.seekTo(Math.max(pos, 0));
-                });
-
-                videoView.setOnErrorListener((mediaPlayer, i, i1) -> {
-                    Log.d(TAG, "onError LOAD VIDEO");
-                    return false;
-                });
-
-                return;
         }
     }
 
@@ -202,6 +185,44 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
         }
 
         return fileName.replaceFirst("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-", "");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (audioPlayerView != null) {
+            audioPlayerView.cleanupMediaPlayer();
+        }
+        if (handler != null){
+            handler.removeCallbacksAndMessages(null);
+        }
+
+        if (videoView != null){
+            videoView.setPlayer(null);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (player != null) {
+            player.pause();
+            player.release();
+            player = null;
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (audioPlayerView != null && audioPlayerView.isPlaying()) {
+            audioPlayerView.stopPlayback();
+        }
+
+        if (player != null) {
+            player.pause();
+        }
     }
 
 }

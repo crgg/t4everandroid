@@ -1,27 +1,21 @@
-package com.t4app.t4everandroid.main.Models;
+package com.t4app.t4everandroid.network.responses;
 
 import com.google.gson.annotations.SerializedName;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.SessionPagination;
 
-public class ResponseCreateAssistant {
+import java.io.Serializable;
+import java.util.List;
+
+public class ResponseGetAssistants implements Serializable {
     @SerializedName("status")
     private boolean status;
 
-    @SerializedName("msg")
-    private String msg;
-
     @SerializedName("data")
-    private LegacyProfile data;
+    private List<LegacyProfile> data;
 
     @SerializedName("pagination")
     private SessionPagination pagination;
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
 
     public boolean isStatus() {
         return status;
@@ -31,11 +25,11 @@ public class ResponseCreateAssistant {
         this.status = status;
     }
 
-    public LegacyProfile getData() {
+    public List<LegacyProfile> getData() {
         return data;
     }
 
-    public void setData(LegacyProfile data) {
+    public void setData(List<LegacyProfile> data) {
         this.data = data;
     }
 

@@ -27,7 +27,7 @@ import com.t4app.t4everandroid.databinding.ActivityCreateLegacyProfileBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
-import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
+import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import java.text.ParseException;

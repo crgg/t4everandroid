@@ -23,6 +23,17 @@ public class Session implements Serializable {
     @SerializedName("canal")
     private String canal;
 
+    @SerializedName("assistant")
+    private LegacyProfile assistant;
+
+    public LegacyProfile getAssistant() {
+        return assistant;
+    }
+
+    public void setAssistant(LegacyProfile assistant) {
+        this.assistant = assistant;
+    }
+
     public String getId() {
         return id;
     }

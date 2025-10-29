@@ -2,12 +2,9 @@ package com.t4app.t4everandroid.main;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -38,7 +34,7 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
-import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
+import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
 import com.t4app.t4everandroid.main.ui.NotificationsFragment;
@@ -185,12 +181,12 @@ public class T4EverMainActivity extends AppCompatActivity {
                     Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
                     Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
                     setForceIcons.invoke(menuPopupHelper, true);
-
-                    Method getPopup = classPopupHelper.getMethod("getPopup");
-                    Object popupWindow = getPopup.invoke(menuPopupHelper);
-                    if (popupWindow instanceof android.widget.PopupWindow) {
-                        ((android.widget.PopupWindow) popupWindow).setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                    }
+//
+//                    Method getPopup = classPopupHelper.getMethod("getPopup");
+//                    Object popupWindow = getPopup.invoke(menuPopupHelper);
+//                    if (popupWindow instanceof android.widget.PopupWindow) {
+//                        ((android.widget.PopupWindow) popupWindow).setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+//                    }
                 } catch (Exception e) {
                     Log.e(TAG, "onSafeClick: ", e);
                 }
@@ -199,6 +195,11 @@ public class T4EverMainActivity extends AppCompatActivity {
                 SpannableString s = new SpannableString(settingsItem.getTitle());
                 s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
                 settingsItem.setTitle(s);
+
+                MenuItem updateItem = popup.getMenu().findItem(R.id.action_update_profile);
+                SpannableString sI = new SpannableString(settingsItem.getTitle());
+                sI.setSpan(new ForegroundColorSpan(Color.BLACK), 0, sI.length(), 0);
+                updateItem.setTitle(sI);
 
                 popup.setOnMenuItemClickListener(item -> {
                     int id = item.getItemId();

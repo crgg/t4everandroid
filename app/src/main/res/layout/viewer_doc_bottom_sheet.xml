@@ -51,7 +51,7 @@
     <include
         android:visibility="gone"
         android:id="@+id/item_video_player"
-        layout="@layout/dialog_video_player"/>
+        layout="@layout/dialog_player_video"/>
 
     <ImageView
         android:id="@+id/content_image"

@@ -11,9 +11,12 @@ public class ApiConfig {
     public static final String ASSISTANTS_URL = "api/assistants";
     public static final String RESEND_EMAIL_URL = "api/email/resend";
     public static final String GET_USER_INFO = "api/auth/user";
+    public static final String GET_INTERACTIONS = "api/interactions";
     public static final String ACTIONS_ASSISTANTS_URL = "api/assistants/{uuid}";
     public static final String GET_QUESTIONS_ASSISTANT = "api/assistant-questions";
     public static final String UPDATE_PROFILE_URL = "api/update-user-info";
+    public static final String START_SESSION_URL = "api/sessions/start";
+    public static final String END_SESSION_URL = "api/sessions/{session_id}/end";
     public static final String CHANGE_PASSWORD_URL = "api/change-password";
     public static final String UPLOAD_PROFILE_IMAGE_URL = "api/upload-avatar-picture";
     public static final String UPLOAD_MEDIA = "api/media";

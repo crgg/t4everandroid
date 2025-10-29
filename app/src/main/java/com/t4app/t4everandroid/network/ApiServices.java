@@ -1,15 +1,18 @@
 package com.t4app.t4everandroid.network;
 
 import com.google.gson.JsonObject;
-import com.t4app.t4everandroid.Login.models.LoginResponse;
+import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
-import com.t4app.t4everandroid.main.Models.ResponseCreateAssistant;
-import com.t4app.t4everandroid.main.Models.ResponseCreateMedia;
-import com.t4app.t4everandroid.main.Models.ResponseGetAssistantQuestions;
-import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
-import com.t4app.t4everandroid.main.Models.ResponseGetMedia;
-import com.t4app.t4everandroid.main.Models.ResponseGetUserInfo;
-import com.t4app.t4everandroid.main.Models.ResponseUpdateProfile;
+import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
+import com.t4app.t4everandroid.network.responses.ResponseCreateInteraction;
+import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
+import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
+import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
+import com.t4app.t4everandroid.network.responses.ResponseGetInteractions;
+import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
+import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
+import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
+import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 
 import java.util.Map;
 
@@ -95,8 +98,29 @@ public interface ApiServices {
             @FieldMap Map<String, Object> body
     );
 
+    @POST(ApiConfig.END_SESSION_URL)
+    Call<ResponseStartEndSession> endSession(
+            @Path("session_id") String clientId
+    );
+
+    @POST(ApiConfig.GET_INTERACTIONS)
+    Call<ResponseCreateInteraction> sendInteraction(
+            @Body Map<String, Object> body
+    );
+
+    @POST(ApiConfig.START_SESSION_URL)
+    @FormUrlEncoded
+    Call<ResponseStartEndSession> startSession(
+            @FieldMap Map<String, Object> body
+    );
+
     @GET(ApiConfig.GET_USER_INFO)
     Call<ResponseGetUserInfo> getUserInfo();
+
+    @GET(ApiConfig.GET_INTERACTIONS)
+    Call<ResponseGetInteractions> getInteractions(
+            @Query("session_id") String sessionId
+    );
 
     @POST(ApiConfig.UPLOAD_PROFILE_IMAGE_URL)
     @Multipart

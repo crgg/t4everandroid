@@ -24,7 +24,7 @@ import com.t4app.t4everandroid.databinding.FragmentQuestionsBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.ListItem;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.ResponseGetAssistantQuestions;
+import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.QuestionGroupedAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
@@ -147,6 +147,38 @@ public class QuestionsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        binding.itemSearch.searchValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                String value = s.toString();
+                if (!value.isEmpty()) {
+                    List<Question> searchResourceList = new ArrayList<>();
+                    for (Question object : questions) {
+                        String nameDevice = object.getQuestion();
+                        if (nameDevice.toLowerCase().contains(value.toLowerCase())) {
+                            searchResourceList.add(object);
+                        }
+                    }
+                    List<Question> dataSearch = new ArrayList<>(searchResourceList);
+
+//                    checkFoundData(dataSearch, noFoundDataTv, getString(R.string.customer));
+                    adapter.updateList(groupByCategory(dataSearch, null));
+                } else {
+                    adapter.updateList(groupByCategory(questions, null));
+                }
+            }
+        });
+
         bottomSheet.setListener(new CreateQuestionBottomSheet.CreateQuestionListener() {
             @Override
             public void onQuestionCreated(Question question) {
@@ -222,7 +254,7 @@ public class QuestionsFragment extends Fragment {
                     if (body != null){
                         if (body.isStatus()){
                             GlobalDataCache.questions.addAll(body.getQuestions());
-                            questions.addAll(body.getQuestions());
+//                            questions.addAll(body.getQuestions());
                             if (adapter != null){
                                 Log.d(TAG, "UPDATE LIST " + body.getQuestions().size());
                                 adapter.updateList(groupByCategory(body.getQuestions(), null));

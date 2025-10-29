@@ -82,6 +82,13 @@ public class RecordAudioActivity extends AppCompatActivity {
         binding = ActivityRecordAudioBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        binding.backRecordBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                finish();
+            }
+        });
+
         binding.startRecordingBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {

@@ -106,7 +106,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             iconPlay.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
-                    int currentPos = getAdapterPosition();
+                    int currentPos = getAbsoluteAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
                         listener.onView(media, currentPos);
                     }
@@ -116,7 +116,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             iconDownload.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
-                    int currentPos = getAdapterPosition();
+                    int currentPos = getAbsoluteAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
                         listener.onDownload(media, currentPos);
                     }
@@ -126,7 +126,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             btnDelete.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
-                    int currentPos = getAdapterPosition();
+                    int currentPos = getAbsoluteAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
                         listener.onDelete(media, currentPos);
                     }

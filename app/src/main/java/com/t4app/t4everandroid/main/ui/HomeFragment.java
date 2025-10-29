@@ -16,7 +16,8 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentHomeBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
-import com.t4app.t4everandroid.main.Models.ResponseGetAssistants;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
@@ -53,7 +54,6 @@ public class HomeFragment extends Fragment {
         View view = binding.getRoot();
 
         binding.welcomeItem.welcomeMessage.setText(getString(R.string.welcome, sessionManager.getName()));
-        //TODO:OPTIMIZE THIS CREATE GLOBAL CACHE OR SOMETHING TO SAVE STATE AND ADD IN DIFF FRAGMENTS
         if (GlobalDataCache.legacyProfiles == null){
             getAssistants();
         }else{
@@ -146,6 +146,15 @@ public class HomeFragment extends Fragment {
                                     binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
                                     binding.scheduledMessagesItem.countMessages.setText("0");
                                 }else{
+                                    if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()){
+                                        for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles){
+                                            if (legacyProfile.getOpenSession() != null){
+                                                GlobalDataCache.legacyProfileSelected = legacyProfile;
+                                                GlobalDataCache.sessionId = legacyProfile.getOpenSession().getId();
+                                                break;
+                                            }
+                                        }
+                                    }
                                     binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
                                     binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
                                     binding.scheduledMessagesItem.countMessages.setText("0");

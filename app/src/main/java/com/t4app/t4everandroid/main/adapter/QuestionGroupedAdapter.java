@@ -103,7 +103,7 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             btnDelete.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
-                    int currentPos = getAdapterPosition();
+                    int currentPos = getAbsoluteAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
                         listener.onDelete(question, currentPos);
                     }
@@ -113,7 +113,7 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             btnEdit.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
-                    int currentPos = getAdapterPosition();
+                    int currentPos = getAbsoluteAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
                         listener.onEdit(question, currentPos);
                     }
@@ -124,6 +124,7 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     public void updateList(List<ListItem> newList) {
+        items.clear();
         this.items = newList;
         notifyDataSetChanged();
     }

@@ -18,7 +18,7 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/emailLayout"
+            android:id="@+id/search_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:boxBackgroundMode="outline"
@@ -26,9 +26,10 @@
             app:startIconDrawable="@drawable/ic_search">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/emailValue"
+                android:id="@+id/search_value"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:textColor="@color/text_color"
                 android:paddingVertical="8dp"
                 android:hint="@string/search_questions"
                 android:textColorHint="@color/gray_hint"
@@ -56,6 +57,7 @@
                 android:inputType="none"
                 android:clickable="true"
                 android:importantForAutofill="no"
+                android:textColor="@color/text_color"
                 android:cursorVisible="false"
                 android:focusable="false"
                 android:layout_weight="1"

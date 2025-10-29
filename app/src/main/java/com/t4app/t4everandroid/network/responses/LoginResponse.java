@@ -1,6 +1,8 @@
-package com.t4app.t4everandroid.Login.models;
+package com.t4app.t4everandroid.network.responses;
 
 import com.google.gson.annotations.SerializedName;
+import com.t4app.t4everandroid.Login.models.ApiError;
+import com.t4app.t4everandroid.Login.models.Token;
 
 import java.io.Serializable;
 

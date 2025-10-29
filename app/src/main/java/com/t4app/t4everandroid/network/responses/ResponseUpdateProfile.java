@@ -1,18 +1,19 @@
-package com.t4app.t4everandroid.main.Models;
+package com.t4app.t4everandroid.network.responses;
 
 import com.google.gson.annotations.SerializedName;
+import com.t4app.t4everandroid.Login.models.User;
 
 import java.io.Serializable;
 
-public class ResponseCreateMedia implements Serializable {
+public class ResponseUpdateProfile implements Serializable {
     @SerializedName("status")
     private boolean status;
 
     @SerializedName("msg")
-    private String msg;
+    private String message;
 
     @SerializedName("data")
-    private Media data;
+    private User data;
 
     public boolean isStatus() {
         return status;
@@ -22,19 +23,19 @@ public class ResponseCreateMedia implements Serializable {
         this.status = status;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public Media getData() {
+    public User getData() {
         return data;
     }
 
-    public void setData(Media data) {
+    public void setData(User data) {
         this.data = data;
     }
 }

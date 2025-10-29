@@ -81,7 +81,7 @@ public class EmailAdapter  extends RecyclerView.Adapter<EmailAdapter.ViewHolder>
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null){
-                int currentPos = holder.getAdapterPosition();
+                int currentPos = holder.getAbsoluteAdapterPosition();
                 if (currentPos != RecyclerView.NO_POSITION){
                     listener.onItemClick(email, currentPos);
                 }

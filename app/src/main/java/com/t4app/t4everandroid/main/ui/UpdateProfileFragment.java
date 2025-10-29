@@ -39,7 +39,7 @@ import com.t4app.t4everandroid.SelectImageUtils;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentUpdateProfileBinding;
 import com.t4app.t4everandroid.databinding.ItemChangePasswordBinding;
-import com.t4app.t4everandroid.main.Models.ResponseUpdateProfile;
+import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.network.ApiServices;
 

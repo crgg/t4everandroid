@@ -11,8 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.chip.Chip;
-import com.t4app.t4everandroid.R;
-import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentEmailBinding;
 import com.t4app.t4everandroid.main.Models.EmailTest;
 import com.t4app.t4everandroid.main.adapter.EmailAdapter;
@@ -27,7 +25,7 @@ public class EmailFragment extends Fragment {
     public EmailFragment() {
     }
 
-    public static EmailFragment newInstance(String param1, String param2) {
+    public static EmailFragment newInstance() {
         return new EmailFragment();
     }
 

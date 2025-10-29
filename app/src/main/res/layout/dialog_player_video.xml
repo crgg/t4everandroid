@@ -8,19 +8,22 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <VideoView
+    <androidx.media3.ui.PlayerView
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:id="@+id/videoView"
+        app:use_controller="true"
+        android:keepScreenOn="true"
+        app:show_buffering="when_playing"
         android:layout_width="match_parent"
         android:layout_height="460dp"
         android:layout_weight="1"
-        android:layout_gravity="center"
-        android:keepScreenOn="true" />
+        android:layout_gravity="center" />
 
     <LinearLayout
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/videoView"
         app:layout_constraintEnd_toEndOf="@id/videoView"
         app:layout_constraintBottom_toBottomOf="@id/videoView"

@@ -53,6 +53,11 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
+    implementation("androidx.media3:media3-exoplayer:1.8.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.8.0")
+    implementation("androidx.media3:media3-ui:1.8.0")
+    implementation("androidx.media3:media3-ui-compose:1.8.0")
+
     implementation ("androidx.room:room-runtime:2.8.2")
     annotationProcessor ("androidx.room:room-compiler:2.8.2")
     implementation ("androidx.room:room-ktx:2.8.2")

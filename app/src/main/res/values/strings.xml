@@ -291,4 +291,5 @@
     <string name="email_verified">Email Verified</string>
     <string name="txt_email_verified">Your account is verified, You can now use the platform.</string>
     <string name="txt_email_not_verified">Your account is not verified. Please check your email to confirm your account</string>
+    <string name="write_a_message">Write a message...</string>
 </resources>

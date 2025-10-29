@@ -1,6 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.T4EverAndroid" parent="Theme.Material3.DayNight.NoActionBar">
 
+        <item name="colorPrimary">@color/second_login_color</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="textInputStyle">@style/CustomTextInputLayoutStyle</item>
+        <item name="editTextStyle">@style/CustomTextInputEditTextStyle</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+
     </style>
 
     <style name="Theme.T4EverAndroid" parent="Base.Theme.T4EverAndroid" />

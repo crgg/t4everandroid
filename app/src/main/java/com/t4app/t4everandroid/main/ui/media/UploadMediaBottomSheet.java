@@ -32,7 +32,7 @@ import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.GlobalDataCache;
-import com.t4app.t4everandroid.main.Models.ResponseCreateMedia;
+import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import java.io.ByteArrayOutputStream;

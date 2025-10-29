@@ -55,7 +55,6 @@
             android:id="@+id/buttonLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp"
@@ -66,6 +65,29 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:text="@string/cancel"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textSize="13sp"
+                android:layout_gravity="start"
+                app:cornerRadius="8dp"
+                style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                app:strokeColor="@color/red"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/red"
+                android:textColor="@color/red" />
+
+            <View
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/take_another_btn"
@@ -86,7 +108,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/save_btn"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="43dp"
                 android:text="@string/save"

@@ -29,7 +29,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.AppUtils;
 import com.t4app.t4everandroid.ErrorUtils;
-import com.t4app.t4everandroid.Login.models.LoginResponse;
+import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.Login.models.Token;
 import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.MessagesUtils;

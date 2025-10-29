@@ -510,6 +510,7 @@ public class MessagesUtils {
 
             ImageView imagePreview = dialogView.findViewById(R.id.image_preview);
             MaterialButton takeAnotherBtn = dialogView.findViewById(R.id.take_another_btn);
+            MaterialButton cancelBtn = dialogView.findViewById(R.id.cancel_btn);
             MaterialButton saveBtn = dialogView.findViewById(R.id.save_btn);
             if (isGallery){
                 takeAnotherBtn.setText(R.string.select_another_image);
@@ -518,6 +519,13 @@ public class MessagesUtils {
             }
 
             imagePreview.setImageURI(uri);
+            cancelBtn.setOnClickListener(new SafeClickListener() {
+                @Override
+                public void onSafeClick(View v) {
+                    currentDialog.dismiss();
+                    isDialogShowing = false;
+                }
+            });
 
             saveBtn.setOnClickListener(new SafeClickListener() {
                 @Override

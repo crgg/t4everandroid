@@ -1,6 +1,5 @@
 package com.t4app.t4everandroid.main.ui;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -21,14 +20,12 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
-import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentSettingsBinding;
-import com.t4app.t4everandroid.main.GlobalDataCache;
-import com.t4app.t4everandroid.main.Models.ResponseUpdateProfile;
+import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import java.util.HashMap;

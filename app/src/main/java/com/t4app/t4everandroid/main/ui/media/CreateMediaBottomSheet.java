@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -42,8 +44,7 @@ import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.GlobalDataCache;
-import com.t4app.t4everandroid.main.Models.Media;
-import com.t4app.t4everandroid.main.Models.ResponseCreateMedia;
+import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
 import com.t4app.t4everandroid.network.ApiServices;
 
 import java.io.ByteArrayOutputStream;
@@ -505,14 +506,34 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
         VideoView videoView = view.findViewById(R.id.videoView);
         ImageButton btnPlayPause = view.findViewById(R.id.btnPlayPause);
         ImageButton btnForward = view.findViewById(R.id.btnForward);
+        SeekBar seekBar = view.findViewById(R.id.seekBarVideo);
         ImageButton btnRewind = view.findViewById(R.id.btnRewind);
 
         videoView.setVideoURI(videoUri);
 
         videoView.setOnPreparedListener(mp -> {
             mp.setLooping(false);
+            seekBar.setMax(videoView.getDuration());
             videoView.start();
             btnPlayPause.setImageResource(R.drawable.ic_pause_48);
+
+            Handler handler = new Handler();
+            Runnable updateSeekBar = new Runnable() {
+                @Override
+                public void run() {
+                    if (videoView.isPlaying()) {
+                        seekBar.setProgress(videoView.getCurrentPosition());
+                    }
+                    handler.postDelayed(this, 500);
+                }
+            };
+            handler.postDelayed(updateSeekBar, 0);
+
+            videoView.setOnCompletionListener(mediaPlayer -> {
+                handler.removeCallbacks(updateSeekBar);
+                btnPlayPause.setImageResource(R.drawable.ic_play_48);
+                seekBar.setProgress(seekBar.getMax());
+            });
         });
 
         btnPlayPause.setOnClickListener(v -> {
@@ -534,6 +555,26 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
             int pos = videoView.getCurrentPosition() - 5000;
             videoView.seekTo(Math.max(pos, 0));
         });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    videoView.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(view)

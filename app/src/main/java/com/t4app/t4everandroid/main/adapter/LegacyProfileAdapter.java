@@ -16,6 +16,7 @@ import com.google.android.material.button.MaterialButton;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
+import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 
 import java.util.List;
@@ -59,12 +60,29 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
 //            } else {
 //                profileStatus.setVisibility(View.INVISIBLE);
 //            }
+        if (profile.getOpenSession() != null && profile.getLastSession() == null){
+            holder.itemView.post(() -> {
+                int newPos = holder.getBindingAdapterPosition();
+                if (newPos == RecyclerView.NO_POSITION || newPos == lastClicked) return;
+
+                int prevPos = lastClicked;
+                lastClicked = newPos;
+
+                if (prevPos != RecyclerView.NO_POSITION) {
+                    notifyItemChanged(prevPos, "payload_selection");
+                }
+                notifyItemChanged(lastClicked, "payload_selection");
+
+                if (listener != null) listener.onSelect(profile);
+            });
+//            holder.bindSelection(true, activity);
+        }
         holder.bindSelection(position == lastClicked, activity);
 
         holder.selectBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                int newPos = holder.getAdapterPosition();
+                int newPos = holder.getBindingAdapterPosition();
                 if (newPos == RecyclerView.NO_POSITION || newPos == lastClicked) return;
 
                 int prevPos = lastClicked;
@@ -86,7 +104,7 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         holder.editBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                int currentPos = holder.getAdapterPosition();
+                int currentPos = holder.getAbsoluteAdapterPosition();
                 if (currentPos != RecyclerView.NO_POSITION){
                     listener.onEdit(profile, currentPos);
                 }
@@ -95,7 +113,7 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         holder.deleteBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                int currentPos = holder.getAdapterPosition();
+                int currentPos = holder.getAbsoluteAdapterPosition();
                 if (currentPos != RecyclerView.NO_POSITION){
                     listener.onDelete(profile, currentPos);
                 }

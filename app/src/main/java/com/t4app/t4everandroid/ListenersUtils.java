@@ -4,8 +4,13 @@ import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.main.Models.Media;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Question;
+import com.t4app.t4everandroid.main.Models.Session;
 
 public class ListenersUtils {
+
+    public interface OnSessionStartedOrEndCallback{
+        void onSession(Session session);
+    }
 
     public interface ConfirmationCallback {
         void onResult(boolean confirmed);

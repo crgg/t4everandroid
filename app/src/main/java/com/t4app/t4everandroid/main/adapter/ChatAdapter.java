@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,106 +12,90 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.t4app.t4everandroid.R;
-import com.t4app.t4everandroid.main.Models.Message;
+import com.t4app.t4everandroid.main.Models.Interactions;
 
 import java.util.List;
 
-public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.InteractionsVH> {
 
-    private List<Message> messages;
+    private List<Interactions> interactions;
     private Context context;
 
-    private static final int VIEW_TYPE_SENT_TEXT = 1;
-    private static final int VIEW_TYPE_RECEIVED_TEXT = 2;
-
-    public ChatAdapter(Context context, List<Message> messages) {
+    public ChatAdapter(Context context, List<Interactions> interactions) {
         this.context = context;
-        this.messages = messages;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        Message message = messages.get(position);
-        if (message.isSentByUser()) {
-            if (message.getType() == Message.TYPE_TEXT) return VIEW_TYPE_SENT_TEXT;
-        } else {
-            if (message.getType() == Message.TYPE_TEXT) return VIEW_TYPE_RECEIVED_TEXT;
-        }
-        return VIEW_TYPE_RECEIVED_TEXT;
+        this.interactions = interactions;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
-        if (viewType == VIEW_TYPE_SENT_TEXT) {
-            View view = inflater.inflate(R.layout.item_message_sent, parent, false);
-            return new SentTextHolder(view);
-        } else {
-            View view = inflater.inflate(R.layout.item_message_received, parent, false);
-            return new ReceivedTextHolder(view);
-        }
+    public ChatAdapter.InteractionsVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_message_sent, parent, false);
+        return new InteractionsVH(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Message message = messages.get(position);
+    public void onBindViewHolder(@NonNull ChatAdapter.InteractionsVH holder, int position) {
+        Interactions interaction = interactions.get(position);
+        holder.bind(interaction);
 
-        if (holder instanceof SentTextHolder) {
-            ((SentTextHolder) holder).bind(message);
-        } else if (holder instanceof ReceivedTextHolder) {
-            ((ReceivedTextHolder) holder).bind(message);
-        }
     }
 
     @Override
     public int getItemCount() {
-        return messages.size();
+        return interactions.size();
     }
 
-    public static class SentTextHolder extends RecyclerView.ViewHolder {
-        TextView textMessage, textTime;
+    public static class InteractionsVH extends RecyclerView.ViewHolder {
+        LinearLayout sendMessageContainer;
+        TextView textMessage;
+        TextView textTime;
 
-        public SentTextHolder(@NonNull View itemView) {
+        LinearLayout responseMessageContainer;
+        TextView textMessageAssistant;
+        TextView textTimeAssistant;
+        public InteractionsVH(@NonNull View itemView) {
             super(itemView);
+            sendMessageContainer = itemView.findViewById(R.id.send_message_container);
             textMessage = itemView.findViewById(R.id.textMessage);
             textTime = itemView.findViewById(R.id.textTime);
+
+            responseMessageContainer = itemView.findViewById(R.id.response_message_container);
+            textMessageAssistant = itemView.findViewById(R.id.textMessageAssistant);
+            textTimeAssistant = itemView.findViewById(R.id.textTimeAssistant);
         }
 
-        void bind(Message message) {
-            textMessage.setText(message.getContent());
-            textTime.setText(message.getTime());
-        }
-    }
-
-    public static class ReceivedTextHolder extends RecyclerView.ViewHolder {
-        TextView textMessage, textTime;
-
-        public ReceivedTextHolder(@NonNull View itemView) {
-            super(itemView);
-            textMessage = itemView.findViewById(R.id.textMessage);
-            textTime = itemView.findViewById(R.id.textTime);
-        }
-
-        void bind(Message message) {
-            textMessage.setText(message.getContent());
-            textTime.setText(message.getTime());
+        void bind(Interactions interaction) {
+            if (interaction.getAssistantTextResponse() != null){
+                responseMessageContainer.setVisibility(View.VISIBLE);
+                textMessageAssistant.setText(interaction.getAssistantTextResponse());
+                textTimeAssistant.setText(interaction.getTimestamp());
+            }else{
+                responseMessageContainer.setVisibility(View.GONE);
+                textMessage.setText(interaction.getTextFromUser());
+                textTime.setText(interaction.getTimestamp());
+            }
         }
     }
 
-    public void updateMessages(List<Message> newMessages) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MessageDiffCallback(this.messages, newMessages));
-        this.messages.clear();
-        this.messages.addAll(newMessages);
+    public void updateMessages(List<Interactions> newMessages) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MessageDiffCallback(this.interactions, newMessages));
+        this.interactions.clear();
+        this.interactions.addAll(newMessages);
         diffResult.dispatchUpdatesTo(this);
     }
 
-    public static class MessageDiffCallback extends DiffUtil.Callback {
-        private final List<Message> oldList;
-        private final List<Message> newList;
+    public void addMessage(Interactions message) {
+        if (message == null) return;
+        interactions.add(message);
+        notifyItemInserted(interactions.size() - 1);
+    }
 
-        public MessageDiffCallback(List<Message> oldList, List<Message> newList) {
+    public static class MessageDiffCallback extends DiffUtil.Callback {
+        private final List<Interactions> oldList;
+        private final List<Interactions> newList;
+
+        public MessageDiffCallback(List<Interactions> oldList, List<Interactions> newList) {
             this.oldList = oldList;
             this.newList = newList;
         }

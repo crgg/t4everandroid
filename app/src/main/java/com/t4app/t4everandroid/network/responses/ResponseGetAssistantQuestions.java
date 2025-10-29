@@ -1,6 +1,8 @@
-package com.t4app.t4everandroid.main.Models;
+package com.t4app.t4everandroid.network.responses;
 
 import com.google.gson.annotations.SerializedName;
+import com.t4app.t4everandroid.main.Models.Question;
+import com.t4app.t4everandroid.main.Models.Scale;
 
 import java.io.Serializable;
 import java.util.List;
