@@ -92,6 +92,14 @@ public class LegacyProfilesFragment extends Fragment {
             }
         });
 
+        binding.itemNoProfilesCreated.createFirstProfile.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                Intent intent = new Intent(requireActivity(), CreateLegacyProfileActivity.class);
+                launcher.launch(intent);
+            }
+        });
+
         adapter = new LegacyProfileAdapter(GlobalDataCache.legacyProfiles, requireActivity(), new ListenersUtils.OnProfileActionListener() {
             @Override
             public void onSelect(LegacyProfile profile) {

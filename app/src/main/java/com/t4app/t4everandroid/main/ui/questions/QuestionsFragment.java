@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,6 +25,7 @@ import com.t4app.t4everandroid.databinding.FragmentQuestionsBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.ListItem;
 import com.t4app.t4everandroid.main.Models.Question;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.QuestionGroupedAdapter;
@@ -70,6 +72,8 @@ public class QuestionsFragment extends Fragment {
 
         if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
             binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
+            binding.addNewQuestionBtn.setEnabled(false);
+            binding.addNewQuestionBtn.setAlpha(0.5f);
 
             binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
             binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
@@ -107,6 +111,7 @@ public class QuestionsFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new LegacyProfilesFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_legacy_profiles);
             }
         });
 
@@ -134,6 +139,11 @@ public class QuestionsFragment extends Fragment {
                 bottomSheet.setEdit(true);
                 bottomSheet.setQuestionEdit(questionTest);
                 bottomSheet.setUpdatePos(pos);
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
+                if (prev != null) {
+                    fm.beginTransaction().remove(prev).commit();
+                }
                 bottomSheet.show(requireActivity().getSupportFragmentManager(), "CreateQuestionBottomSheet");
             }
         });
@@ -207,6 +217,11 @@ public class QuestionsFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 bottomSheet.setEdit(false);
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
+                if (prev != null) {
+                    fm.beginTransaction().remove(prev).commit();
+                }
                 bottomSheet.show(requireActivity().getSupportFragmentManager(), "CreateQuestionBottomSheet");
             }
         });
@@ -214,6 +229,11 @@ public class QuestionsFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 bottomSheet.setEdit(false);
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
+                if (prev != null) {
+                    fm.beginTransaction().remove(prev).commit();
+                }
                 bottomSheet.show(requireActivity().getSupportFragmentManager(), "CreateQuestionBottomSheet");
             }
         });

@@ -19,6 +19,7 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentChatBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.Interactions;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.ChatAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
@@ -80,6 +81,7 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void onSafeClick(View v) {
                     showFragment(new LegacyProfilesFragment());
+                    ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_legacy_profiles);
                 }
             });
 
@@ -87,6 +89,7 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void onSafeClick(View v) {
                     showFragment(new LegacyProfilesFragment());
+                    ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_legacy_profiles);
                 }
             });
         }

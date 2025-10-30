@@ -292,4 +292,17 @@
     <string name="txt_email_verified">Your account is verified, You can now use the platform.</string>
     <string name="txt_email_not_verified">Your account is not verified. Please check your email to confirm your account</string>
     <string name="write_a_message">Write a message...</string>
+    <string name="all_types">All Types</string>
+    <string name="information">Information</string>
+    <string name="warning">Warning</string>
+    <string name="error">Error</string>
+    <string name="unread">Unread</string>
+    <string name="read">Read</string>
+    <string name="type_notification">Type Notification</string>
+    <string name="search_notification">Search Notification</string>
+    <string name="search">Search...</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="view_image">View Image</string>
+    <string name="view_text">View Text</string>
+    <string name="click_to_select_other_file">Click to select other file</string>
 </resources>

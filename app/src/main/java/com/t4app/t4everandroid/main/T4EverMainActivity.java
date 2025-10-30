@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -282,6 +283,13 @@ public class T4EverMainActivity extends AppCompatActivity {
         });
     }
 
+    public void selectNavItem(int itemId) {
+        Menu menu = navigationView.getMenu();
+        for(int i = 0; i < menu.size(); i++){
+            MenuItem item = menu.getItem(i);
+            item.setChecked(item.getItemId() == itemId);
+        }
+    }
 
 
 }

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.button.MaterialButton;
@@ -36,6 +37,7 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentMediaBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.Media;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
 import com.t4app.t4everandroid.main.adapter.MediaAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
@@ -88,7 +90,8 @@ public class MediaFragment extends Fragment {
 
         if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
             binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
-
+            binding.createNewMediaBtn.setEnabled(false);
+            binding.createNewMediaBtn.setAlpha(0.5f);
             binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
             binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
 
@@ -116,6 +119,7 @@ public class MediaFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new LegacyProfilesFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_legacy_profiles);
             }
         });
         mediaTestList = new ArrayList<>();
@@ -142,6 +146,11 @@ public class MediaFragment extends Fragment {
             @Override
             public void onView(Media mediaTest, int pos) {
                 viewerDocumentBottomSheet.setMedia(mediaTest);
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                Fragment prev = fm.findFragmentByTag("viewer_doc");
+                if (prev != null) {
+                    fm.beginTransaction().remove(prev).commit();
+                }
                 viewerDocumentBottomSheet.show(getChildFragmentManager(), "viewer_doc");
             }
         });
@@ -215,6 +224,11 @@ public class MediaFragment extends Fragment {
         uploadNewMedia.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                Fragment prev = fm.findFragmentByTag("add_media");
+                if (prev != null) {
+                    fm.beginTransaction().remove(prev).commit();
+                }
                 uploadMediaBottomSheet.show(getChildFragmentManager(), "add_media");
                 dialog.dismiss();
             }
@@ -223,6 +237,11 @@ public class MediaFragment extends Fragment {
         recordNewMedia.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                Fragment prev = fm.findFragmentByTag("create_media");
+                if (prev != null) {
+                    fm.beginTransaction().remove(prev).commit();
+                }
                 createMediaBottomSheet.show(getChildFragmentManager(), "create_media");
                 dialog.dismiss();
             }

@@ -1,7 +1,13 @@
 package com.t4app.t4everandroid.main.ui.legacyProfile;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -10,26 +16,38 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.CameraPermissionManager;
 import com.t4app.t4everandroid.ErrorUtils;
+import com.t4app.t4everandroid.ImageSelectorBottomSheet;
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
+import com.t4app.t4everandroid.SelectImageUtils;
 import com.t4app.t4everandroid.databinding.ActivityCreateLegacyProfileBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +58,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -55,6 +76,18 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private AutoCompleteTextView autoCountry, autoLanguage;
 
     private LegacyProfile profile;
+
+    private ActivityResultLauncher<Uri> cameraLauncher;
+    private ActivityResultLauncher<Intent> galleryLauncher;
+    private Uri photoUri;
+    private Uri realPdfUri;
+    private File photoFile;
+
+    private SelectImageUtils selectImageUtils;
+
+    private ActivityResultLauncher<String> cameraPermissionLauncher;
+    private CameraPermissionManager.PermissionCallback permissionCallback;
+    private ImageSelectorBottomSheet bottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +105,70 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         initViews();
+
+        selectImageUtils = new SelectImageUtils(this);
+
+        galleryLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        if (imageUri != null){
+                            photoUri = imageUri;
+                            MessagesUtils.showPreviewImage(CreateLegacyProfileActivity.this, photoUri, true, new ListenersUtils.OnActionPreviewImageListener() {
+                                @Override
+                                public void onSaveImage() {
+                                    realPdfUri = imageUri;
+                                    Glide.with(CreateLegacyProfileActivity.this)
+                                            .load(realPdfUri)
+                                            .transform(new CircleCrop())
+                                            .into(binding.uploadImageBtn);
+                                    binding.iconUpload.setImageTintList(ColorStateList.valueOf(
+                                            ContextCompat.getColor(CreateLegacyProfileActivity.this, R.color.second_login_color)
+                                    ));
+                                }
+
+                                @Override
+                                public void onTakeAnother() {
+                                    openGallery();
+                                }
+                            });
+                        }
+
+                    }
+                }
+        );
+
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.TakePicture(),
+                success -> {
+                    if (success && photoUri != null) {
+                        MessagesUtils.showPreviewImage(CreateLegacyProfileActivity.this, photoUri, false, new ListenersUtils.OnActionPreviewImageListener() {
+                            @Override
+                            public void onSaveImage() {
+                                realPdfUri = photoUri;
+                                Glide.with(CreateLegacyProfileActivity.this)
+                                        .load(realPdfUri)
+                                        .transform(new CircleCrop())
+                                        .into(binding.uploadImageBtn);
+                                binding.iconUpload.setImageTintList(ColorStateList.valueOf(
+                                        ContextCompat.getColor(CreateLegacyProfileActivity.this, R.color.second_login_color)
+                                ));
+                            }
+
+                            @Override
+                            public void onTakeAnother() {
+                                openCamera();
+                            }
+                        });
+                    }
+                }
+        );
+
+        bottomSheet = getImageSelectorBottomSheet();
+
+        setupPermissionCallback();
+        setupPermissionLauncher();
 
         binding.backBtn.setOnClickListener(new SafeClickListener() {
             @Override
@@ -102,13 +199,6 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             @Override
             public void onSafeClick(View v) {
                 showDatePicker(binding.deathdateValue);
-            }
-        });
-
-        binding.uploadImageBtn.setOnClickListener(new SafeClickListener() {
-            @Override
-            public void onSafeClick(View v) {
-                //TODO:UPLOAD IMAGE PROFILE LEGACY PROFILE
             }
         });
 
@@ -146,6 +236,13 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                         createUser(request);
                     }
                 }
+            }
+        });
+
+        binding.uploadImageBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                bottomSheet.show(getSupportFragmentManager(), "ImageSelector");
             }
         });
     }
@@ -375,6 +472,30 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         autoLanguage = findViewById(R.id.auto_language);
     }
 
+    @NonNull
+    private ImageSelectorBottomSheet getImageSelectorBottomSheet() {
+        ImageSelectorBottomSheet bottomSheet = new ImageSelectorBottomSheet();
+        bottomSheet.setListener(new ImageSelectorBottomSheet.Listener() {
+            @Override
+            public void onCameraSelected() {
+                if (CameraPermissionManager.hasCameraPermission(CreateLegacyProfileActivity.this)){
+                    openCamera();
+                }else{
+                    CameraPermissionManager.requestCameraPermission(
+                            CreateLegacyProfileActivity.this,
+                            cameraPermissionLauncher,
+                            permissionCallback);
+                }
+            }
+
+            @Override
+            public void onGallerySelected() {
+                openGallery();
+            }
+        });
+        return bottomSheet;
+    }
+
     private void clearErrors() {
         fullNameLayout.setError(null);
         aliasLayout.setError(null);
@@ -421,6 +542,83 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             Log.e(TAG, "calculateAge: ", e);
             return 0;
         }
+    }
+
+    private void setupPermissionCallback() {
+        permissionCallback = new CameraPermissionManager.PermissionCallback() {
+            @Override
+            public void onPermissionGranted() {
+                openCamera();
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                MessagesUtils.showErrorDialog(CreateLegacyProfileActivity.this,getString(R.string.permission_to_use_camera_denied));
+            }
+
+            @Override
+            public void onPermissionPermanentlyDenied() {
+                CameraPermissionManager.showPermanentlyDeniedDialog(CreateLegacyProfileActivity.this);
+            }
+        };
+    }
+
+    private void uploadImageUser(){
+        try {
+            Log.d(TAG, "uploadImageUser: ");
+            File file = selectImageUtils.getFileFromUri(realPdfUri);
+            RequestBody requestFile = RequestBody.create(file, MediaType.parse("image/*"));
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+            ApiServices apiServices = AppController.getApiServices();
+            Call<ResponseUpdateProfile> call = apiServices.uploadImageProfile(body);
+            call.enqueue(new Callback<>() {
+                @Override
+                public void onResponse(Call<ResponseUpdateProfile> call, Response<ResponseUpdateProfile> response) {
+                    if (response.isSuccessful()){
+                        ResponseUpdateProfile body = response.body();
+                        if (body != null){
+                            if (body.isStatus()){
+                                if (body.getData() != null){
+                                    Log.d(TAG, "AVATAR URL :  " + body.getData().getAvatarUrl());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseUpdateProfile> call, Throwable throwable) {
+                    Log.e(TAG, "Upload Image Error Throw" + throwable.getMessage());
+                }
+            });
+        }catch (Exception e){
+            Log.e(TAG, "Upload Image Error " + e);
+        }
+
+    }
+
+    private void setupPermissionLauncher() {
+        cameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> CameraPermissionManager.handlePermissionResult(
+                        isGranted, CreateLegacyProfileActivity.this, permissionCallback));
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(intent);
+    }
+
+    private void openCamera() {
+        photoFile = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                "photo_" + System.currentTimeMillis() + ".jpg");
+        photoUri = FileProvider.getUriForFile(
+                this,
+                getPackageName() + ".provider",
+                photoFile
+        );
+        cameraLauncher.launch(photoUri);
     }
 
 

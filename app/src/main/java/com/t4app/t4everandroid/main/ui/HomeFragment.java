@@ -17,6 +17,7 @@ import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentHomeBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
@@ -74,6 +75,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new LegacyProfilesFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_legacy_profiles);
             }
         });
 
@@ -81,6 +83,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new LegacyProfilesFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_legacy_profiles);
             }
         });
 
@@ -88,13 +91,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new MediaFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_media);
             }
         });
 
         binding.scheduledMessagesItem.getRoot().setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                showFragment(new EmailFragment());
+                showFragment(new ChatFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
             }
         });
 
@@ -102,6 +107,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new QuestionsFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_questions);
             }
         });
 
@@ -109,6 +115,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new QuestionsFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_questions);
             }
         });
 
@@ -116,13 +123,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new MediaFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_media);
             }
         });
 
         binding.itemQuickActions.itemCreateMessage.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                showFragment(new EmailFragment());
+                showFragment(new ChatFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
             }
         });
 

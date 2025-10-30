@@ -39,6 +39,7 @@ import com.t4app.t4everandroid.SelectImageUtils;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentUpdateProfileBinding;
 import com.t4app.t4everandroid.databinding.ItemChangePasswordBinding;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.network.ApiServices;
@@ -270,6 +271,7 @@ public class UpdateProfileFragment extends Fragment {
                                 user.getAvatarUrl(), user.getDateRegister(), user.getLastLogin(), user.getEmailVerifiedAt());
 
                         showFragment(new HomeFragment());
+                        ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_home);
 
                     });
 
@@ -282,6 +284,7 @@ public class UpdateProfileFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showFragment(new HomeFragment());
+                ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_home);
             }
         });
     }

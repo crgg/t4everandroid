@@ -107,12 +107,6 @@ public class EmailFragment extends Fragment {
         });
 
 
-
-
-
-
-
-
     }
 
     private void chipCloseBtnVisibility(Chip chip){

@@ -167,13 +167,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
-                app:chipIconVisible="false"
                 app:closeIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 android:textColor="@color/soft_black"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/personal_no_icon" />
@@ -184,13 +183,13 @@
                 android:layout_height="wrap_content"
                 android:checkable="true"
                 app:chipIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconVisible="false"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/family_no_icon" />
 
@@ -201,12 +200,12 @@
                 android:checkable="true"
                 app:chipIconVisible="false"
                 app:closeIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/career_no_icon" />
 
@@ -217,12 +216,12 @@
                 android:checkable="true"
                 app:chipIconVisible="false"
                 app:closeIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/memories_no_icon"/>
 
@@ -233,12 +232,12 @@
                 android:checkable="true"
                 app:chipIconVisible="false"
                 app:closeIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/photos" />
 
@@ -249,12 +248,12 @@
                 android:checkable="true"
                 app:chipIconVisible="false"
                 app:closeIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/recipes" />
 
@@ -265,12 +264,12 @@
                 android:checkable="true"
                 app:chipIconVisible="false"
                 app:closeIconVisible="false"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:closeIconEnabled="true"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/music" />
 
@@ -282,11 +281,11 @@
                 app:chipIconVisible="false"
                 app:closeIconVisible="false"
                 app:closeIconEnabled="true"
+                app:chipBackgroundColor="@color/soft_gray"
                 app:checkedIconEnabled="false"
                 app:closeIconTint="@color/black"
                 android:textColor="@color/soft_black"
                 app:closeIcon="@drawable/ic_close_chip"
-                android:backgroundTint="@color/soft_gray"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:text="@string/travel" />
 

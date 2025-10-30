@@ -3,10 +3,17 @@ package com.t4app.t4everandroid;
 import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.main.Models.Media;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.Models.Session;
 
 public class ListenersUtils {
+
+    public interface OnNotificationClickListener {
+        void onItemChecked(NotificationItem item, boolean isChecked);
+        void onMarkRead(NotificationItem item, int position);
+        void onDeleteClicked(NotificationItem item, int position);
+    }
 
     public interface OnSessionStartedOrEndCallback{
         void onSession(Session session);

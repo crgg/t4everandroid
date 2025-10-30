@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -59,7 +60,14 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
     private LinearLayout dataContainer;
     private LinearLayout loadContainer;
 
+    private MaterialButton playMedia;
+
+    private TextView uploadTitle;
+    private TextView uploadDescription;
+    private ImageView iconUpload;
     private ListenersUtils.OnMediaAddedListener listener;
+
+    private ViewerDocumentBottomSheet viewerDocumentBottomSheet;
 
     public void setListener(ListenersUtils.OnMediaAddedListener listener) {
         this.listener = listener;
@@ -69,6 +77,8 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        viewerDocumentBottomSheet = new ViewerDocumentBottomSheet();
+
         filePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -76,6 +86,40 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
                         Uri selectedFileUri = result.getData().getData();
                         if (selectedFileUri != null) {
                             fileSelected = selectedFileUri;
+                            viewerDocumentBottomSheet.setUri(fileSelected);
+                            viewerDocumentBottomSheet.setTypeDoc(type);
+                            viewerDocumentBottomSheet.setFromUri(true);
+                            Drawable startDrawable = null;
+                            switch (type){
+                                case "text":
+                                    playMedia.setText(R.string.view_text);
+                                    startDrawable = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_eye);
+                                    iconUpload.setImageResource(R.drawable.ic_doc);
+                                    break;
+                                case "image":
+                                    playMedia.setText(R.string.view_image);
+                                    startDrawable = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_eye);
+                                    iconUpload.setImageResource(R.drawable.ic_gallery);
+                                    break;
+                                case "audio":
+                                    playMedia.setText(R.string.play_audio);
+                                    startDrawable = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_play);
+                                    iconUpload.setImageResource(R.drawable.ic_headset);
+                                    break;
+                                case "video":
+                                    playMedia.setText(R.string.play_video);
+                                    startDrawable = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_play);
+                                    iconUpload.setImageResource(R.drawable.ic_video);
+                                    break;
+                            }
+                            saveMedia.setEnabled(true);
+                            saveMedia.setAlpha(1.0f);
+
+                            uploadTitle.setText(getFileNameFromUri(selectedFileUri));
+                            uploadDescription.setText(R.string.click_to_select_other_file);
+
+                            playMedia.setCompoundDrawablesWithIntrinsicBounds(startDrawable, null, null, null);
+                            playMedia.setVisibility(View.VISIBLE);
                         }
                     }
                 }
@@ -104,22 +148,39 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
         ImageView videoIcon = view.findViewById(R.id.icon_video);
         ImageView imageIcon = view.findViewById(R.id.icon_image);
 
+        iconUpload = view.findViewById(R.id.icon_upload);
+
         TextView text = view.findViewById(R.id.text);
         TextView audio = view.findViewById(R.id.audio);
         TextView video = view.findViewById(R.id.video);
         TextView image = view.findViewById(R.id.image);
 
-        TextView uploadTitle = view.findViewById(R.id.upload_title);
-        TextView uploadDescription = view.findViewById(R.id.upload_description);
+        uploadTitle = view.findViewById(R.id.upload_title);
+        uploadDescription = view.findViewById(R.id.upload_description);
 
         MaterialButton cancelBtn = view.findViewById(R.id.cancel_btn);
+        playMedia = view.findViewById(R.id.play_media);
         saveMedia = view.findViewById(R.id.save_media);
         AppCompatImageButton closeBtn = view.findViewById(R.id.btn_close);
+
+        playMedia.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                viewerDocumentBottomSheet.show(getChildFragmentManager(), "view_media");
+            }
+        });
 
         optionText.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
                 type = "text";
+
+                saveMedia.setEnabled(false);
+                saveMedia.setAlpha(0.5f);
+
+                fileSelected = null;
+                playMedia.setVisibility(View.GONE);
+                iconUpload.setImageResource(R.drawable.ic_upload);
 
                 uploadTitle.setText(R.string.upload_a_file);
                 uploadDescription.setText(R.string.click_to_select_txt_up_to_50mb);
@@ -163,6 +224,13 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
             public void onSafeClick(View v) {
                 type = "audio";
 
+                saveMedia.setEnabled(false);
+                saveMedia.setAlpha(0.5f);
+
+                fileSelected = null;
+                playMedia.setVisibility(View.GONE);
+                iconUpload.setImageResource(R.drawable.ic_upload);
+
                 uploadTitle.setText(R.string.upload_an_audio);
                 uploadDescription.setText(R.string.click_to_select_mp3_wav_ogg_up_to_50mb);
 
@@ -204,6 +272,13 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
             public void onSafeClick(View v) {
                 type = "video";
 
+                saveMedia.setEnabled(false);
+                saveMedia.setAlpha(0.5f);
+
+                fileSelected = null;
+                playMedia.setVisibility(View.GONE);
+                iconUpload.setImageResource(R.drawable.ic_upload);
+
                 uploadTitle.setText(R.string.upload_a_video);
                 uploadDescription.setText(R.string.click_to_select_mp4_webm_ogg_up_to_100mb);
 
@@ -244,6 +319,13 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onSafeClick(View v) {
                 type = "image";
+
+                saveMedia.setEnabled(false);
+                saveMedia.setAlpha(0.5f);
+
+                fileSelected = null;
+                playMedia.setVisibility(View.GONE);
+                iconUpload.setImageResource(R.drawable.ic_upload);
 
                 uploadTitle.setText(R.string.upload_a_photo);
                 uploadDescription.setText(R.string.click_to_select_png_jpg_up_to_5mb);
@@ -436,6 +518,33 @@ public class UploadMediaBottomSheet extends BottomSheetDialogFragment {
                 }
             } else {
                 result = "f_" + System.currentTimeMillis();
+            }
+        }
+
+        return result;
+    }
+
+    public String getFileNameFromUri(Uri uri) {
+        String result = null;
+
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = requireActivity().getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+
+        if (result == null) {
+            result = uri.getPath();
+            if (result != null) {
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
+                }
             }
         }
 

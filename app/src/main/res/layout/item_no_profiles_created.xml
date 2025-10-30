@@ -43,6 +43,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/create_first_profile"
             android:layout_marginTop="10dp"
             android:text="@string/create_first_profile"
             android:textColor="@color/white"

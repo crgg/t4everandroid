@@ -1,7 +1,10 @@
 package com.t4app.t4everandroid.main.ui.media;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.OpenableColumns;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +27,10 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.Media;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -53,8 +59,24 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
 
     private Media media;
 
+    private Uri uri;
+    private String typeDoc;
+    private boolean fromUri;
+
     public void setMedia(Media media) {
         this.media = media;
+    }
+
+    public void setTypeDoc(String typeDoc) {
+        this.typeDoc = typeDoc;
+    }
+
+    public void setFromUri(boolean fromUri) {
+        this.fromUri = fromUri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     @Override
@@ -103,62 +125,98 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        String name = extractReadableName(media.getStorageUrl());
+        String name;
+        if (fromUri){
+            name = getFileNameFromUri(uri);
+        }else{
+            name = extractReadableName(media.getStorageUrl());
+        }
         fileName.setText(name);
-        Log.d(TAG, "FILE NAME: " + name);
-        switch (media.getType()){
+        String type = fromUri ? typeDoc : media.getType();
+        Log.d(TAG, "onViewCreated: TYPE" + type);
+        switch (type){
             case "text":
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url(media.getStorageUrl())
-                        .build();
-                textContent.setVisibility(View.VISIBLE);
+                if (fromUri){
+                    String content = readTextFromUri(uri);
+                    textContent.setText(content);
+                    textContent.setVisibility(View.VISIBLE);
+                }else{
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(media.getStorageUrl())
+                            .build();
+                    textContent.setVisibility(View.VISIBLE);
 
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        Log.e(TAG, "onFailure LOAD TEXT ERROR ", e);
-                    }
-
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        if (response.isSuccessful()){
-                            String content = response.body().string();
-                            requireActivity().runOnUiThread(() -> {
-                                textContent.setText(content);
-                            });
-                        }else{
-                            requireActivity().runOnUiThread(() -> {
-                                textContent.setText("Error load content");
-                            });
+                    client.newCall(request).enqueue(new Callback() {
+                        @Override
+                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                            Log.e(TAG, "onFailure LOAD TEXT ERROR ", e);
                         }
-                    }
-                });
+
+                        @Override
+                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                            if (response.isSuccessful()){
+                                String content = response.body().string();
+                                requireActivity().runOnUiThread(() -> {
+                                    textContent.setText(content);
+                                });
+                            }else{
+                                requireActivity().runOnUiThread(() -> {
+                                    textContent.setText("Error load content");
+                                });
+                            }
+                        }
+                    });
+                }
+
 
                 return;
             case "image":
-                contentImage.setVisibility(View.VISIBLE);
-                Glide.with(requireActivity())
-                        .load(media.getStorageUrl())
-                        .into(contentImage);
+                if (fromUri){
+                    contentImage.setVisibility(View.VISIBLE);
+                    Glide.with(requireActivity())
+                            .load(uri)
+                            .into(contentImage);
+                }else{
+                    contentImage.setVisibility(View.VISIBLE);
+                    Glide.with(requireActivity())
+                            .load(media.getStorageUrl())
+                            .into(contentImage);
+
+                }
                 return;
             case "audio":
-                audioPlayerView.setVisibility(View.VISIBLE);
-                setupAudioPlayer(media.getStorageUrl());
-
+                if (fromUri){
+                    audioPlayerView.setVisibility(View.VISIBLE);
+                    setupAudioPlayerFromUri(uri);
+                }else{
+                    audioPlayerView.setVisibility(View.VISIBLE);
+                    setupAudioPlayer(media.getStorageUrl());
+                }
                 return;
             case "video":
-                itemVideoPlayer.setVisibility(View.VISIBLE);
-                player = new ExoPlayer.Builder(requireContext()).build();
-                videoView.setPlayer(player);
+                if (fromUri){
+                    itemVideoPlayer.setVisibility(View.VISIBLE);
+                    player = new ExoPlayer.Builder(requireContext()).build();
+                    videoView.setPlayer(player);
 
-                String videoUrl = media.getStorageUrl();
-                MediaItem mediaItem = MediaItem.fromUri(videoUrl);
-                player.setMediaItem(mediaItem);
+                    MediaItem mediaItem = MediaItem.fromUri(uri);
+                    player.setMediaItem(mediaItem);
 
-                player.prepare();
-                player.play();
+                    player.prepare();
+                    player.play();
+                }else{
+                    itemVideoPlayer.setVisibility(View.VISIBLE);
+                    player = new ExoPlayer.Builder(requireContext()).build();
+                    videoView.setPlayer(player);
 
+                    String videoUrl = media.getStorageUrl();
+                    MediaItem mediaItem = MediaItem.fromUri(videoUrl);
+                    player.setMediaItem(mediaItem);
+
+                    player.prepare();
+                    player.play();
+                }
         }
     }
 
@@ -169,12 +227,47 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
+    public void setupAudioPlayerFromUri(Uri uri) {
+        if (audioPlayerView != null) {
+            audioPlayerView.setVisibility(View.VISIBLE);
+            audioPlayerView.setAudioUri(uri);
+        }
+    }
+
     public void hideAudioPlayer() {
         if (audioPlayerView != null) {
             audioPlayerView.setVisibility(View.GONE);
             audioPlayerView.stopPlayback();
         }
     }
+
+    public String getFileNameFromUri(Uri uri) {
+        String result = null;
+
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = requireActivity().getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+
+        if (result == null) {
+            result = uri.getPath();
+            if (result != null) {
+                int cut = result.lastIndexOf('/');
+                if (cut != -1) {
+                    result = result.substring(cut + 1);
+                }
+            }
+        }
+
+        return result;
+    }
+
 
     public String extractReadableName(String fileName) {
         if (fileName == null || fileName.isEmpty()) return "";
@@ -201,6 +294,28 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
             videoView.setPlayer(null);
         }
     }
+
+    private String readTextFromUri(Uri uri) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            InputStream inputStream = requireActivity().getContentResolver().openInputStream(uri);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+
+            reader.close();
+            inputStream.close();
+        } catch (Exception e) {
+            Log.e(TAG, "readTextFromUri: ", e);
+        }
+
+        return stringBuilder.toString();
+    }
+
 
     @Override
     public void onStop() {
