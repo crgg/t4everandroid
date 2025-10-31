@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid;
 
 import com.t4app.t4everandroid.Login.models.User;
+import com.t4app.t4everandroid.main.Models.Interactions;
 import com.t4app.t4everandroid.main.Models.Media;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
@@ -58,5 +59,9 @@ public class ListenersUtils {
         void onEmailChanged(String newEmail);
     }
 
+    public interface OnInteractionActionsListener{
+        void onDelete(Interactions interactions, int position);
+        void onDeleteAudio(Interactions interactions, int position);
+    }
 
 }

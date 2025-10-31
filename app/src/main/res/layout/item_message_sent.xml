@@ -7,29 +7,54 @@
     android:padding="8dp">
 
     <LinearLayout
-        android:id="@+id/send_message_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:background="@drawable/item_sent_chat_bg"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textMessage"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/delete_interaction"
+            android:src="@drawable/ic_delete"
+            android:visibility="gone"
+            android:tint="@color/red"
+            android:background="@null"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
+        <com.t4app.t4everandroid.main.ui.media.AudioPlayerView
+            android:id="@+id/item_audio"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_width="250dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/send_message_container"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/textTime"
-            android:textColor="@color/soft_gray"
-            android:textSize="11sp"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:background="@drawable/item_sent_chat_bg"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/textMessage"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textTime"
+                android:textColor="@color/soft_gray"
+                android:textSize="11sp"
+                android:layout_gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
     </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/response_message_container"

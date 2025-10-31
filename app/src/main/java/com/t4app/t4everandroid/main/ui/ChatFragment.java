@@ -1,15 +1,31 @@
 package com.t4app.t4everandroid.main.ui;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
@@ -22,10 +38,13 @@ import com.t4app.t4everandroid.main.Models.Interactions;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.ChatAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
+import com.t4app.t4everandroid.main.ui.media.RecordAudioActivity;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.responses.ResponseCreateInteraction;
 import com.t4app.t4everandroid.network.responses.ResponseGetInteractions;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +55,47 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ChatFragment extends Fragment {
+    private static final String TAG = "CHAT_FRAGMENT";
 
     private ChatAdapter adapter;
     private FragmentChatBinding binding;
+    boolean isShowingText = true;
+
+    private final Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            long elapsed = System.currentTimeMillis() - startTime;
+
+            int seconds = (int) (elapsed / 1000);
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+
+            String time = String.format("%02d:%02d", minutes, seconds);
+            binding.itemChat.audioTimer.setText(time);
+
+            handler.postDelayed(this, 1000);
+        }
+    };
+
+    private final ActivityResultLauncher<String> permissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted){
+//                    startRecording();
+                }else{
+                    MessagesUtils.showErrorDialog(requireActivity(),
+                            getString(R.string.microphone_permission_denied));
+                }
+
+            });
+
+
+    private MediaRecorder recorder;
+    private File audioFile;
+    private boolean isRecording = false;
+
+    private Handler handler = new Handler();
+    private boolean isRunning = false;
+    private long startTime = 0L;
 
     public ChatFragment() {
     }
@@ -95,7 +152,25 @@ public class ChatFragment extends Fragment {
         }
 
         List<Interactions> interactions = new ArrayList<>();
-        adapter = new ChatAdapter(requireContext(), interactions);
+        adapter = new ChatAdapter(requireContext(), interactions, new ListenersUtils.OnInteractionActionsListener() {
+            @Override
+            public void onDelete(Interactions interactions, int position) {
+                MessagesUtils.showMessageConfirmation(requireActivity(), getString(R.string.msg_delete), confirmed -> {
+                    if (confirmed){
+                        deleteInteraction(interactions, position);
+                    }
+                });
+            }
+
+            @Override
+            public void onDeleteAudio(Interactions interactions, int position) {
+                MessagesUtils.showMessageConfirmation(requireActivity(), getString(R.string.msg_delete), confirmed -> {
+                    if (confirmed){
+                        adapter.deleteItem(position);
+                    }
+                });
+            }
+        });
         binding.itemChat.chatRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.itemChat.chatRv.setAdapter(adapter);
 
@@ -157,9 +232,14 @@ public class ChatFragment extends Fragment {
         });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Animation slideIn = AnimationUtils.loadAnimation(requireActivity(), R.anim.slide_in_left);
+        Animation slideOut = AnimationUtils.loadAnimation(requireActivity(), R.anim.slide_in_right);
+
 
         if (GlobalDataCache.sessionId != null){
             binding.itemChat.sendInteractionBtn.setOnClickListener(new SafeClickListener() {
@@ -179,6 +259,215 @@ public class ChatFragment extends Fragment {
             });
         }
 
+        binding.itemChat.uploadFile.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+
+            }
+        });
+
+//        binding.itemChat.recordAudioBtn.setOnLongClickListener(v -> {
+//            Log.d(TAG, "LONG PRESSED ");
+////            binding.itemChat.containerRecordAudio.setVisibility(View.VISIBLE);
+////            binding.itemChat.containerTextInteraction.setVisibility(View.GONE);
+//            showRecordContainer(slideOut, slideIn);
+//            return true;
+//        });
+
+        binding.itemChat.recordAudioBtn.setOnTouchListener((view1, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
+                    Log.d(TAG, "ON DOWN ACTION: ");
+                    if (isRecording){
+                        stopRecording();
+                    }else{
+                        checkPermissionAndStart(confirmed -> {
+                            if (confirmed){
+                                startRecording();
+                                startTime = System.currentTimeMillis();
+                                handler.post(timerRunnable);
+                                isRunning = true;
+                                binding.getRoot().requestDisallowInterceptTouchEvent(true);
+                                showRecordContainer(slideOut, slideIn);
+                            }
+                        });
+                    }
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    Log.d(TAG, "ON MOVE ACTION: ");
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                    binding.getRoot().requestDisallowInterceptTouchEvent(false);
+                    showTextContainer(slideOut, slideIn);
+                    handler.removeCallbacks(timerRunnable);
+                    isRunning = false;
+                    Log.d(TAG, "ON UP ACTION");
+                    uploadFileAudio();
+                    return true;
+
+                case MotionEvent.ACTION_CANCEL:
+                    binding.getRoot().requestDisallowInterceptTouchEvent(false);
+                    showTextContainer(slideOut, slideIn);
+                    handler.removeCallbacks(timerRunnable);
+                    isRunning = false;
+                    Log.d(TAG, "ON CANCEL ACTION");
+                    uploadFileAudio();
+                    return true;
+
+            }
+            return false;
+        });
+
+        binding.itemChat.cancelSendAudio.setOnTouchListener((view2, motionEvent) -> {
+            switch (motionEvent.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    Log.d(TAG, "ON DOWN ACTION: CANCEL ");
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    Log.d(TAG, "ON MOVE ACTION:CANCEL ");
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                    Log.d(TAG, "ON UP ACTION CANCEL");
+                    return true;
+
+                case MotionEvent.ACTION_CANCEL:
+                    Log.d(TAG, "ON CANCEL ACTION CANCEL");
+                    return true;
+
+            }
+            return false;
+        });
+
+    }
+
+    private void deleteInteraction(Interactions interactions, int pos){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<JsonObject> call = apiServices.deleteInteraction(interactions.getId());
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    JsonObject body = response.body();
+                    if (body != null) {
+                        if (body.has("status")) {
+                            if (body.get("status").getAsBoolean()) {
+                                adapter.deleteItem(pos);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable throwable) {
+                Log.e(TAG, "onFailure ERROR DELETE MEDIA ", throwable);
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+    private void checkPermissionAndStart(ListenersUtils.ConfirmationCallback callback) {
+        if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+        } else {
+            callback.onResult(true);
+        }
+    }
+
+    private void showRecordContainer(Animation slideOut, Animation slideIn) {
+        binding.itemChat.containerTextInteraction.startAnimation(slideOut);
+        binding.itemChat.containerTextInteraction.setVisibility(View.GONE);
+
+        binding.itemChat.containerRecordAudio.setVisibility(View.VISIBLE);
+        binding.itemChat.containerRecordAudio.startAnimation(slideIn);
+    }
+
+    private void showTextContainer(Animation slideOut, Animation slideIn) {
+        binding.itemChat.containerRecordAudio.startAnimation(slideOut);
+        binding.itemChat.containerRecordAudio.setVisibility(View.GONE);
+
+        binding.itemChat.containerTextInteraction.setVisibility(View.VISIBLE);
+        binding.itemChat.containerTextInteraction.startAnimation(slideIn);
+    }
+
+    private void startRecording() {
+        try {
+            File dir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+            if (dir != null && !dir.exists()) dir.mkdirs();
+
+            audioFile = new File(dir, "audio_" + System.currentTimeMillis() + ".m4a");
+
+            recorder = new MediaRecorder();
+            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            recorder.setAudioEncodingBitRate(128000);
+            recorder.setAudioSamplingRate(44100);
+            recorder.setOutputFile(audioFile.getAbsolutePath());
+
+            recorder.prepare();
+            recorder.start();
+
+            isRecording = true;
+
+        } catch (IOException e) {
+            Log.e(TAG, "ERROR START RECORDING: ", e);
+        }
+    }
+
+    private void uploadFileAudio(){
+        if (isRecording) stopRecording();
+
+        if (audioFile != null && audioFile.exists()) {
+            Uri uri = FileProvider.getUriForFile(
+                    requireActivity(),
+                    requireActivity().getPackageName() + ".provider",
+                    audioFile
+            );
+
+            Interactions interaction = new Interactions();
+            interaction.setId(String.valueOf(System.currentTimeMillis()));
+            interaction.setSessionId(GlobalDataCache.sessionId);
+            interaction.setTextFromUser(null);
+            interaction.setUserAudioUrl(uri.toString());
+            interaction.setAssistantTextResponse(null);
+            interaction.setAssistantAudioResponse(null);
+            interaction.setEmotionDetected(null);
+            interaction.setTimestamp("2025-10-31T09:14:45.000000Z");
+            interaction.setHasResponse(false);
+            interaction.setWasCanceled(false);
+            interaction.setFileUuid(true);
+            interaction.setTextFromUser(null);
+
+            adapter.addMessage(interaction);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (recorder != null) {
+            recorder.release();
+            recorder = null;
+        }
+    }
+
+    private void stopRecording() {
+        try {
+            recorder.stop();
+            recorder.release();
+            recorder = null;
+            isRecording = false;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showFragment(Fragment fragment) {

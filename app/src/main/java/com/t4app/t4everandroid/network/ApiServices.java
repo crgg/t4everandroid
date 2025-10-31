@@ -67,6 +67,11 @@ public interface ApiServices {
             @Path("uuid")String uuid
     );
 
+    @DELETE(ApiConfig.DELETE_INTERACTION)
+    Call<JsonObject> deleteInteraction(
+            @Path("uuid")String uuid
+    );
+
     @PUT(ApiConfig.ACTIONS_ASSISTANTS_URL)
     Call<ResponseCreateAssistant> updateAssistant(
             @Path("uuid")String uuid,
