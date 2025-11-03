@@ -26,6 +26,7 @@
 
         <TextView
             android:layout_marginTop="8dp"
+            android:textSize="14sp"
             android:text="@string/select_a_legacy_profile_to_start"
             android:textColor="@color/text_color"
             android:layout_width="wrap_content"
@@ -233,6 +234,37 @@
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_marginTop="8dp"
+                android:text="@string/type_of_media"
+                android:textSize="13sp"
+                android:textColor="@color/text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <AutoCompleteTextView
+                android:layout_marginTop="10dp"
+                android:id="@+id/categories_auto"
+                android:inputType="none"
+                android:importantForAutofill="no"
+                android:cursorVisible="false"
+                android:textColor="@color/text_color"
+                android:focusable="false"
+                android:layout_weight="1"
+                android:text="@string/all"
+                android:background="@drawable/bg_border_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_more_info_rotated"/>
+
         </LinearLayout>
 
         <include

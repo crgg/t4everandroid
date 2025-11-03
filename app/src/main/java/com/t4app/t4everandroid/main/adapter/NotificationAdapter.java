@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
+import com.t4app.t4everandroid.main.Models.EmailTest;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
 
 import java.util.List;
@@ -52,6 +53,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.action.setText(item.getActionText());
         holder.checkBox.setChecked(item.isChecked());
 
+        holder.checkBox.setChecked(false);
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             item.setChecked(isChecked);
@@ -143,5 +145,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 //        notificationList.clear();
         this.notificationList = newList;
         notifyDataSetChanged();
+    }
+
+    public void addItem(NotificationItem newItem) {
+        notificationList.add(0, newItem);
+        notifyItemInserted(0);
+    }
+
+    public void deleteItem(int position) {
+        if (position >= 0 && position < notificationList.size()) {
+            notificationList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, notificationList.size());
+            notifyItemChanged(getItemCount() - 1);
+        }
     }
 }

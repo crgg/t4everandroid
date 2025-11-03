@@ -98,7 +98,6 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     iconTypeContent.setImageResource(R.drawable.ic_headset);
                     iconPlay.setImageResource(R.drawable.ic_play_rounded);
                     break;
-
             }
 
             txtDate.setText(parseDate(media.getDateUpload()));

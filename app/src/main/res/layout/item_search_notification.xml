@@ -66,27 +66,73 @@
             android:layout_height="0dp"
             android:drawableEnd="@drawable/ic_more_info_rotated"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/add_new_question_btn"
-            android:layout_width="wrap_content"
-            android:layout_gravity="end"
-            android:layout_height="48dp"
+        <LinearLayout
             android:layout_marginTop="10dp"
-            android:text="@string/mark_all_as_read"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            app:iconGravity="textStart"
-            app:icon="@drawable/ic_double_check"
-            app:iconTint="@color/gray_hint"
-            android:textSize="13sp"
-            app:cornerRadius="8dp"
-            android:backgroundTint="@color/white"
-            app:strokeColor="@color/gray_hint"
-            app:strokeWidth="1dp"
-            app:rippleColor="@color/gray_hint"
-            android:textColor="@color/gray_hint" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/mark_read"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/ic_eye"
+                android:tint="@color/second_login_color"
+                android:background="@drawable/bg_border_line_second_color"
+                android:padding="5dp"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/mark_unread"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/ic_visibility_off"
+                android:visibility="gone"
+                android:tint="@color/second_login_color"
+                android:background="@drawable/bg_border_line_second_color"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/delete_all"
+                android:layout_marginStart="5dp"
+                android:visibility="gone"
+                android:src="@drawable/ic_delete"
+                android:tint="@color/second_login_color"
+                android:padding="5dp"
+                android:background="@drawable/bg_border_line_second_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mark_all_read"
+                android:layout_width="wrap_content"
+                android:layout_gravity="end"
+                android:layout_height="48dp"
+                android:text="@string/mark_all_as_read"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:iconGravity="textStart"
+                app:icon="@drawable/ic_double_check"
+                app:iconTint="@color/gray_hint"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/white"
+                app:strokeColor="@color/gray_hint"
+                app:strokeWidth="1dp"
+                app:rippleColor="@color/gray_hint"
+                android:textColor="@color/gray_hint" />
+
+        </LinearLayout>
 
 
     </LinearLayout>

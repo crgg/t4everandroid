@@ -61,7 +61,7 @@ public class HomeFragment extends Fragment {
             binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(GlobalDataCache.legacyProfiles.size()));
             binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
             binding.scheduledMessagesItem.countMessages.setText("0");
-            binding.mediaItem.countMedia.setText("0");
+            binding.mediaItem.countMedia.setText(String.valueOf(GlobalDataCache.mediaList.size()));
         }
 
         return view;
@@ -165,7 +165,7 @@ public class HomeFragment extends Fragment {
                                         }
                                     }
                                     binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
-                                    binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
+                                    binding.questionAnsweredItem.countQuestionsAnswered.setText(String.valueOf(GlobalDataCache.mediaList.size()));
                                     binding.scheduledMessagesItem.countMessages.setText("0");
                                     binding.mediaItem.countMedia.setText("0");
                                 }

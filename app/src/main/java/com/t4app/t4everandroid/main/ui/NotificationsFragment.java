@@ -19,6 +19,7 @@ import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentNotificationsBinding;
+import com.t4app.t4everandroid.main.Models.EmailTest;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
@@ -34,6 +35,7 @@ public class NotificationsFragment extends Fragment {
     private FragmentNotificationsBinding binding;
 
     private List<NotificationItem> notifications;
+    private List<NotificationItem> checkedNotifications;
     private NotificationAdapter adapter;
 
     public NotificationsFragment() {
@@ -56,6 +58,7 @@ public class NotificationsFragment extends Fragment {
         View view = binding.getRoot();
 
         notifications = new ArrayList<>();
+        checkedNotifications = new ArrayList<>();
 
         notifications.add(new NotificationItem("1", "New Conversation Started",
                 "Emma Pérez has started a conversation with you.",
@@ -77,8 +80,24 @@ public class NotificationsFragment extends Fragment {
 
         adapter = new NotificationAdapter(requireContext(), notifications, new ListenersUtils.OnNotificationClickListener() {
             @Override
-            public void onItemChecked(NotificationItem item, boolean isChecked) {
-                //TODO
+            public void onItemChecked(NotificationItem item, boolean b) {
+                if (b){
+                    if (!checkedNotifications.contains(item)){
+                        checkedNotifications.add(item);
+                    }
+                }else{
+                    checkedNotifications.remove(item);
+                }
+
+                if (!checkedNotifications.isEmpty()){
+                    binding.itemSearchNotification.markUnread.setVisibility(View.VISIBLE);
+                    binding.itemSearchNotification.markRead.setVisibility(View.VISIBLE);
+                    binding.itemSearchNotification.deleteAll.setVisibility(View.VISIBLE);
+                }else{
+                    binding.itemSearchNotification.markUnread.setVisibility(View.GONE);
+                    binding.itemSearchNotification.markRead.setVisibility(View.GONE);
+                    binding.itemSearchNotification.deleteAll.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -88,11 +107,64 @@ public class NotificationsFragment extends Fragment {
 
             @Override
             public void onDeleteClicked(NotificationItem item, int position) {
-                //TODO
+                adapter.deleteItem(position);
             }
         });
+
+        binding.itemSearchNotification.markUnread.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                for (NotificationItem emailTest : checkedNotifications){
+                    emailTest.setRead(false);
+                    notifications.set(notifications.indexOf(emailTest), emailTest);
+                }
+                checkedNotifications = new ArrayList<>();
+                adapter.notifyDataSetChanged();
+                binding.itemSearchNotification.markUnread.setVisibility(View.GONE);
+                binding.itemSearchNotification.markRead.setVisibility(View.GONE);
+                binding.itemSearchNotification.deleteAll.setVisibility(View.GONE);
+            }
+        });
+
+        binding.itemSearchNotification.markRead.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                for (NotificationItem emailTest : checkedNotifications){
+                    emailTest.setRead(true);
+                    notifications.set(notifications.indexOf(emailTest), emailTest);
+                }
+                checkedNotifications = new ArrayList<>();
+                adapter.notifyDataSetChanged();
+                binding.itemSearchNotification.markUnread.setVisibility(View.GONE);
+                binding.itemSearchNotification.markRead.setVisibility(View.GONE);
+                binding.itemSearchNotification.deleteAll.setVisibility(View.GONE);
+            }
+        });
+
+        binding.itemSearchNotification.deleteAll.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                notifications.removeAll(checkedNotifications);
+                checkedNotifications = new ArrayList<>();
+                adapter.notifyDataSetChanged();
+                binding.itemSearchNotification.markUnread.setVisibility(View.GONE);
+                binding.itemSearchNotification.markRead.setVisibility(View.GONE);
+                binding.itemSearchNotification.deleteAll.setVisibility(View.GONE);
+            }
+        });
+
         binding.notificationsRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.notificationsRv.setAdapter(adapter);
+
+        binding.itemSearchNotification.markAllRead.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                for (NotificationItem notificationItem : notifications){
+                    notificationItem.setRead(true);
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         return view;
     }

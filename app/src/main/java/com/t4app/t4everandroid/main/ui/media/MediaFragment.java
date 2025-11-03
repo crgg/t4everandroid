@@ -24,7 +24,9 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
@@ -37,7 +39,9 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentMediaBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.Media;
+import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
+import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
 import com.t4app.t4everandroid.main.adapter.MediaAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
@@ -49,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -189,6 +194,13 @@ public class MediaFragment extends Fragment {
         if (GlobalDataCache.legacyProfileSelected != null){
             getMedia();
         }
+
+        binding.categoriesAuto.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showCategories();
+            }
+        });
     }
 
     private void showCustomDialog() {
@@ -301,7 +313,6 @@ public class MediaFragment extends Fragment {
                     if (body != null){
                         if (body.isStatus()){
                             if (body.getData() != null){
-                                adapter.updateList(body.getData());
                                 calculateMedias(body.getData());
                                 if (!body.getData().isEmpty()){
                                     if (binding.mediaRv.getVisibility() == View.GONE){
@@ -309,6 +320,9 @@ public class MediaFragment extends Fragment {
                                         binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
                                     }
                                 }
+                                mediaTestList.addAll(body.getData());
+                                GlobalDataCache.mediaList = new ArrayList<>(body.getData());
+                                adapter.notifyDataSetChanged();
                             }
                         }
                     }
@@ -465,6 +479,47 @@ public class MediaFragment extends Fragment {
         return lastSlash == -1 ? url : url.substring(lastSlash + 1);
     }
 
+
+    public void showCategories() {
+        BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+
+        List<String> items;
+        items = Arrays.asList(
+                getString(R.string.all),
+                getString(R.string.text),
+                getString(R.string.image),
+                getString(R.string.audio),
+                getString(R.string.video)
+        );
+
+
+        CategoriesAdapter catAdapter = new CategoriesAdapter(items);
+        recyclerView.setAdapter(catAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        catAdapter.setOnItemClickListener(category -> {
+            binding.categoriesAuto.setText(category);
+            if (!category.equalsIgnoreCase(getString(R.string.all))) {
+                List<Media> searchResourceList = new ArrayList<>();
+                for (Media object : mediaTestList) {
+                    String nameDevice = object.getType();
+                    if (nameDevice.equalsIgnoreCase(category)) {
+                        searchResourceList.add(object);
+                    }
+                }
+                adapter.updateList(searchResourceList);
+            } else {
+                adapter.updateList(mediaTestList);
+            }
+            categoriesBottomSheet.dismiss();
+        });
+
+        categoriesBottomSheet.setContentView(view);
+        categoriesBottomSheet.show();
+    }
 
 
     private void showFragment(Fragment fragment) {

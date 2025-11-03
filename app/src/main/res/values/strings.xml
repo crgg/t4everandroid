@@ -307,4 +307,16 @@
     <string name="click_to_select_other_file">Click to select other file</string>
     <string name="slide_to_cancel">Slide to cancel</string>
     <string name="_00_00">00:00</string>
+    <string name="reply">Reply</string>
+    <string name="forward">Forward</string>
+    <string name="to">To:</string>
+    <string name="from_example_com">from@example.com</string>
+    <string name="subject">Subject</string>
+    <string name="message">Message:</string>
+    <string name="write_your_message_here">Write your message here...</string>
+    <string name="new_email">New Email</string>
+    <string name="compose_email">Compose email</string>
+    <string name="send">Send</string>
+    <string name="required">Required</string>
+    <string name="type_of_media">Type of media</string>
 </resources>
