@@ -2,6 +2,7 @@ package com.t4app.t4everandroid.main;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -124,11 +125,17 @@ public class T4EverMainActivity extends AppCompatActivity {
             if (!sessionManager.getAvatarUrl().contains("https://go2storage.s3.us-east-2.amazonaws.com")){
                 path = "https://go2storage.s3.us-east-2.amazonaws.com/" + sessionManager.getAvatarUrl();
             }
+            icon.setImageResource(0);
+            icon.setImageDrawable(null);
+            icon.setBackground(null);
             Glide.with(this)
                     .load(path)
+                    .placeholder(new ColorDrawable(Color.TRANSPARENT))
+                    .error(new ColorDrawable(Color.TRANSPARENT))
                     .transform(new CircleCrop())
                     .into(icon);
-            icon.setBackground(null);
+            Log.d(TAG, "onCreate:   " + path);
+//            icon.setBackground(null);
         }
         userRepository = new UserRepository();
         getUserInfo();
