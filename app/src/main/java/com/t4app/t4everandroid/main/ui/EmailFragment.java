@@ -6,6 +6,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentEmailBinding;
 import com.t4app.t4everandroid.main.Models.EmailTest;
+import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.adapter.EmailAdapter;
 
 import java.text.SimpleDateFormat;
@@ -62,6 +65,39 @@ public class EmailFragment extends Fragment {
         binding = FragmentEmailBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         binding.searchEmail.categoriesAuto.setVisibility(View.INVISIBLE);
+        binding.searchEmail.searchValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                String value = s.toString();
+                if (!value.isEmpty()) {
+                    List<EmailTest> searchResourceList = new ArrayList<>();
+                    for (EmailTest object : testEmails) {
+                        String nameDevice = object.getContactName();
+                        String email = object.getEmail();
+                        if (nameDevice.toLowerCase().trim().contains(value.toLowerCase().trim())) {
+                            searchResourceList.add(object);
+                        }else if (email.toLowerCase().trim().contains(value.toLowerCase().trim())) {
+                            searchResourceList.add(object);
+                        }
+                    }
+
+//                    checkFoundData(dataSearch, noFoundDataTv, getString(R.string.customer));
+                    adapter.updateList(searchResourceList);
+                } else {
+                    adapter.updateList(testEmails);
+                }
+            }
+        });
 
         testEmails = new ArrayList<>();
         deleted = new ArrayList<>();
