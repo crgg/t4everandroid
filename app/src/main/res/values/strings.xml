@@ -305,4 +305,6 @@
     <string name="view_image">View Image</string>
     <string name="view_text">View Text</string>
     <string name="click_to_select_other_file">Click to select other file</string>
+    <string name="slide_to_cancel">Slide to cancel</string>
+    <string name="_00_00">00:00</string>
 </resources>

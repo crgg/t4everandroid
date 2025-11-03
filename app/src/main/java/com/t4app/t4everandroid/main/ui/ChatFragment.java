@@ -61,6 +61,18 @@ public class ChatFragment extends Fragment {
     private FragmentChatBinding binding;
     boolean isShowingText = true;
 
+    private float cancelThreshold = 200;
+    private boolean canceled = false;
+
+    private MediaRecorder recorder;
+    private File audioFile;
+    private boolean isRecording = false;
+
+    private Handler handler = new Handler();
+    private boolean isRunning = false;
+    private long startTime = 0L;
+
+
     private final Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
@@ -87,15 +99,6 @@ public class ChatFragment extends Fragment {
                 }
 
             });
-
-
-    private MediaRecorder recorder;
-    private File audioFile;
-    private boolean isRecording = false;
-
-    private Handler handler = new Handler();
-    private boolean isRunning = false;
-    private long startTime = 0L;
 
     public ChatFragment() {
     }
@@ -232,6 +235,8 @@ public class ChatFragment extends Fragment {
         });
     }
 
+    private float startX = 0f;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -275,10 +280,13 @@ public class ChatFragment extends Fragment {
 //        });
 
         binding.itemChat.recordAudioBtn.setOnTouchListener((view1, motionEvent) -> {
+
             switch (motionEvent.getAction()) {
 
                 case MotionEvent.ACTION_DOWN:
                     Log.d(TAG, "ON DOWN ACTION: ");
+                    startX = motionEvent.getRawX();
+                    canceled = false;
                     if (isRecording){
                         stopRecording();
                     }else{
@@ -296,16 +304,48 @@ public class ChatFragment extends Fragment {
                     return true;
 
                 case MotionEvent.ACTION_MOVE:
-                    Log.d(TAG, "ON MOVE ACTION: ");
+                    float currentX = motionEvent.getRawX();
+                    float diffX = currentX - startX;
+                    if (diffX > 0) {
+                        binding.itemChat.textSideToCancel.setTranslationX(diffX);
+
+                        if (diffX > cancelThreshold && !canceled) {
+                            Log.d(TAG, "onViewCreated: ENTRY IN CANCEL RECORD");
+                            canceled = true;
+                            binding.getRoot().requestDisallowInterceptTouchEvent(false);
+                            showTextContainer(slideOut, slideIn);
+                            handler.removeCallbacks(timerRunnable);
+
+                            isRunning = false;
+                            stopRecording();
+
+                            binding.itemChat.textSideToCancel.animate()
+                                    .translationX(0)
+                                    .alpha(0f)
+                                    .setDuration(150)
+                                    .start();
+                        }
+
+                        Log.d(TAG,  "Swipe Right");
+                    }
                     return true;
 
                 case MotionEvent.ACTION_UP:
+
                     binding.getRoot().requestDisallowInterceptTouchEvent(false);
                     showTextContainer(slideOut, slideIn);
                     handler.removeCallbacks(timerRunnable);
                     isRunning = false;
                     Log.d(TAG, "ON UP ACTION");
-                    uploadFileAudio();
+                    if (!canceled){
+                        uploadFileAudio();
+                    }
+
+                    binding.itemChat.textSideToCancel.animate()
+                            .translationX(0)
+                            .alpha(1f)
+                            .setDuration(200)
+                            .start();
                     return true;
 
                 case MotionEvent.ACTION_CANCEL:
@@ -314,7 +354,14 @@ public class ChatFragment extends Fragment {
                     handler.removeCallbacks(timerRunnable);
                     isRunning = false;
                     Log.d(TAG, "ON CANCEL ACTION");
-                    uploadFileAudio();
+                    if (!canceled){
+                        uploadFileAudio();
+                    }
+                    binding.itemChat.textSideToCancel.animate()
+                            .translationX(0)
+                            .alpha(1f)
+                            .setDuration(200)
+                            .start();
                     return true;
 
             }
