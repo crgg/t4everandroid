@@ -19,6 +19,7 @@ public class ApiConfig {
     public static final String END_SESSION_URL = "api/sessions/{session_id}/end";
     public static final String CHANGE_PASSWORD_URL = "api/change-password";
     public static final String UPLOAD_PROFILE_IMAGE_URL = "api/upload-avatar-picture";
+    public static final String UPLOAD_IMAGE_ASSISTANT_URL = "api/set-assistant-avatar";
     public static final String UPLOAD_MEDIA = "api/media";
     public static final String DELETE_MEDIA = "api/media/{uuid}";
     public static final String DELETE_INTERACTION = "api/interactions/{uuid}";

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,8 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.material.button.MaterialButton;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
@@ -48,12 +51,19 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         LegacyProfile profile = profileList.get(position);
 
         holder.valueName.setText(profile.getName());
-        holder.userNameProfile.setText(profile.getName());
+        holder.userNameProfile.setText(profile.getAlias());
         holder.valueRelationship.setText(profile.getFamilyRelationship());
         holder.valueAge.setText(String.valueOf(profile.getAge()));
         holder.valueLanguage.setText(profile.getLanguage());
         holder.valueCountry.setText(profile.getCountry());
         holder.valuePersonality.setText(String.join(", ", profile.getBasePersonality()));
+
+        if (profile.getAvatarPath() != null){
+            Glide.with(holder.itemView.getContext())
+                    .load(profile.getAvatarPath())
+                    .transform(new CircleCrop())
+                    .into(holder.imgProfile);
+        }
 //            if(profile.status != null && !profile.status.isEmpty()) {
 //                profileStatus.setText(profile.status);
 //                profileStatus.setVisibility(View.VISIBLE);
@@ -143,11 +153,13 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         TextView profileStatus, userNameProfile;
         MaterialButton selectBtn, chatBtn, editBtn;
         AppCompatImageButton deleteBtn;
+        ImageView imgProfile;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             valueName = itemView.findViewById(R.id.value_name);
+            imgProfile = itemView.findViewById(R.id.img_profile);
             userNameProfile = itemView.findViewById(R.id.user_name_profile);
             valueRelationship = itemView.findViewById(R.id.value_relationship);
             valueAge = itemView.findViewById(R.id.value_age);

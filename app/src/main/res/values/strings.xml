@@ -319,4 +319,14 @@
     <string name="send">Send</string>
     <string name="required">Required</string>
     <string name="type_of_media">Type of media</string>
+    <string name="family_member">Family member</string>
+    <string name="profile_for">Profile For:</string>
+    <string name="someone_else">Someone else</string>
+    <string name="is_this_person_alive">Is this person alive?</string>
+    <string name="myself">Myself</string>
+    <string name="no">No</string>
+    <string name="another_person">Another person</string>
+    <string name="living_status">Living status</string>
+    <string name="deceased">Deceased</string>
+    <string name="alive">Alive</string>
 </resources>

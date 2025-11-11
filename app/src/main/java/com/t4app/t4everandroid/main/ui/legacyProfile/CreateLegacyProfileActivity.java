@@ -25,9 +25,12 @@ import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.t4app.t4everandroid.AppController;
@@ -43,9 +46,9 @@ import com.t4app.t4everandroid.databinding.ActivityCreateLegacyProfileBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
-import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
+import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.network.ApiServices;
-import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
+import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
 
 import java.io.File;
 import java.text.ParseException;
@@ -89,6 +92,8 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private CameraPermissionManager.PermissionCallback permissionCallback;
     private ImageSelectorBottomSheet bottomSheet;
 
+    private boolean isUpdate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +104,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        boolean isUpdate = getIntent().getBooleanExtra("is_update", false);
+        isUpdate = getIntent().getBooleanExtra("is_update", false);
 
         binding = ActivityCreateLegacyProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -181,6 +186,12 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
             profile = (LegacyProfile) getIntent().getSerializableExtra("legacy_profile");
             if (profile != null){
                 setValues(profile);
+                if (profile.getAvatarPath() != null){
+                    Glide.with(CreateLegacyProfileActivity.this)
+                            .load(profile.getAvatarPath())
+                            .transform(new CircleCrop())
+                            .into(binding.uploadImageBtn);
+                }
             }
 
             binding.titleCreateProfile.setText(R.string.edit_legacy_profile);
@@ -213,25 +224,45 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                     String alias = getTextTv(aliasValue);
                     String relationship = getTextTv(relationshipValue);
                     String birthdate = formatDate(getTextTv(birthdateValue));
-                    String deathdate = formatDate(getTextTv(deathdateValue));
+                    String deathdate;
+                    if(getTextTv(deathdateValue).isEmpty()){
+                        deathdate = "";
+                    }else{
+                        deathdate = formatDate(getTextTv(deathdateValue));
+                    }
                     List<String> personalityList = getPersonalityList(getTextTv(personalityValue));
                     String country = autoCountry.getText().toString().trim();
                     String language = autoLanguage.getText().toString().trim();
 
-                    ProfileRequest request = new ProfileRequest(alias,
-                            calculateAge(birthdate),
-                            birthdate,
-                            deathdate,
-                            relationship,
-                            personalityList,
-                            binding.activeCheckBox.isChecked(),
-                            language,
-                            country,
-                            fullName
-                    );
+                    ProfileRequest request;
+                    if (binding.categoriesProfileForAuto.getText().toString().equalsIgnoreCase(getString(R.string.myself))){
+                        request = new ProfileRequest(alias,
+                                calculateAge(birthdate),
+                                birthdate,
+                                "0000/00/00",
+                                "Myself",
+                                personalityList,
+                                binding.activeCheckBox.isChecked(),
+                                language,
+                                country,
+                                fullName
+                        );
+                    }else{
+                        request = new ProfileRequest(alias,
+                                calculateAge(birthdate),
+                                birthdate,
+                                deathdate,
+                                relationship,
+                                personalityList,
+                                binding.activeCheckBox.isChecked(),
+                                language,
+                                country,
+                                fullName
+                        );
+                    }
 
                     if (isUpdate){
-                        updateProfile(request, profile);
+                        updateProfile(request);
                     }else{
                         createUser(request);
                     }
@@ -245,6 +276,21 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                 bottomSheet.show(getSupportFragmentManager(), "ImageSelector");
             }
         });
+
+        binding.categoriesProfileForAuto.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showCategories(true);
+            }
+        });
+
+        binding.categoriesAliveAuto.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showCategories(false);
+            }
+        });
+
     }
 
     private void createUser(ProfileRequest data){
@@ -258,9 +304,13 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                     if (body != null) {
                         if (body.isStatus()) {
                             if (body.getData() != null) {
-                                GlobalDataCache.legacyProfiles.add(body.getData());
+                                GlobalDataCache.legacyProfiles.add(0, body.getData());
                                 if (body.getMsg() != null){
-                                    MessagesUtils.showMessageFinishAndReturnBool(CreateLegacyProfileActivity.this, body.getMsg());
+                                    if(realPdfUri != null){
+                                        uploadImageUser(body.getData().getId(), body.getMsg());
+                                    }else{
+                                        MessagesUtils.showMessageFinishAndReturnBool(CreateLegacyProfileActivity.this, body.getMsg());
+                                    }
                                 }
                             }
                         }
@@ -276,9 +326,9 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void updateProfile(ProfileRequest data, LegacyProfile legacyProfile){
+    private void updateProfile(ProfileRequest data){
         ApiServices apiServices = AppController.getApiServices();
-        Call<ResponseCreateAssistant> call = apiServices.updateAssistant(legacyProfile.getId(), data);
+        Call<ResponseCreateAssistant> call = apiServices.updateAssistant(profile.getId(), data);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<ResponseCreateAssistant> call, Response<ResponseCreateAssistant> response) {
@@ -288,11 +338,15 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                         if (body.isStatus()) {
                             if (body.getData() != null) {
                                 GlobalDataCache.legacyProfiles.set(
-                                        GlobalDataCache.legacyProfiles.indexOf(legacyProfile),
-                                        body.getData()
+                                        GlobalDataCache.legacyProfiles.indexOf(profile), body.getData()
                                 );
-                                MessagesUtils.showMessageFinishAndReturn(CreateLegacyProfileActivity.this,
-                                        body.getMsg(), "update_list");
+                                if(realPdfUri != null){
+                                    uploadImageUser(body.getData().getId(), body.getMsg());
+                                }else{
+                                    MessagesUtils.showMessageFinishAndReturn(CreateLegacyProfileActivity.this,
+                                            body.getMsg(), "update_list");
+                                }
+
 
                             }
                         }
@@ -513,8 +567,18 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         aliasValue.setText(profile.getAlias());
         relationshipValue.setText(profile.getFamilyRelationship());
         personalityValue.setText(String.join(", ", profile.getBasePersonality()));
-//        birthdateValue.setText(profile.get);
-//        deathdateValue.setText();
+        birthdateValue.setText(profile.getBirthDate());
+        if (profile.getDeathDate() != null && !profile.getDeathDate().isEmpty()){
+            deathdateValue.setText(profile.getDeathDate());
+            binding.categoriesAliveAuto.setText(R.string.deceased);
+            binding.containerLiving.setVisibility(View.VISIBLE);
+            binding.deathDateContainer.setVisibility(View.VISIBLE);
+        }else{
+            binding.categoriesAliveAuto.setText(R.string.alive);
+            binding.containerLiving.setVisibility(View.GONE);
+            binding.deathDateContainer.setVisibility(View.GONE);
+        }
+
         autoCountry.setText(profile.getCountry());
         autoLanguage.setText(profile.getLanguage());
     }
@@ -563,24 +627,38 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         };
     }
 
-    private void uploadImageUser(){
+    private void uploadImageUser(String assistantId, String msg){
         try {
             Log.d(TAG, "uploadImageUser: ");
             File file = selectImageUtils.getFileFromUri(realPdfUri);
+
+            RequestBody assistantIdBody = RequestBody.create(assistantId, MediaType.parse("text/plain"));
+            MultipartBody.Part assistantIdPart = MultipartBody.Part.createFormData("assistant_id", null, assistantIdBody);
+
             RequestBody requestFile = RequestBody.create(file, MediaType.parse("image/*"));
             MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
             ApiServices apiServices = AppController.getApiServices();
-            Call<ResponseUpdateProfile> call = apiServices.uploadImageProfile(body);
+            Call<ResponseCreateAssistant> call = apiServices.uploadImageAssistant(assistantIdPart,body);
             call.enqueue(new Callback<>() {
                 @Override
-                public void onResponse(Call<ResponseUpdateProfile> call, Response<ResponseUpdateProfile> response) {
+                public void onResponse(Call<ResponseCreateAssistant> call, Response<ResponseCreateAssistant> response) {
                     if (response.isSuccessful()){
-                        ResponseUpdateProfile body = response.body();
+                        ResponseCreateAssistant body = response.body();
                         if (body != null){
                             if (body.isStatus()){
                                 if (body.getData() != null){
-                                    Log.d(TAG, "AVATAR URL :  " + body.getData().getAvatarUrl());
+                                    if (isUpdate){
+                                        profile.setAvatarPath(body.getData().getAvatarPath());
+                                        GlobalDataCache.legacyProfiles.set(
+                                                GlobalDataCache.legacyProfiles.indexOf(profile), profile
+                                        );
+
+                                        MessagesUtils.showMessageFinishAndReturn(CreateLegacyProfileActivity.this,
+                                                body.getMsg(), "update_list");
+                                    }else{
+                                        MessagesUtils.showMessageFinishAndReturnBool(CreateLegacyProfileActivity.this, msg);
+                                    }
                                 }
                             }
                         }
@@ -588,7 +666,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<ResponseUpdateProfile> call, Throwable throwable) {
+                public void onFailure(Call<ResponseCreateAssistant> call, Throwable throwable) {
                     Log.e(TAG, "Upload Image Error Throw" + throwable.getMessage());
                 }
             });
@@ -619,6 +697,66 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                 photoFile
         );
         cameraLauncher.launch(photoUri);
+    }
+
+    public void showCategories(boolean isFor) {
+        BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+
+        List<String> items;
+        if (isFor){
+            items = Arrays.asList(
+                    getString(R.string.another_person),
+                    getString(R.string.myself)
+            );
+        }else{
+            items = Arrays.asList(
+                    getString(R.string.alive),
+                    getString(R.string.deceased)
+            );
+        }
+
+
+
+        CategoriesAdapter catAdapter = new CategoriesAdapter(items);
+        recyclerView.setAdapter(catAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        catAdapter.setOnItemClickListener(category -> {
+            if (isFor){
+                binding.categoriesProfileForAuto.setText(category);
+                if (category.equalsIgnoreCase(getString(R.string.another_person))){
+                    binding.containerLiving.setVisibility(View.VISIBLE);
+                    binding.containerRelationship.setVisibility(View.VISIBLE);
+                    if (binding.categoriesAliveAuto.getText().toString().
+                            equalsIgnoreCase(getString(R.string.alive))){
+                        binding.deathDateContainer.setVisibility(View.GONE);
+                    }else{
+                        binding.deathDateContainer.setVisibility(View.VISIBLE);
+                    }
+                }else{
+                    binding.containerLiving.setVisibility(View.GONE);
+                    binding.deathDateContainer.setVisibility(View.GONE);
+                    binding.containerRelationship.setVisibility(View.GONE);
+                }
+            }else{
+                binding.categoriesAliveAuto.setText(category);
+                if (category.equalsIgnoreCase(getString(R.string.alive))) {
+                    binding.deathDateContainer.setVisibility(View.GONE);
+                }else {
+                    binding.deathDateContainer.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+
+            categoriesBottomSheet.dismiss();
+        });
+
+        categoriesBottomSheet.setContentView(view);
+        categoriesBottomSheet.show();
     }
 
 

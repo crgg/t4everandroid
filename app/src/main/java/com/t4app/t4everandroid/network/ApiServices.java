@@ -133,6 +133,13 @@ public interface ApiServices {
             @Part MultipartBody.Part file
             );
 
+    @POST(ApiConfig.UPLOAD_IMAGE_ASSISTANT_URL)
+    @Multipart
+    Call<ResponseCreateAssistant> uploadImageAssistant(
+            @Part MultipartBody.Part assistantId,
+            @Part MultipartBody.Part file
+            );
+
     @POST(ApiConfig.UPLOAD_MEDIA)
     @Multipart
     Call<ResponseCreateMedia> uploadMedia(

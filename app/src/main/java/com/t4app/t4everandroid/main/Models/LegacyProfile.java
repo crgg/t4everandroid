@@ -33,6 +33,12 @@ public class LegacyProfile implements Serializable {
     @SerializedName("avatar_path")
     private String avatarPath;
 
+    @SerializedName("death_date")
+    private String deathDate;
+
+    @SerializedName("birth_date")
+    private String birthDate;
+
     @SerializedName("family_relationship")
     private String familyRelationship;
 
@@ -65,6 +71,22 @@ public class LegacyProfile implements Serializable {
 
     @SerializedName("big_five_answers")
     private List<Question> bigFiveAnswers;
+
+    public String getDeathDate() {
+        return deathDate;
+    }
+
+    public void setDeathDate(String deathDate) {
+        this.deathDate = deathDate;
+    }
+
+    public String getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
+    }
 
     public String getId() {
         return id;
@@ -209,4 +231,10 @@ public class LegacyProfile implements Serializable {
         LegacyProfile other = (LegacyProfile) obj;
         return Objects.equals(this.id, other.id);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }

@@ -25,7 +25,6 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentLegacyProfilesBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
-import com.t4app.t4everandroid.main.Models.Session;
 import com.t4app.t4everandroid.main.adapter.LegacyProfileAdapter;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
@@ -77,6 +76,7 @@ public class LegacyProfilesFragment extends Fragment {
                             binding.itemActiveProfiles.countActiveProfiles.setText("0");
                             binding.itemCompletedProfiles.countCompletedProfiles.setText("0");
                             adapter.setProfileList(GlobalDataCache.legacyProfiles);
+                            adapter.notifyDataSetChanged();
                         }else if (type != null && type.equalsIgnoreCase("update_list")){
                             adapter.notifyDataSetChanged();
                         }
