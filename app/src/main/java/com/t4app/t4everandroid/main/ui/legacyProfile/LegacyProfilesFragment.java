@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
@@ -25,7 +26,11 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentLegacyProfilesBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.LegacyProfileAdapter;
+import com.t4app.t4everandroid.main.ui.ChatFragment;
+import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
+import com.t4app.t4everandroid.main.viewmodel.MainViewModel;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
@@ -139,6 +144,91 @@ public class LegacyProfilesFragment extends Fragment {
 
             @Override
             public void onChat(LegacyProfile profile) {
+                if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+                    GlobalDataCache.legacyProfileSelected = profile;
+                    if (profile.getOpenSession() != null){
+                        GlobalDataCache.sessionId = profile.getOpenSession().getId();
+                    }
+                    showFragment(new ChatFragment());
+                    ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
+                }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
+                    endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
+                            session -> {
+                                GlobalDataCache.legacyProfiles.set(
+                                        GlobalDataCache.legacyProfiles.indexOf(GlobalDataCache.legacyProfileSelected),
+                                        session.getAssistant());
+
+                                Map<String, Object> data = new HashMap<>();
+                                data.put("assistant_id", profile.getId());
+                                startSession(data, session1 -> {
+                                    GlobalDataCache.legacyProfiles.set(
+                                            GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                                    );
+                                    GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                                    GlobalDataCache.sessionId = session1.getId();
+                                    showFragment(new ChatFragment());
+                                    ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
+                                });
+                            });
+
+                }else{
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("assistant_id", profile.getId());
+                    startSession(data, session1 -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                        );
+                        GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                        GlobalDataCache.sessionId = session1.getId();
+                        showFragment(new ChatFragment());
+                        ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
+                    });
+                }
+
+            }
+
+            @Override
+            public void onQuestion(LegacyProfile profile) {
+                if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+                    GlobalDataCache.legacyProfileSelected = profile;
+                    if (profile.getOpenSession() != null){
+                        GlobalDataCache.sessionId = profile.getOpenSession().getId();
+                    }
+                    showFragment(new ChatFragment());
+                    ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
+                }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
+                    endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
+                            session -> {
+                                GlobalDataCache.legacyProfiles.set(
+                                        GlobalDataCache.legacyProfiles.indexOf(GlobalDataCache.legacyProfileSelected),
+                                        session.getAssistant());
+
+                                Map<String, Object> data = new HashMap<>();
+                                data.put("assistant_id", profile.getId());
+                                startSession(data, session1 -> {
+                                    GlobalDataCache.legacyProfiles.set(
+                                            GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                                    );
+                                    GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                                    GlobalDataCache.sessionId = session1.getId();
+                                    showFragment(new QuestionsFragment());
+                                    ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_questions);
+                                });
+                            });
+
+                }else{
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("assistant_id", profile.getId());
+                    startSession(data, session1 -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                        );
+                        GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                        GlobalDataCache.sessionId = session1.getId();
+                        showFragment(new QuestionsFragment());
+                        ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_questions);
+                    });
+                }
 
             }
 
@@ -254,4 +344,13 @@ public class LegacyProfilesFragment extends Fragment {
             }
         });
     }
+
+    private void showFragment(Fragment fragment) {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
 }

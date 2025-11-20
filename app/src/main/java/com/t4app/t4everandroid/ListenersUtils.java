@@ -36,6 +36,7 @@ public class ListenersUtils {
     public interface OnProfileActionListener {
         void onSelect(LegacyProfile profile);
         void onChat(LegacyProfile profile);
+        void onQuestion(LegacyProfile profile);
         void onEdit(LegacyProfile profile, int position);
         void onDelete(LegacyProfile profile, int position);
     }

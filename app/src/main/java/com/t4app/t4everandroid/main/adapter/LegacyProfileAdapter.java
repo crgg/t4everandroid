@@ -1,7 +1,6 @@
 package com.t4app.t4everandroid.main.adapter;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +9,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.material.button.MaterialButton;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
-import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 
 import java.util.List;
@@ -64,12 +62,7 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
                     .transform(new CircleCrop())
                     .into(holder.imgProfile);
         }
-//            if(profile.status != null && !profile.status.isEmpty()) {
-//                profileStatus.setText(profile.status);
-//                profileStatus.setVisibility(View.VISIBLE);
-//            } else {
-//                profileStatus.setVisibility(View.INVISIBLE);
-//            }
+
         if (profile.getOpenSession() != null && profile.getLastSession() == null){
             holder.itemView.post(() -> {
                 int newPos = holder.getBindingAdapterPosition();
@@ -85,7 +78,6 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
 
                 if (listener != null) listener.onSelect(profile);
             });
-//            holder.bindSelection(true, activity);
         }
         holder.bindSelection(position == lastClicked, activity);
 
@@ -111,6 +103,14 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
                 listener.onChat(profile);
             }
         });
+
+        holder.questionsBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                listener.onQuestion(profile);
+            }
+        });
+
         holder.editBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
@@ -151,13 +151,14 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView valueName, valueRelationship, valueAge, valueLanguage, valueCountry, valuePersonality;
         TextView profileStatus, userNameProfile;
-        MaterialButton selectBtn, chatBtn, editBtn;
-        AppCompatImageButton deleteBtn;
+        AppCompatImageButton selectBtn, chatBtn, editBtn, questionsBtn, deleteBtn;
         ImageView imgProfile;
+        ConstraintLayout container;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            container = itemView.findViewById(R.id.container_item_legacy);
             valueName = itemView.findViewById(R.id.value_name);
             imgProfile = itemView.findViewById(R.id.img_profile);
             userNameProfile = itemView.findViewById(R.id.user_name_profile);
@@ -172,23 +173,19 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
             selectBtn = itemView.findViewById(R.id.select_btn);
             chatBtn   = itemView.findViewById(R.id.chat_btn);
             editBtn   = itemView.findViewById(R.id.edit_btn);
+            questionsBtn = itemView.findViewById(R.id.questions_btn);
             deleteBtn = itemView.findViewById(R.id.delete_btn);
         }
 
         public void bindSelection(boolean selected, Activity activity) {
-            int bgColor = selected ? R.color.second_login_color : R.color.white;
-            int iconColor = selected ? R.color.white : R.color.second_login_color;
-            int text = selected ? R.string.selected : R.string.select;
-            int icon = selected ? R.drawable.ic_check : R.drawable.ic_stop;
-            int textColor = selected
-                    ? Color.WHITE
-                    : ContextCompat.getColor(activity, R.color.second_login_color);
+            int bgColor = selected ? R.drawable.bg_border_line_stroke_2_selected : R.drawable.bg_border_line_stroke_2 ;
+            int bgTintColor = selected ? R.color.white : R.color.second_login_color;
+            int bgContainer = selected ? R.drawable.bg_only_border_line : R.color.white;
 
-            selectBtn.setBackgroundTintList(ContextCompat.getColorStateList(activity, bgColor));
-            selectBtn.setTextColor(textColor);
-            selectBtn.setText(text);
-            selectBtn.setIcon(ContextCompat.getDrawable(activity, icon));
-            selectBtn.setIconTint(ContextCompat.getColorStateList(activity, iconColor));
+            container.setBackgroundResource(bgContainer);
+
+            selectBtn.setBackgroundResource(bgColor);
+            selectBtn.setImageTintList(ContextCompat.getColorStateList(activity, bgTintColor));
         }
     }
 

@@ -171,4 +171,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.InteractionsVH
         }
     }
 
+    public List<Interactions> getInteractions() {
+        return interactions;
+    }
 }

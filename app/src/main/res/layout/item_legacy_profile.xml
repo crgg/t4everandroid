@@ -2,14 +2,17 @@
 <androidx.cardview.widget.CardView android:fitsSystemWindows="true"
     app:cardCornerRadius="10dp"
     app:cardElevation="8dp"
-    android:background="@color/white"
+    android:background="@drawable/bg_border_line_second_color"
     android:layout_marginTop="15dp"
+    android:layout_marginStart="2dp"
+    android:layout_marginEnd="2dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_item_legacy"
         android:padding="10dp"
         android:background="@color/white"
         android:layout_width="match_parent"
@@ -206,76 +209,56 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/select_btn"
-                android:layout_width="wrap_content"
+                android:layout_width="52dp"
                 android:layout_height="43dp"
-                android:text="@string/select"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                app:icon="@drawable/ic_stop"
-                app:iconTint="@color/second_login_color"
-                android:textSize="13sp"
-                app:cornerRadius="8dp"
-                style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-                app:strokeColor="@color/second_login_color"
-                app:strokeWidth="2dp"
-                android:layout_weight="1"
-                app:rippleColor="@color/second_login_color"
-                android:textColor="@color/second_login_color" />
+                android:scaleType="centerInside"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_border_line_stroke_2"
+                android:src="@drawable/ic_heart_soft_border"
+                android:tint="@color/second_login_color"/>
 
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/chat_btn"
-                android:layout_marginStart="5dp"
-                android:layout_width="wrap_content"
+                android:layout_width="52dp"
                 android:layout_height="43dp"
-                android:layout_weight="1"
-                android:text="@string/chat"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                app:icon="@drawable/ic_questions"
-                app:iconTint="@color/second_login_color"
-                android:textSize="13sp"
-                app:cornerRadius="8dp"
-                style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-                app:strokeColor="@color/second_login_color"
-                app:strokeWidth="2dp"
-                app:rippleColor="@color/second_login_color"
-                android:textColor="@color/second_login_color" />
+                android:scaleType="centerInside"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_border_line_stroke_2"
+                android:src="@drawable/ic_questions"
+                android:tint="@color/second_login_color" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/edit_btn"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/questions_btn"
+                android:layout_width="52dp"
                 android:layout_height="43dp"
-                android:layout_marginStart="5dp"
-                android:text="@string/edit"
-                android:layout_weight="1"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                app:icon="@drawable/ic_edit"
-                app:iconTint="@color/second_login_color"
-                android:textSize="13sp"
-                app:cornerRadius="8dp"
-                style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-                app:strokeColor="@color/second_login_color"
-                app:strokeWidth="2dp"
-                app:rippleColor="@color/second_login_color"
-                android:textColor="@color/second_login_color" />
+                android:scaleType="centerInside"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_border_line_stroke_2"
+                android:src="@drawable/ic_bubble_question"
+                android:tint="@color/second_login_color" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/edit_btn"
+                android:layout_width="52dp"
+                android:layout_height="43dp"
+                android:scaleType="centerInside"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_border_line_stroke_2"
+                android:src="@drawable/ic_edit_soft_border"
+                android:tint="@color/second_login_color" />
+
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/delete_btn"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
+                android:layout_width="52dp"
+                android:layout_height="43dp"
                 android:src="@drawable/ic_delete"
-                android:tint="@color/red"
-                android:background="@null"
+                android:scaleType="centerInside"
+                android:tint="@color/white"
+                android:background="@drawable/bg_border_line_second_color"
+                android:backgroundTint="@color/red"
                 android:layout_gravity="end"/>
         </LinearLayout>
 

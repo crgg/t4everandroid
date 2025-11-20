@@ -4,8 +4,9 @@ public class CategoryItem {
     private String text;
     private int iconResId;
 
-    public CategoryItem(String text) {
+    public CategoryItem(String text, int iconResId) {
         this.text = text;
+        this.iconResId = iconResId;
     }
 
     public String getText() {

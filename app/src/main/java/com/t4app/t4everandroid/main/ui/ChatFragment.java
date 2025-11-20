@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
@@ -34,14 +35,17 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentChatBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.CategoryItem;
 import com.t4app.t4everandroid.main.Models.Interactions;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.ChatAdapter;
+import com.t4app.t4everandroid.main.adapter.OptionsFirstMsgAdapter;
+import com.t4app.t4everandroid.main.adapter.SelectContactAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
-import com.t4app.t4everandroid.main.ui.media.RecordAudioActivity;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.responses.ResponseCreateInteraction;
 import com.t4app.t4everandroid.network.responses.ResponseGetInteractions;
+import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +63,6 @@ public class ChatFragment extends Fragment {
 
     private ChatAdapter adapter;
     private FragmentChatBinding binding;
-    boolean isShowingText = true;
 
     private float cancelThreshold = 200;
     private boolean canceled = false;
@@ -71,6 +74,7 @@ public class ChatFragment extends Fragment {
     private Handler handler = new Handler();
     private boolean isRunning = false;
     private long startTime = 0L;
+    private float startX = 0f;
 
 
     private final Runnable timerRunnable = new Runnable() {
@@ -103,7 +107,7 @@ public class ChatFragment extends Fragment {
     public ChatFragment() {
     }
 
-    public static ChatFragment newInstance(String param1, String param2) {
+    public static ChatFragment newInstance() {
         return new ChatFragment();
     }
 
@@ -119,21 +123,19 @@ public class ChatFragment extends Fragment {
         View view = binding.getRoot();
 
         if (GlobalDataCache.legacyProfileSelected != null){
-            binding.itemChatHelper.cardChatHelper.setVisibility(View.VISIBLE);
             binding.itemChat.getRoot().setVisibility(View.VISIBLE);
-            binding.titleContainer.setVisibility(View.VISIBLE);
+            binding.itemChat.titleContainer.setVisibility(View.VISIBLE);
             binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
 
-            binding.chatSubtitle.setText(getString(R.string.chat_with_the_digital_version_of,
+            binding.itemChat.chatSubtitle.setText(getString(R.string.chat_with_the_digital_version_of,
                     GlobalDataCache.legacyProfileSelected.getName()));
 
-            binding.chatTitle.setText(getString(R.string.chat_with,
+            binding.itemChat.chatTitle.setText(getString(R.string.chat_with,
                     GlobalDataCache.legacyProfileSelected.getName()));
 
         }else {
-            binding.itemChatHelper.cardChatHelper.setVisibility(View.GONE);
             binding.itemChat.getRoot().setVisibility(View.GONE);
-            binding.titleContainer.setVisibility(View.GONE);
+            binding.itemChat.titleContainer.setVisibility(View.GONE);
             binding.itemSelectLegacy.getRoot().setVisibility(View.VISIBLE);
 
             binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_profile_chat);
@@ -178,64 +180,59 @@ public class ChatFragment extends Fragment {
         binding.itemChat.chatRv.setAdapter(adapter);
 
         if (GlobalDataCache.legacyProfileSelected != null && GlobalDataCache.sessionId != null){
-            getInteractions();
+            getInteractions(GlobalDataCache.sessionId);
         }
+
+        GridLayoutManager grid = new GridLayoutManager(getContext(), 4);
+        binding.itemChat.rvCategoriesFirstMsg.setLayoutManager(grid);
+        int spacing = (int) (2 * getResources().getDisplayMetrics().density);
+        binding.itemChat.rvCategoriesFirstMsg.addItemDecoration(
+                new GridSpacingItemDecoration(4, spacing, true));
+
+        binding.itemChat.rvCategoriesFirstMsg.setAdapter(getOptionsAdapter());
+
+
+        SelectContactAdapter contactAdapter = new SelectContactAdapter(GlobalDataCache.legacyProfiles, requireActivity(), profile -> {
+            if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+                Log.d(TAG, "IS SAME: ");
+            }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
+                endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
+                        session -> {
+                            GlobalDataCache.legacyProfiles.set(
+                                    GlobalDataCache.legacyProfiles.indexOf(GlobalDataCache.legacyProfileSelected),
+                                    session.getAssistant());
+
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("assistant_id", profile.getId());
+                            startSession(data, session1 -> {
+                                GlobalDataCache.legacyProfiles.set(
+                                        GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                                );
+                                GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                                GlobalDataCache.sessionId = session1.getId();
+                                getInteractions(session1.getId());
+                            });
+                        });
+
+            }else{
+                Map<String, Object> data = new HashMap<>();
+                data.put("assistant_id", profile.getId());
+                startSession(data, session1 -> {
+                    GlobalDataCache.legacyProfiles.set(
+                            GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                    );
+                    GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                    GlobalDataCache.sessionId = session1.getId();
+                    getInteractions(session1.getId());
+                });
+            }
+        });
+        binding.itemChat.contactsRv.setLayoutManager(new LinearLayoutManager(requireActivity()));
+        binding.itemChat.contactsRv.setAdapter(contactAdapter);
+
         return view;
     }
 
-    private void getInteractions(){
-        ApiServices apiServices = AppController.getApiServices();
-        Call<ResponseGetInteractions> call = apiServices.getInteractions(GlobalDataCache.sessionId);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ResponseGetInteractions> call, Response<ResponseGetInteractions> response) {
-                if (response.isSuccessful()){
-                    ResponseGetInteractions body = response.body();
-                    if (body != null){
-                        if (body.isStatus()){
-                            if (body.getData() != null){
-                                adapter.updateMessages(body.getData());
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseGetInteractions> call, Throwable throwable) {
-                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
-            }
-        });
-    }
-
-
-    private void sendInteraction(Map<String, Object> data, ListenersUtils.ConfirmationCallback callback){
-        ApiServices apiServices = AppController.getApiServices();
-        Call<ResponseCreateInteraction> call = apiServices.sendInteraction(data);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ResponseCreateInteraction> call, Response<ResponseCreateInteraction> response) {
-                if (response.isSuccessful()) {
-                    ResponseCreateInteraction body = response.body();
-                    if (body != null) {
-                        if (body.isStatus()) {
-                            if (body.getData() != null) {
-                                adapter.addMessage(body.getData());
-                                callback.onResult(true);
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseCreateInteraction> call, Throwable throwable) {
-                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
-            }
-        });
-    }
-
-    private float startX = 0f;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -258,6 +255,7 @@ public class ChatFragment extends Fragment {
                         data.put("text_from_user", msg);
                         sendInteraction(data, confirmed -> {
                             binding.itemChat.textInteraction.setText("");
+                            updateUI(adapter.getInteractions());
                         });
                     }
                 }
@@ -270,15 +268,6 @@ public class ChatFragment extends Fragment {
 
             }
         });
-
-//        binding.itemChat.recordAudioBtn.setOnLongClickListener(v -> {
-//            Log.d(TAG, "LONG PRESSED ");
-////            binding.itemChat.containerRecordAudio.setVisibility(View.VISIBLE);
-////            binding.itemChat.containerTextInteraction.setVisibility(View.GONE);
-//            showRecordContainer(slideOut, slideIn);
-//            return true;
-//        });
-
         binding.itemChat.recordAudioBtn.setOnTouchListener((view1, motionEvent) -> {
 
             switch (motionEvent.getAction()) {
@@ -390,7 +379,79 @@ public class ChatFragment extends Fragment {
             return false;
         });
 
+        binding.itemChat.changeContactBtn.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                binding.itemChat.containerChat.setVisibility(View.GONE);
+                binding.itemChat.containerSelectContact.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.itemChat.btnCloseSelectContact.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                binding.itemChat.containerChat.setVisibility(View.VISIBLE);
+                binding.itemChat.containerSelectContact.setVisibility(View.GONE);
+            }
+        });
+
+
     }
+
+
+    private void getInteractions(String sessionId){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseGetInteractions> call = apiServices.getInteractions(sessionId);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseGetInteractions> call, Response<ResponseGetInteractions> response) {
+                if (response.isSuccessful()){
+                    ResponseGetInteractions body = response.body();
+                    if (body != null){
+                        if (body.isStatus()){
+                            if (body.getData() != null){
+                                adapter.updateMessages(body.getData());
+                                updateUI(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseGetInteractions> call, Throwable throwable) {
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+
+    private void sendInteraction(Map<String, Object> data, ListenersUtils.ConfirmationCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseCreateInteraction> call = apiServices.sendInteraction(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseCreateInteraction> call, Response<ResponseCreateInteraction> response) {
+                if (response.isSuccessful()) {
+                    ResponseCreateInteraction body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                adapter.addMessage(body.getData());
+                                callback.onResult(true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseCreateInteraction> call, Throwable throwable) {
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
 
     private void deleteInteraction(Interactions interactions, int pos){
         ApiServices apiServices = AppController.getApiServices();
@@ -404,6 +465,7 @@ public class ChatFragment extends Fragment {
                         if (body.has("status")) {
                             if (body.get("status").getAsBoolean()) {
                                 adapter.deleteItem(pos);
+                                updateUI(adapter.getInteractions());
                             }
                         }
                     }
@@ -424,6 +486,16 @@ public class ChatFragment extends Fragment {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
         } else {
             callback.onResult(true);
+        }
+    }
+
+    private void updateUI(List<Interactions> interactions){
+        if (!interactions.isEmpty()){
+            binding.itemChat.chatRv.setVisibility(View.VISIBLE);
+            binding.itemChat.containerFirstMsg.setVisibility(View.GONE);
+        }else{
+            binding.itemChat.chatRv.setVisibility(View.GONE);
+            binding.itemChat.containerFirstMsg.setVisibility(View.VISIBLE);
         }
     }
 
@@ -524,4 +596,75 @@ public class ChatFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
+
+    private void startSession(Map<String, Object> data, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.startSession(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: START SESSION " + throwable.getMessage());
+            }
+        });
+    }
+
+    private void endSession(String sessionId, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.endSession(sessionId);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure:END SESSION " + throwable.getMessage());
+            }
+        });
+    }
+
+
+    private OptionsFirstMsgAdapter getOptionsAdapter(){
+
+        List<CategoryItem> items = new ArrayList<>();
+        items.add(new CategoryItem("MEMORIES", R.drawable.ic_person));
+        items.add(new CategoryItem("FAMILY", R.drawable.ic_person));
+        items.add(new CategoryItem("STORIES", R.drawable.ic_person));
+        items.add(new CategoryItem("PHOTOS", R.drawable.ic_person));
+        items.add(new CategoryItem("MUSIC", R.drawable.ic_person));
+        items.add(new CategoryItem("LESSONS", R.drawable.ic_person));
+        items.add(new CategoryItem("CHAT", R.drawable.ic_person));
+        items.add(new CategoryItem("RELAX", R.drawable.ic_person));
+
+        OptionsFirstMsgAdapter adapter = new OptionsFirstMsgAdapter(items, item -> {
+
+        });
+
+        return adapter;
+    }
+
 }

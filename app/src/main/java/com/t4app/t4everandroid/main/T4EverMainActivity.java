@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -22,6 +23,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -36,6 +38,7 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
+import com.t4app.t4everandroid.main.viewmodel.MainViewModel;
 import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.repository.UserRepository;
 import com.t4app.t4everandroid.main.ui.ChatFragment;
@@ -68,6 +71,8 @@ public class T4EverMainActivity extends AppCompatActivity {
 
     private UserRepository userRepository;
 
+    private MainViewModel mainViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +87,9 @@ public class T4EverMainActivity extends AppCompatActivity {
 
         binding = ActivityT4EverMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         SessionManager sessionManager = SessionManager.getInstance();
 
