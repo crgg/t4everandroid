@@ -39,7 +39,7 @@
 
             <TextView
                 android:id="@+id/textMessage"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

@@ -94,7 +94,7 @@ public class EmailAdapter  extends RecyclerView.Adapter<EmailAdapter.ViewHolder>
                     if (!email.isRead()){
                         email.setRead(true);
                         holder.containerEmail.setBackgroundTintList(ContextCompat.
-                                getColorStateList(context, R.color.white));
+                                getColorStateList(context, R.color.background_item));
                     }
                     listener.onItemClick(email, currentPos);
                 }
@@ -103,7 +103,7 @@ public class EmailAdapter  extends RecyclerView.Adapter<EmailAdapter.ViewHolder>
 
         if (email.isRead()){
             holder.containerEmail.setBackgroundTintList(ContextCompat.
-                    getColorStateList(context, R.color.white));
+                    getColorStateList(context, R.color.background_item));
         }else{
             holder.containerEmail.setBackgroundTintList(ContextCompat.
                     getColorStateList(context, R.color.soft_gray));

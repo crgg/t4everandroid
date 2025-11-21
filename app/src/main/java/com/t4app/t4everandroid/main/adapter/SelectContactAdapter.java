@@ -115,8 +115,8 @@ public class SelectContactAdapter extends RecyclerView.Adapter<SelectContactAdap
         }
 
         public void bindSelection(boolean isSelected, Activity activity) {
-            int bgColor = isSelected ? R.color.second_login_color : R.color.white;
-            int bgTintColor = isSelected ? R.color.white : R.color.soft_gray;
+            int bgColor = isSelected ? R.color.second_login_color : R.color.background;
+            int bgTintColor = isSelected ? R.color.background : R.color.soft_gray;
 
             selected.setBackgroundTintList(
                     ContextCompat.getColorStateList(activity, bgColor)

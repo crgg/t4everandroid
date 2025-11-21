@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -71,8 +73,6 @@ public class T4EverMainActivity extends AppCompatActivity {
 
     private UserRepository userRepository;
 
-    private MainViewModel mainViewModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +88,6 @@ public class T4EverMainActivity extends AppCompatActivity {
         binding = ActivityT4EverMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
-        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         SessionManager sessionManager = SessionManager.getInstance();
 
@@ -213,8 +211,10 @@ public class T4EverMainActivity extends AppCompatActivity {
                 settingsItem.setTitle(s);
 
                 MenuItem updateItem = popup.getMenu().findItem(R.id.action_update_profile);
-                SpannableString sI = new SpannableString(settingsItem.getTitle());
-                sI.setSpan(new ForegroundColorSpan(Color.BLACK), 0, sI.length(), 0);
+
+                SpannableString sI = new SpannableString(updateItem.getTitle());
+                int textColor = ContextCompat.getColor(T4EverMainActivity.this, R.color.black);
+                sI.setSpan(new ForegroundColorSpan(textColor), 0, sI.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 updateItem.setTitle(sI);
 
                 popup.setOnMenuItemClickListener(item -> {

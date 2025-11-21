@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
-import com.t4app.t4everandroid.main.Models.EmailTest;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
 
 import java.util.List;

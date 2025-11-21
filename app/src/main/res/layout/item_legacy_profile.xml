@@ -14,7 +14,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_item_legacy"
         android:padding="10dp"
-        android:background="@color/white"
+        android:background="@color/background_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

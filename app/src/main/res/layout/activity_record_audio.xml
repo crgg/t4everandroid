@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:padding="16dp"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/background"
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

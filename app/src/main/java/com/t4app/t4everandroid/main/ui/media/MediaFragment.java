@@ -38,14 +38,17 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentMediaBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Media;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
 import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
 import com.t4app.t4everandroid.main.adapter.MediaAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +57,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -93,32 +98,7 @@ public class MediaFragment extends Fragment {
         binding = FragmentMediaBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
-            binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
-            binding.createNewMediaBtn.setEnabled(false);
-            binding.createNewMediaBtn.setAlpha(0.5f);
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
-            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
-
-        } else if (GlobalDataCache.legacyProfileSelected == null){
-            binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_profile_media);
-            binding.createNewMediaBtn.setEnabled(false);
-            binding.createNewMediaBtn.setAlpha(0.5f);
-
-
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
-            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
-        }else {
-            binding.itemSelectLegacy.selectLegacyDescription.setText(
-                    getString(R.string.profile_selected_media,
-                            GlobalDataCache.legacyProfileSelected.getName()));
-            binding.createNewMediaBtn.setEnabled(true);
-            binding.createNewMediaBtn.setAlpha(1f);
-
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.VISIBLE);
-            binding.itemSelectLegacy.btnAddFirst.setText(R.string.record_first_media);
-            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.GONE);
-        }
+        checkStatus();
 
         binding.itemSelectLegacy.buttonActionsProfile.setOnClickListener(new SafeClickListener() {
             @Override
@@ -192,8 +172,16 @@ public class MediaFragment extends Fragment {
             }
         });
         if (GlobalDataCache.legacyProfileSelected != null){
+            binding.changeGlobalProfile.setText(GlobalDataCache.legacyProfileSelected.getName());
             getMedia();
         }
+
+        binding.changeGlobalProfile.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showProfilesBottomSheet();
+            }
+        });
 
         binding.categoriesAuto.setOnClickListener(new SafeClickListener() {
             @Override
@@ -314,15 +302,21 @@ public class MediaFragment extends Fragment {
                         if (body.isStatus()){
                             if (body.getData() != null){
                                 calculateMedias(body.getData());
+                                checkStatus();
+                                mediaTestList.addAll(body.getData());
+                                GlobalDataCache.mediaList = new ArrayList<>(body.getData());
+                                adapter.notifyDataSetChanged();
                                 if (!body.getData().isEmpty()){
                                     if (binding.mediaRv.getVisibility() == View.GONE){
                                         binding.mediaRv.setVisibility(View.VISIBLE);
                                         binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
                                     }
+                                }else{
+                                    if (binding.mediaRv.getVisibility() == View.VISIBLE){
+                                        binding.mediaRv.setVisibility(View.GONE);
+                                        binding.itemSelectLegacy.getRoot().setVisibility(View.VISIBLE);
+                                    }
                                 }
-                                mediaTestList.addAll(body.getData());
-                                GlobalDataCache.mediaList = new ArrayList<>(body.getData());
-                                adapter.notifyDataSetChanged();
                             }
                         }
                     }
@@ -529,4 +523,163 @@ public class MediaFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
+
+    private void checkStatus(){
+        if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
+            binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
+            binding.createNewMediaBtn.setEnabled(false);
+            binding.createNewMediaBtn.setAlpha(0.5f);
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
+
+        } else if (GlobalDataCache.legacyProfileSelected == null){
+            binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_profile_media);
+            binding.createNewMediaBtn.setEnabled(false);
+            binding.createNewMediaBtn.setAlpha(0.5f);
+
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
+        }else {
+            binding.itemSelectLegacy.selectLegacyDescription.setText(
+                    getString(R.string.profile_selected_media,
+                            GlobalDataCache.legacyProfileSelected.getName()));
+            binding.createNewMediaBtn.setEnabled(true);
+            binding.createNewMediaBtn.setAlpha(1f);
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.VISIBLE);
+            binding.itemSelectLegacy.btnAddFirst.setText(R.string.record_first_media);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.GONE);
+        }
+    }
+
+    private void showProfilesBottomSheet() {
+        BottomSheetDialog profilesBottomSheet = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+
+        List<LegacyProfile> profiles = GlobalDataCache.legacyProfiles;
+        if (profiles == null) {
+            profiles = new ArrayList<>();
+        }
+
+        LegacyItemsAdapter adapter = new LegacyItemsAdapter(profiles);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        adapter.setOnItemClickListener(profile -> {
+            processChange(profile, profilesBottomSheet);
+        });
+
+        profilesBottomSheet.setContentView(view);
+        profilesBottomSheet.show();
+    }
+
+    private void processChange(LegacyProfile profile, BottomSheetDialog profilesBottomSheet){
+        if (GlobalDataCache.legacyProfileSelected == null){
+            Map<String, Object> data = new HashMap<>();
+            data.put("assistant_id", profile.getId());
+            startSession(data, session -> {
+                GlobalDataCache.legacyProfiles.set(
+                        GlobalDataCache.legacyProfiles.indexOf(profile), session.getAssistant()
+                );
+                GlobalDataCache.legacyProfileSelected = session.getAssistant();
+                GlobalDataCache.sessionId = session.getId();
+                binding.changeGlobalProfile.setText(profile.getName(), false);
+                getMedia();
+                profilesBottomSheet.dismiss();
+            });
+        }else if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+            Log.d(TAG, "IS SAME: ");
+            binding.changeGlobalProfile.setText(profile.getName(), false);
+            profilesBottomSheet.dismiss();
+        }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
+            endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
+                    session -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(GlobalDataCache.legacyProfileSelected),
+                                session.getAssistant());
+
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("assistant_id", profile.getId());
+                        startSession(data, session1 -> {
+                            GlobalDataCache.legacyProfiles.set(
+                                    GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                            );
+                            GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                            GlobalDataCache.sessionId = session1.getId();
+                            binding.changeGlobalProfile.setText(profile.getName(), false);
+                            getMedia();
+                            profilesBottomSheet.dismiss();
+                        });
+                    });
+
+        }else{
+            Map<String, Object> data = new HashMap<>();
+            data.put("assistant_id", profile.getId());
+            startSession(data, session1 -> {
+                GlobalDataCache.legacyProfiles.set(
+                        GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                );
+                GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                GlobalDataCache.sessionId = session1.getId();
+                binding.changeGlobalProfile.setText(profile.getName(), false);
+                getMedia();
+                profilesBottomSheet.dismiss();
+            });
+        }
+    }
+
+    private void startSession(Map<String, Object> data, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.startSession(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: START SESSION " + throwable.getMessage());
+            }
+        });
+    }
+
+    private void endSession(String sessionId, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.endSession(sessionId);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure:END SESSION " + throwable.getMessage());
+            }
+        });
+    }
+
 }

@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView android:fitsSystemWindows="true"
     app:cardCornerRadius="16dp"
     app:cardElevation="8dp"
-    android:background="@color/white"
+    android:background="@color/background_item"
     android:layout_marginTop="15dp"
     android:layout_marginStart="15dp"
     android:layout_marginEnd="15dp"
@@ -15,7 +15,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:padding="15dp"
-        android:background="@color/white"
+        android:background="@color/background_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -46,7 +46,7 @@
             android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white">
+            android:background="@color/background_item">
 
             <LinearLayout
                 android:background="@drawable/bg_soft_border_line"

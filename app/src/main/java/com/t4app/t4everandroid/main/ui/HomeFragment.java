@@ -11,18 +11,21 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentHomeBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.Session;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -156,12 +159,16 @@ public class HomeFragment extends Fragment {
                                     binding.scheduledMessagesItem.countMessages.setText("0");
                                 }else{
                                     if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()){
+                                        int sessions = 0;
                                         for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles){
                                             if (legacyProfile.getOpenSession() != null){
                                                 GlobalDataCache.legacyProfileSelected = legacyProfile;
                                                 GlobalDataCache.sessionId = legacyProfile.getOpenSession().getId();
-                                                break;
+                                                sessions++;
                                             }
+                                        }
+                                        if (sessions > 1){
+                                            endSessions();
                                         }
                                     }
                                     binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
@@ -189,4 +196,42 @@ public class HomeFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
+
+    private void endSessions(){
+        if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()){
+            GlobalDataCache.legacyProfileSelected = null;
+            GlobalDataCache.sessionId = null;
+            for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles){
+                if (legacyProfile.getOpenSession() != null){
+                    endSession(legacyProfile.getOpenSession().getId(), session -> {});
+                }
+            }
+        }
+    }
+
+    private void endSession(String sessionId, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.endSession(sessionId);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure:END SESSION " + throwable.getMessage());
+            }
+        });
+    }
+
 }

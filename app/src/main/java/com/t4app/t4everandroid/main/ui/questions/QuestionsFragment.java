@@ -23,14 +23,18 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentQuestionsBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.ListItem;
 import com.t4app.t4everandroid.main.Models.Question;
+import com.t4app.t4everandroid.main.Models.Session;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.QuestionGroupedAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,33 +74,7 @@ public class QuestionsFragment extends Fragment {
         binding = FragmentQuestionsBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
-            binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
-            binding.addNewQuestionBtn.setEnabled(false);
-            binding.addNewQuestionBtn.setAlpha(0.5f);
-
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
-            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
-
-        } else if (GlobalDataCache.legacyProfileSelected == null){
-            binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_to_start);
-            binding.addNewQuestionBtn.setEnabled(false);
-            binding.addNewQuestionBtn.setAlpha(0.5f);
-
-
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
-            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
-        }else {
-            binding.itemSelectLegacy.selectLegacyDescription.setText(
-                    getString(R.string.start_adding_questions_to_capture_the_essence_of,
-                    GlobalDataCache.legacyProfileSelected.getName()));
-            binding.addNewQuestionBtn.setEnabled(true);
-            binding.addNewQuestionBtn.setAlpha(1f);
-
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.VISIBLE);
-            binding.itemSelectLegacy.btnAddFirst.setText(R.string.add_first_question);
-            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.GONE);
-        }
+        checkStatus();
 
         bottomSheet = new CreateQuestionBottomSheet();
 
@@ -104,6 +82,13 @@ public class QuestionsFragment extends Fragment {
             @Override
             public void onSafeClick(View v) {
                 showCategories();
+            }
+        });
+
+        binding.changeGlobalProfile.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                showProfilesBottomSheet();
             }
         });
 
@@ -261,6 +246,37 @@ public class QuestionsFragment extends Fragment {
 
     }
 
+    private void checkStatus(){
+        if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
+            binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
+            binding.addNewQuestionBtn.setEnabled(false);
+            binding.addNewQuestionBtn.setAlpha(0.5f);
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
+
+        } else if (GlobalDataCache.legacyProfileSelected == null){
+            binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_to_start);
+            binding.addNewQuestionBtn.setEnabled(false);
+            binding.addNewQuestionBtn.setAlpha(0.5f);
+
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
+        }else {
+            binding.changeGlobalProfile.setText(GlobalDataCache.legacyProfileSelected.getName());
+            binding.itemSelectLegacy.selectLegacyDescription.setText(
+                    getString(R.string.start_adding_questions_to_capture_the_essence_of,
+                            GlobalDataCache.legacyProfileSelected.getName()));
+            binding.addNewQuestionBtn.setEnabled(true);
+            binding.addNewQuestionBtn.setAlpha(1f);
+
+            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.VISIBLE);
+            binding.itemSelectLegacy.btnAddFirst.setText(R.string.add_first_question);
+            binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.GONE);
+        }
+    }
+
 
     private void getQuestions(){
         ApiServices apiServices = AppController.getApiServices();
@@ -281,6 +297,7 @@ public class QuestionsFragment extends Fragment {
                                 calculateTotalQuestions(body.getQuestions());
                             }
                             checkList();
+                            checkStatus();
                         }
                     }
                 }
@@ -328,6 +345,29 @@ public class QuestionsFragment extends Fragment {
 
         categoriesBottomSheet.setContentView(view);
         categoriesBottomSheet.show();
+    }
+
+    private void showProfilesBottomSheet() {
+        BottomSheetDialog profilesBottomSheet = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+
+        List<LegacyProfile> profiles = GlobalDataCache.legacyProfiles;
+        if (profiles == null) {
+            profiles = new ArrayList<>();
+        }
+
+        LegacyItemsAdapter adapter = new LegacyItemsAdapter(profiles);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        adapter.setOnItemClickListener(profile -> {
+            processChange(profile, profilesBottomSheet);
+        });
+
+        profilesBottomSheet.setContentView(view);
+        profilesBottomSheet.show();
     }
 
     private List<ListItem> groupByCategory(List<Question> list, @Nullable String filterCategory) {
@@ -407,6 +447,112 @@ public class QuestionsFragment extends Fragment {
             binding.totalCategories.setText(String.valueOf(categoriesFounded.size()));
             binding.totalPending.setText(String.valueOf(pending));
         }
+    }
+
+    private void processChange(LegacyProfile profile, BottomSheetDialog profilesBottomSheet){
+        if (GlobalDataCache.legacyProfileSelected == null){
+            Map<String, Object> data = new HashMap<>();
+            data.put("assistant_id", profile.getId());
+            startSession(data, session -> {
+                GlobalDataCache.legacyProfiles.set(
+                        GlobalDataCache.legacyProfiles.indexOf(profile), session.getAssistant()
+                );
+                GlobalDataCache.legacyProfileSelected = session.getAssistant();
+                GlobalDataCache.sessionId = session.getId();
+                binding.changeGlobalProfile.setText(profile.getName(), false);
+                getQuestions();
+                profilesBottomSheet.dismiss();
+            });
+        }else if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+            Log.d(TAG, "IS SAME: ");
+            binding.changeGlobalProfile.setText(profile.getName(), false);
+            profilesBottomSheet.dismiss();
+        }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
+            endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
+                    session -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(GlobalDataCache.legacyProfileSelected),
+                                session.getAssistant());
+
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("assistant_id", profile.getId());
+                        startSession(data, session1 -> {
+                            GlobalDataCache.legacyProfiles.set(
+                                    GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                            );
+                            GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                            GlobalDataCache.sessionId = session1.getId();
+                            binding.changeGlobalProfile.setText(profile.getName(), false);
+                            getQuestions();
+                            profilesBottomSheet.dismiss();
+                        });
+                    });
+
+        }else{
+            Map<String, Object> data = new HashMap<>();
+            data.put("assistant_id", profile.getId());
+            startSession(data, session1 -> {
+                GlobalDataCache.legacyProfiles.set(
+                        GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                );
+                GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                GlobalDataCache.sessionId = session1.getId();
+                binding.changeGlobalProfile.setText(profile.getName(), false);
+                getQuestions();
+                profilesBottomSheet.dismiss();
+            });
+        }
+    }
+
+    private void startSession(Map<String, Object> data, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.startSession(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: START SESSION " + throwable.getMessage());
+            }
+        });
+    }
+
+    private void endSession(String sessionId, ListenersUtils.OnSessionStartedOrEndCallback callback){
+        ApiServices apiServices = AppController.getApiServices();
+        Call<ResponseStartEndSession> call = apiServices.endSession(sessionId);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+                if (response.isSuccessful()) {
+                    ResponseStartEndSession body = response.body();
+                    if (body != null) {
+                        if (body.isStatus()) {
+                            if (body.getData() != null) {
+                                callback.onSession(body.getData());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+                Log.e(TAG, "onFailure:END SESSION " + throwable.getMessage());
+            }
+        });
     }
 
 

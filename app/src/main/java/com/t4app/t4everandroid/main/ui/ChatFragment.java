@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -26,6 +28,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ErrorUtils;
@@ -37,6 +40,7 @@ import com.t4app.t4everandroid.databinding.FragmentChatBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.CategoryItem;
 import com.t4app.t4everandroid.main.Models.Interactions;
+import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.ChatAdapter;
 import com.t4app.t4everandroid.main.adapter.OptionsFirstMsgAdapter;
@@ -191,10 +195,32 @@ public class ChatFragment extends Fragment {
 
         binding.itemChat.rvCategoriesFirstMsg.setAdapter(getOptionsAdapter());
 
+        binding.itemChat.btnProfileData.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                if (GlobalDataCache.legacyProfileSelected != null){
+                    showProfileBottomSheet(GlobalDataCache.legacyProfileSelected);
+                }
+            }
+        });
+
 
         SelectContactAdapter contactAdapter = new SelectContactAdapter(GlobalDataCache.legacyProfiles, requireActivity(), profile -> {
-            if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+            if (GlobalDataCache.legacyProfileSelected == null){
+                Map<String, Object> data = new HashMap<>();
+                data.put("assistant_id", profile.getId());
+                startSession(data, session1 -> {
+                    GlobalDataCache.legacyProfiles.set(
+                            GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                    );
+                    GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                    GlobalDataCache.sessionId = session1.getId();
+                    getInteractions(session1.getId());
+                });
+            } else if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
                 Log.d(TAG, "IS SAME: ");
+                binding.itemChat.containerChat.setVisibility(View.VISIBLE);
+                binding.itemChat.containerSelectContact.setVisibility(View.GONE);
             }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
                 endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
                         session -> {
@@ -412,6 +438,13 @@ public class ChatFragment extends Fragment {
                             if (body.getData() != null){
                                 adapter.updateMessages(body.getData());
                                 updateUI(body.getData());
+                                binding.itemChat.containerChat.setVisibility(View.VISIBLE);
+                                binding.itemChat.containerSelectContact.setVisibility(View.GONE);
+                                binding.itemChat.chatSubtitle.setText(getString(R.string.chat_with_the_digital_version_of,
+                                        GlobalDataCache.legacyProfileSelected.getName()));
+
+                                binding.itemChat.chatTitle.setText(getString(R.string.chat_with,
+                                        GlobalDataCache.legacyProfileSelected.getName()));
                             }
                         }
                     }
@@ -651,20 +684,120 @@ public class ChatFragment extends Fragment {
     private OptionsFirstMsgAdapter getOptionsAdapter(){
 
         List<CategoryItem> items = new ArrayList<>();
-        items.add(new CategoryItem("MEMORIES", R.drawable.ic_person));
-        items.add(new CategoryItem("FAMILY", R.drawable.ic_person));
-        items.add(new CategoryItem("STORIES", R.drawable.ic_person));
-        items.add(new CategoryItem("PHOTOS", R.drawable.ic_person));
-        items.add(new CategoryItem("MUSIC", R.drawable.ic_person));
-        items.add(new CategoryItem("LESSONS", R.drawable.ic_person));
-        items.add(new CategoryItem("CHAT", R.drawable.ic_person));
-        items.add(new CategoryItem("RELAX", R.drawable.ic_person));
+        items.add(new CategoryItem(getString(R.string.memories_no_icon), R.drawable.ic_memories, R.color.card_memories_bg));
+        items.add(new CategoryItem(getString(R.string.family_no_icon), R.drawable.ic_family, R.color.card_family_bg));
+        items.add(new CategoryItem(getString(R.string.stories), R.drawable.ic_book, R.color.card_stories_bg));
+        items.add(new CategoryItem(getString(R.string.photos), R.drawable.ic_camera, R.color.card_photos_bg));
+        items.add(new CategoryItem(getString(R.string.music), R.drawable.ic_music, R.color.card_music_bg));
+        items.add(new CategoryItem(getString(R.string.lessons), R.drawable.ic_star, R.color.card_lessons_bg));
+        items.add(new CategoryItem(getString(R.string.chat), R.drawable.ic_sms, R.color.card_chat_bg));
+        items.add(new CategoryItem(getString(R.string.relax), R.drawable.ic_relax, R.color.card_relax_bg));
 
         OptionsFirstMsgAdapter adapter = new OptionsFirstMsgAdapter(items, item -> {
+            String title = item.getText();
+            String textMsg = "";
+            if (title.equals(getString(R.string.memories_no_icon))) {
+                textMsg = "What is your favorite memory from childhood?";
+            }
+            else if (title.equals(getString(R.string.family_no_icon))) {
+                textMsg = "Tell me about your family";
+            }
+            else if (title.equals(getString(R.string.stories))) {
+                textMsg = "Tell me a story from your life";
+            }
+            else if (title.equals(getString(R.string.photos))) {
+                textMsg = "Do you have any favorite photos you'd like to share?";
+            }
+            else if (title.equals(getString(R.string.music))) {
+                textMsg = "What's the most important lesson you've learned?";
+            }
+            else if (title.equals(getString(R.string.lessons))) {
+                textMsg = "What are you most proud of?";
+            }
+            else if (title.equals(getString(R.string.chat))) {
+                textMsg = "Let's have a conversation";
+            }
+            else if (title.equals(getString(R.string.relax))) {
+                textMsg = "Let's have a relaxed chat";
+            }
 
+            binding.itemChat.textInteraction.setText(textMsg);
+            binding.itemChat.textInteraction.post(() -> {
+                EditText edit = binding.itemChat.textInteraction;
+                edit.setSelection(edit.getText().length());
+                edit.requestFocus();
+            });
         });
 
         return adapter;
+    }
+
+    private void showProfileBottomSheet(LegacyProfile profile) {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_profile_info, null);
+
+        TextView textName = view.findViewById(R.id.textName);
+        TextView textRelationship = view.findViewById(R.id.textRelationshipValue);
+        TextView textAge = view.findViewById(R.id.textAge);
+        TextView textCountry = view.findViewById(R.id.textCountry);
+        TextView textLanguage = view.findViewById(R.id.textLanguage);
+        TextView textPersonality = view.findViewById(R.id.textPersonality);
+        TextView textStatus = view.findViewById(R.id.textStatus);
+        TextView textSessionInfo = view.findViewById(R.id.textSessionInfo);
+        View viewStatusDot = view.findViewById(R.id.viewStatusDot);
+        View btnClose = view.findViewById(R.id.buttonClose);
+
+        textName.setText(profile.getName());
+
+        textRelationship.setText(profile.getFamilyRelationship());
+
+        if (profile.getAge() > 0) {
+            textAge.setText(profile.getAge() + " years old");
+        } else {
+            textAge.setText("-");
+        }
+
+        textCountry.setText(
+                profile.getCountry() != null && !profile.getCountry().isEmpty()
+                        ? profile.getCountry()
+                        : "-"
+        );
+
+        textLanguage.setText(
+                profile.getLanguage() != null && !profile.getLanguage().isEmpty()
+                        ? profile.getLanguage()
+                        : "-"
+        );
+
+        if (profile.getBasePersonality() != null && !profile.getBasePersonality().isEmpty()) {
+            String traits = android.text.TextUtils.join(", ", profile.getBasePersonality());
+            textPersonality.setText(traits);
+        } else {
+            textPersonality.setText("-");
+        }
+
+        String state = profile.getState();
+        if (state == null || state.isEmpty()) {
+            state = "Inactive";
+        }
+        textStatus.setText(state);
+
+        if ("Active".equalsIgnoreCase(state)) {
+            viewStatusDot.setBackgroundResource(R.drawable.bg_status_dot_active);
+        } else {
+            viewStatusDot.setBackgroundResource(R.drawable.bg_status_dot_inactive);
+        }
+
+        if (profile.getDateCreation() != null && !profile.getDateCreation().isEmpty()) {
+            textSessionInfo.setText("Active session started " + profile.getDateCreation());
+        } else {
+            textSessionInfo.setText("No active session information");
+        }
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.setContentView(view);
+        dialog.show();
     }
 
 }

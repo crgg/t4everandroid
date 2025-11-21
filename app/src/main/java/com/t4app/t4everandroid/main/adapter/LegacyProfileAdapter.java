@@ -49,7 +49,11 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         LegacyProfile profile = profileList.get(position);
 
         holder.valueName.setText(profile.getName());
-        holder.userNameProfile.setText(profile.getAlias());
+        if (profile.getAlias() != null && !profile.getAlias().isEmpty()){
+            holder.userNameProfile.setText(profile.getAlias());
+        }else{
+            holder.userNameProfile.setText(profile.getName());
+        }
         holder.valueRelationship.setText(profile.getFamilyRelationship());
         holder.valueAge.setText(String.valueOf(profile.getAge()));
         holder.valueLanguage.setText(profile.getLanguage());
@@ -180,7 +184,7 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         public void bindSelection(boolean selected, Activity activity) {
             int bgColor = selected ? R.drawable.bg_border_line_stroke_2_selected : R.drawable.bg_border_line_stroke_2 ;
             int bgTintColor = selected ? R.color.white : R.color.second_login_color;
-            int bgContainer = selected ? R.drawable.bg_only_border_line : R.color.white;
+            int bgContainer = selected ? R.drawable.bg_only_border_line : R.color.background;
 
             container.setBackgroundResource(bgContainer);
 

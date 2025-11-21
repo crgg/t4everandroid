@@ -27,7 +27,6 @@ import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentEmailBinding;
 import com.t4app.t4everandroid.main.Models.EmailTest;
-import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.adapter.EmailAdapter;
 
 import java.text.SimpleDateFormat;
@@ -47,7 +46,7 @@ public class EmailFragment extends Fragment {
     private AddEmailBottomSheet bottomSheet;
 
     public EmailFragment() {
-    }
+     }
 
     public static EmailFragment newInstance() {
         return new EmailFragment();
@@ -222,7 +221,7 @@ public class EmailFragment extends Fragment {
 
         testEmails.removeAll(deleted);
 
-        binding.emailQuantityText.setText(testEmails.size() + "emails total, " + unread + " unread");
+        binding.emailQuantityText.setText(testEmails.size() + " emails total, " + unread + " unread");
 
         adapter = new EmailAdapter(testEmails, requireContext(), new EmailAdapter.OnItemClickListener() {
             @Override

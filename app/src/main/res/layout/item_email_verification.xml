@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView android:fitsSystemWindows="true"
     app:cardCornerRadius="10dp"
     app:cardElevation="8dp"
-    android:background="@color/white"
+    android:background="@color/background"
     android:layout_marginTop="15dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,7 +10,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:background="@color/white"
+        android:background="@color/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

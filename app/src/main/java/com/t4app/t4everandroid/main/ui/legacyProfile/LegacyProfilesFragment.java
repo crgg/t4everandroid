@@ -108,7 +108,17 @@ public class LegacyProfilesFragment extends Fragment {
         adapter = new LegacyProfileAdapter(GlobalDataCache.legacyProfiles, requireActivity(), new ListenersUtils.OnProfileActionListener() {
             @Override
             public void onSelect(LegacyProfile profile) {
-                if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+                if (GlobalDataCache.legacyProfileSelected == null){
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("assistant_id", profile.getId());
+                    startSession(data, session1 -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                        );
+                        GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                        GlobalDataCache.sessionId = session1.getId();
+                    });
+                }else if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
                     Log.d(TAG, "IS SAME: ");
                 }else if (GlobalDataCache.legacyProfileSelected.getOpenSession() != null){
                     endSession(GlobalDataCache.legacyProfileSelected.getOpenSession().getId(),
@@ -144,7 +154,19 @@ public class LegacyProfilesFragment extends Fragment {
 
             @Override
             public void onChat(LegacyProfile profile) {
-                if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+                if (GlobalDataCache.legacyProfileSelected == null){
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("assistant_id", profile.getId());
+                    startSession(data, session1 -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(profile), session1.getAssistant()
+                        );
+                        GlobalDataCache.legacyProfileSelected = session1.getAssistant();
+                        GlobalDataCache.sessionId = session1.getId();
+                        showFragment(new ChatFragment());
+                        ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
+                    });
+                } else if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
                     GlobalDataCache.legacyProfileSelected = profile;
                     if (profile.getOpenSession() != null){
                         GlobalDataCache.sessionId = profile.getOpenSession().getId();
@@ -189,7 +211,19 @@ public class LegacyProfilesFragment extends Fragment {
 
             @Override
             public void onQuestion(LegacyProfile profile) {
-                if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
+                if (GlobalDataCache.legacyProfileSelected == null){
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("assistant_id", profile.getId());
+                    startSession(data, session -> {
+                        GlobalDataCache.legacyProfiles.set(
+                                GlobalDataCache.legacyProfiles.indexOf(profile), session.getAssistant()
+                        );
+                        GlobalDataCache.legacyProfileSelected = session.getAssistant();
+                        GlobalDataCache.sessionId = session.getId();
+                        showFragment(new QuestionsFragment());
+                        ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_questions);
+                    });
+                }else if (GlobalDataCache.legacyProfileSelected.getId().equalsIgnoreCase(profile.getId())){
                     GlobalDataCache.legacyProfileSelected = profile;
                     if (profile.getOpenSession() != null){
                         GlobalDataCache.sessionId = profile.getOpenSession().getId();

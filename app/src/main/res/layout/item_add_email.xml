@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView android:fitsSystemWindows="true"
     app:cardCornerRadius="10dp"
     app:cardElevation="8dp"
-    android:background="@color/white"
+    android:background="@color/background"
     android:layout_marginTop="4dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,7 +12,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="@color/white"
+        android:background="@color/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -60,9 +60,9 @@
                     android:textSize="13sp"
                     app:cornerRadius="8dp"
                     android:backgroundTint="@color/email_filter_bg"
-                    app:strokeColor="@color/white"
+                    app:strokeColor="@color/background_item"
                     app:strokeWidth="2dp"
-                    app:rippleColor="@color/soft_gray"
+                    app:rippleColor="@color/rippleColor"
                     android:textColor="@color/email_filter_text_color" />
 
                 <com.google.android.material.button.MaterialButton
@@ -79,9 +79,9 @@
                     android:textSize="13sp"
                     app:cornerRadius="8dp"
                     android:backgroundTint="@color/email_filter_bg"
-                    app:strokeColor="@color/white"
+                    app:strokeColor="@color/background_item"
                     app:strokeWidth="2dp"
-                    app:rippleColor="@color/soft_gray"
+                    app:rippleColor="@color/rippleColor"
                     android:textColor="@color/email_filter_text_color" />
 
                 <com.google.android.material.button.MaterialButton
@@ -98,9 +98,9 @@
                     android:textSize="13sp"
                     app:cornerRadius="8dp"
                     android:backgroundTint="@color/email_filter_bg"
-                    app:strokeColor="@color/white"
+                    app:strokeColor="@color/background_item"
                     app:strokeWidth="2dp"
-                    app:rippleColor="@color/soft_gray"
+                    app:rippleColor="@color/rippleColor"
                     android:textColor="@color/second_login_color" />
 
                 <com.google.android.material.button.MaterialButton
@@ -117,9 +117,9 @@
                     android:textSize="13sp"
                     app:cornerRadius="8dp"
                     android:backgroundTint="@color/email_filter_bg"
-                    app:strokeColor="@color/white"
+                    app:strokeColor="@color/background_item"
                     app:strokeWidth="2dp"
-                    app:rippleColor="@color/soft_gray"
+                    app:rippleColor="@color/rippleColor"
                     android:textColor="@color/second_login_color" />
 
                 <com.google.android.material.button.MaterialButton
@@ -136,9 +136,9 @@
                     android:textSize="13sp"
                     app:cornerRadius="8dp"
                     android:backgroundTint="@color/email_filter_bg"
-                    app:strokeColor="@color/white"
+                    app:strokeColor="@color/background_item"
                     app:strokeWidth="2dp"
-                    app:rippleColor="@color/soft_gray"
+                    app:rippleColor="@color/rippleColor"
                     android:textColor="@color/second_login_color" />
 
 
