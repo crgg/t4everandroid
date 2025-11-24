@@ -83,7 +83,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
     private ActivityResultLauncher<Uri> cameraLauncher;
     private ActivityResultLauncher<Intent> galleryLauncher;
     private Uri photoUri;
-    private Uri realPdfUri;
+    private Uri realPdfUri = null;
     private File photoFile;
 
     private SelectImageUtils selectImageUtils;
@@ -219,7 +219,8 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         binding.createProfileBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                if (validateInputs()){
+                if (validateInputs(binding.categoriesProfileForAuto.getText().toString()
+                        .equalsIgnoreCase(getString(R.string.myself)))){
                     String fullName = getTextTv(fullNameValue);
                     String alias = getTextTv(aliasValue);
                     String relationship = getTextTv(relationshipValue);
@@ -239,7 +240,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                         request = new ProfileRequest(alias,
                                 calculateAge(birthdate),
                                 birthdate,
-                                "0000/00/00",
+                                deathdate,
                                 "Myself",
                                 personalityList,
                                 binding.activeCheckBox.isChecked(),
@@ -266,6 +267,8 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                     }else{
                         createUser(request);
                     }
+                }else{
+                    Log.d(TAG, "NO VALID INPUT: ");
                 }
             }
         });
@@ -304,12 +307,14 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                     if (body != null) {
                         if (body.isStatus()) {
                             if (body.getData() != null) {
+                                Log.d(TAG, "CREATE USER: ");
                                 GlobalDataCache.legacyProfiles.add(0, body.getData());
                                 if (body.getMsg() != null){
                                     if(realPdfUri != null){
                                         uploadImageUser(body.getData().getId(), body.getMsg());
                                     }else{
-                                        MessagesUtils.showMessageFinishAndReturnBool(CreateLegacyProfileActivity.this, body.getMsg());
+                                        MessagesUtils.showMessageFinishAndReturnBool(
+                                                CreateLegacyProfileActivity.this, body.getMsg());
                                     }
                                 }
                             }
@@ -424,44 +429,52 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         binding.autoCountry.setText(getString(R.string.united_state), false);
     }
 
-    private boolean validateInputs() {
+    private boolean validateInputs(boolean isMyself) {
         boolean valid = true;
 
         clearErrors();
-
         if (isEmpty(fullNameValue)) {
             setError(fullNameLayout, getString(R.string.full_name_is_required));
             valid = false;
+            Log.d(TAG, "IS FALSE: 1");
         }
 
         if (isEmpty(aliasValue)) {
             setError(aliasLayout, getString(R.string.alias_is_required));
             valid = false;
+            Log.d(TAG, "IS FALSE: 2");
         }
 
-        if (isEmpty(relationshipValue)) {
-            setError(relationshipLayout, getString(R.string.relationship_is_required));
-            valid = false;
+        if (!isMyself){
+            if (isEmpty(relationshipValue)) {
+                setError(relationshipLayout, getString(R.string.relationship_is_required));
+                valid = false;
+                Log.d(TAG, "IS FALSE: 3");
+            }
         }
 
         if (isEmpty(personalityValue)) {
             setError(personalityLayout, getString(R.string.personality_is_required));
             valid = false;
+            Log.d(TAG, "IS FALSE: 4");
         }
 
         if (isEmpty(birthdateValue)) {
             setError(birthdateLayout, getString(R.string.birthdate_is_required));
             valid = false;
+            Log.d(TAG, "IS FALSE: 5");
         }
 
         if (isEmpty(autoCountry)) {
             autoCountry.setError(getString(R.string.country_is_required));
             valid = false;
+            Log.d(TAG, "IS FALSE: 6");
         }
 
         if (isEmpty(autoLanguage)) {
             autoLanguage.setError(getString(R.string.language_is_required));
             valid = false;
+            Log.d(TAG, "IS FALSE: 7");
         }
 
         return valid;
