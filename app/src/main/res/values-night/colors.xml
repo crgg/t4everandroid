@@ -1,56 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="black">#FFFFFFFF</color>
     <color name="soft_black">#FFFFFFFF</color>
     <color name="white">#FFFFFFFF</color>
 
     <color name="text_color">#FFFFFFFF</color>
     <color name="gray_hint">#FFFFFFFF</color>
-    <color name="soft_gray">#0D1B2C</color>
+    <color name="soft_text_color">#AFC7E0</color>
+    <color name="text_color_primary_color">#2C4563</color>
+    <color name="icon_color">#2C4563</color>
+
     <color name="gray">#0D1B2C</color>
+    <color name="soft_gray">#0D1B2C</color>
 
     <color name="background">#09203D</color>
     <color name="background_item">#0D2F58</color>
-    <color name="text_color_primary_color">#2C4563</color>
+    <color name="background_decorator">#55658C</color>
+    <color name="background_item_categories">#0D2F58</color>
     <color name="rippleColor">#09203D</color>
-
-    <color name="icon_color">#2C4563</color>
 
     <color name="card_memories_bg">#40DEC6F6</color>
     <color name="card_family_bg">#40C6F6D7</color>
     <color name="card_stories_bg">#40B7D0FB</color>
     <color name="card_photos_bg">#40E3CBFB</color>
-
     <color name="card_music_bg">#40BFF8D2</color>
     <color name="card_lessons_bg">#40FAEEC4</color>
     <color name="card_chat_bg">#40C9FBE4</color>
     <color name="card_relax_bg">#40FBBFBF</color>
 
-
-    <color name="sign_in_color">#6F8BAA</color>
-    <color name="soft_text_color">#AFC7E0</color>
-
+    <color name="materialButtonTextColor">#FFFFFF</color>
     <color name="primary_login_color">#34547E</color>
     <color name="second_login_color">#355987</color>
-
     <color name="border_color_buttons">#3B9AFF</color>
+    <color name="sign_in_color">#6F8BAA</color>
 
     <color name="green_success">#6EDA6D</color>
+    <color name="soft_green">#1C4D2C</color>
+    <color name="text_green">#22A653</color>
+    <color name="alert_email_verified">#05E071</color>
     <color name="email_verified_bg">#1A3B2D</color>
     <color name="email_verified_txt">#A0F0C8</color>
-    <color name="alert_email_verified">#05E071</color>
-    <color name="text_green">#22A653</color>
-    <color name="soft_green">#1C4D2C</color>
 
     <color name="alert_color">#E8B100</color>
     <color name="alert_email_not_verified">#CFA123</color>
     <color name="email_not_verified_bg">#4A3D00</color>
     <color name="change_email_bg">#4A4510</color>
+    <color name="soft_yellow">#4A4305</color>
 
     <color name="red">#FF6B6B</color>
     <color name="purple">#B46BE0</color>
     <color name="pink">#D265AC</color>
     <color name="brown">#A56D2A</color>
-    <color name="soft_yellow">#4A4305</color>
 
 </resources>

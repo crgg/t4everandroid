@@ -25,6 +25,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,6 +61,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -148,7 +150,8 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
                 new ActivityResultContracts.TakePicture(),
                 success -> {
                     if (success && photoUri != null) {
-                        MessagesUtils.showPreviewImage(CreateLegacyProfileActivity.this, photoUri, false, new ListenersUtils.OnActionPreviewImageListener() {
+                        MessagesUtils.showPreviewImage(CreateLegacyProfileActivity.this, photoUri,
+                                false, new ListenersUtils.OnActionPreviewImageListener() {
                             @Override
                             public void onSaveImage() {
                                 realPdfUri = photoUri;
@@ -732,6 +735,12 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         }
 
 
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(), LinearLayoutManager.VERTICAL);
+        dividerItemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(this,
+                R.drawable.recycler_divider)));
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         CategoriesAdapter catAdapter = new CategoriesAdapter(items);
         recyclerView.setAdapter(catAdapter);

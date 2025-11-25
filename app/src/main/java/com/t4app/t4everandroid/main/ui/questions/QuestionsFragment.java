@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,14 +28,13 @@ import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.ListItem;
 import com.t4app.t4everandroid.main.Models.Question;
-import com.t4app.t4everandroid.main.Models.Session;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
-import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
-import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.QuestionGroupedAdapter;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -333,6 +335,12 @@ public class QuestionsFragment extends Fragment {
                 getString(R.string.neuroticism),
                 getString(R.string.openness)
         );
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(), LinearLayoutManager.VERTICAL);
+        dividerItemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(),
+                R.drawable.recycler_divider)));
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         CategoriesAdapter adapter = new CategoriesAdapter(items);
         recyclerView.setAdapter(adapter);

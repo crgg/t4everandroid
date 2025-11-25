@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/background_item"
+    android:background="@drawable/bg_border_line"
+    android:backgroundTint="@color/background_item_categories"
     android:gravity="center_vertical"
     android:padding="12dp">
 

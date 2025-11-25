@@ -21,8 +21,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,14 +42,13 @@ import com.t4app.t4everandroid.databinding.FragmentMediaBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Media;
-import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
-import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
-import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
 import com.t4app.t4everandroid.main.adapter.MediaAdapter;
+import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import java.io.File;
@@ -60,6 +61,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -489,6 +491,11 @@ public class MediaFragment extends Fragment {
                 getString(R.string.video)
         );
 
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(), LinearLayoutManager.VERTICAL);
+        dividerItemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(),
+                R.drawable.recycler_divider)));
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         CategoriesAdapter catAdapter = new CategoriesAdapter(items);
         recyclerView.setAdapter(catAdapter);

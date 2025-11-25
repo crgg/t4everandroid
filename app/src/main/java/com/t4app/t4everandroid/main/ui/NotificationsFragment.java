@@ -1,33 +1,33 @@
 package com.t4app.t4everandroid.main.ui;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentNotificationsBinding;
-import com.t4app.t4everandroid.main.Models.EmailTest;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
-import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.NotificationAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class NotificationsFragment extends Fragment {
@@ -242,6 +242,12 @@ public class NotificationsFragment extends Fragment {
                     getString(R.string.read)
             );
         }
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(), LinearLayoutManager.VERTICAL);
+        dividerItemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(),
+                R.drawable.recycler_divider)));
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         CategoriesAdapter catAdapter = new CategoriesAdapter(items);
         recyclerView.setAdapter(catAdapter);
