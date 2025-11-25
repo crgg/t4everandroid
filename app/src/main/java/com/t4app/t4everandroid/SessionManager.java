@@ -22,6 +22,8 @@ public class SessionManager {
     private static final String KEY_TOKEN_USER = "token";
     private static final String KEY_IS_LOGGED = "is_logged";
     private static final String KEY_REMEMBER = "is_remember";
+    private static final String KEY_LAST_MSG_MAP = "map_last_msg";
+
 
     private SharedPreferences.Editor editor;
 
@@ -101,6 +103,18 @@ public class SessionManager {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         editor.putString(KEY_ALIAS, alias);
+        editor.apply();
+    }
+
+    public String getLastMsgMap() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(KEY_LAST_MSG_MAP, null);
+    }
+
+    public void setLastMsgMap(String msgMap) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putString(KEY_LAST_MSG_MAP , msgMap);
         editor.apply();
     }
 

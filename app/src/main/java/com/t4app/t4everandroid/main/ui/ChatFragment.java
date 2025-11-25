@@ -29,13 +29,16 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
+import com.t4app.t4everandroid.SessionManager;
 import com.t4app.t4everandroid.databinding.FragmentChatBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.CategoryItem;
@@ -53,10 +56,12 @@ import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -74,6 +79,9 @@ public class ChatFragment extends Fragment {
     private MediaRecorder recorder;
     private File audioFile;
     private boolean isRecording = false;
+
+    private Gson gson = new Gson();
+    private SessionManager sessionManager;
 
     private Handler handler = new Handler();
     private boolean isRunning = false;
@@ -118,6 +126,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sessionManager = SessionManager.getInstance();
     }
 
     @Override
@@ -264,6 +274,10 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (GlobalDataCache.legacyProfileSelected != null){
+            parseLastMessage(GlobalDataCache.legacyProfileSelected.getId());
+        }
 
         Animation slideIn = AnimationUtils.loadAnimation(requireActivity(), R.anim.slide_in_left);
         Animation slideOut = AnimationUtils.loadAnimation(requireActivity(), R.anim.slide_in_right);
@@ -798,6 +812,52 @@ public class ChatFragment extends Fragment {
 
         dialog.setContentView(view);
         dialog.show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (GlobalDataCache.legacyProfileSelected != null){
+            String lastMsg = binding.itemChat.textInteraction.getText().toString();
+            String json = sessionManager.getLastMsgMap();
+            Type type = new TypeToken<Map<String, String>>(){}.getType();
+            Map<String, String> map = gson.fromJson(json, type);
+            if (map == null){
+                map = new HashMap<>();
+            }
+            map.put(GlobalDataCache.legacyProfileSelected.getId(), lastMsg);
+            String newJson = gson.toJson(map);
+            sessionManager.setLastMsgMap(newJson);
+        }
+    }
+
+    private void parseLastMessage(String profileId){
+        String json = sessionManager.getLastMsgMap();
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> map = gson.fromJson(json, type);
+        if (map != null){
+            if(map.containsKey(profileId)){
+                if (map.get(profileId) != null){
+                    if (!Objects.requireNonNull(map.get(profileId)).isEmpty()){
+                        String lastMsg = map.get(profileId);
+                        if (lastMsg != null){
+                            if (!lastMsg.isEmpty()){
+                                binding.itemChat.textInteraction.post(() -> {
+                                    binding.itemChat.textInteraction.setText(lastMsg);
+                                    binding.itemChat.textInteraction.requestFocus();
+                                    binding.itemChat.textInteraction.setSelection(binding.itemChat.textInteraction.getText().length());
+                                });
+
+                            }else{
+                                binding.itemChat.textInteraction.post(() -> binding.itemChat.textInteraction.setText(""));
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
