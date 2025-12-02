@@ -9,7 +9,6 @@ import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -28,8 +27,8 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.AppUtils;
+import com.t4app.t4everandroid.BaseActivity;
 import com.t4app.t4everandroid.ErrorUtils;
-import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.Login.models.Token;
 import com.t4app.t4everandroid.Login.models.User;
 import com.t4app.t4everandroid.MessagesUtils;
@@ -40,6 +39,7 @@ import com.t4app.t4everandroid.databinding.ActivityT4EverLoginBinding;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.network.ApiConfig;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.LoginResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +50,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class T4EverLoginActivity extends AppCompatActivity {
+public class T4EverLoginActivity extends BaseActivity {
     private static final String TAG = "LOGIN_ACT";
     private ActivityT4EverLoginBinding binding;
 
@@ -62,11 +62,6 @@ public class T4EverLoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_t4_ever_login);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         binding = ActivityT4EverLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

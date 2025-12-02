@@ -13,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.t4app.t4everandroid.BaseActivity;
 import com.t4app.t4everandroid.Login.adapter.OnboardingAdapter;
 import com.t4app.t4everandroid.Login.models.OnboardingItem;
 import com.t4app.t4everandroid.R;
@@ -23,7 +24,7 @@ import com.t4app.t4everandroid.main.T4EverMainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class T4EverOnboardingActivity extends AppCompatActivity {
+public class T4EverOnboardingActivity extends BaseActivity {
 
     private ViewPager2 viewPager;
     private Button btnNext;
@@ -37,11 +38,7 @@ public class T4EverOnboardingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_t4_ever_onboarding);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
         binding = ActivityT4EverOnboardingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

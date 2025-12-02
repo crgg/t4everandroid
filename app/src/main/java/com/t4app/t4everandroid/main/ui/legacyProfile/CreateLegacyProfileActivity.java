@@ -35,6 +35,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.BaseActivity;
 import com.t4app.t4everandroid.CameraPermissionManager;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ImageSelectorBottomSheet;
@@ -70,7 +71,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateLegacyProfileActivity extends AppCompatActivity {
+public class CreateLegacyProfileActivity extends BaseActivity {
     private static final String TAG = "CREATE_LEGACY_PROFILE_ACT";
     private ActivityCreateLegacyProfileBinding binding;
 
@@ -101,11 +102,7 @@ public class CreateLegacyProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_create_legacy_profile);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
         isUpdate = getIntent().getBooleanExtra("is_update", false);
 
         binding = ActivityCreateLegacyProfileBinding.inflate(getLayoutInflater());

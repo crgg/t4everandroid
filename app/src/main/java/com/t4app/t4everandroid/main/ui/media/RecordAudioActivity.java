@@ -21,6 +21,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.t4app.t4everandroid.BaseActivity;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
@@ -29,7 +30,7 @@ import com.t4app.t4everandroid.databinding.ActivityRecordAudioBinding;
 import java.io.File;
 import java.io.IOException;
 
-public class RecordAudioActivity extends AppCompatActivity {
+public class RecordAudioActivity extends BaseActivity {
     private static final String TAG = "";
     private ActivityRecordAudioBinding binding;
 
@@ -73,12 +74,6 @@ public class RecordAudioActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_record_audio);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
         binding = ActivityRecordAudioBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

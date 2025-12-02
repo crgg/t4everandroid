@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid.main;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -29,9 +31,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.BaseActivity;
 import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.Login.ui.T4EverLoginActivity;
@@ -39,6 +43,7 @@ import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
+import com.t4app.t4everandroid.UtilsInsets;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
 import com.t4app.t4everandroid.main.viewmodel.MainViewModel;
 import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
@@ -61,7 +66,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class T4EverMainActivity extends AppCompatActivity {
+public class T4EverMainActivity extends BaseActivity {
 
     private static final String TAG  = "MAIN_ACT";
     public static T4EverMainActivity instance;
@@ -77,17 +82,9 @@ public class T4EverMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_t4_ever_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
         instance = T4EverMainActivity.this;
-
         binding = ActivityT4EverMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
 
         SessionManager sessionManager = SessionManager.getInstance();
 
@@ -239,7 +236,56 @@ public class T4EverMainActivity extends AppCompatActivity {
                 popup.show();
             }
         });
+
     }
+
+    private void applyInsetsForDrawer(
+            DrawerLayout drawerLayout,
+            View toolbar,
+            View contentRoot,
+            NavigationView navigationView) {
+
+        ViewCompat.setOnApplyWindowInsetsListener(drawerLayout, (v, insets) -> {
+
+            int types = WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout();
+
+            Insets safe = insets.getInsets(types);
+
+            int left   = safe.left;
+            int top    = safe.top;
+            int right  = safe.right;
+            int bottom = safe.bottom;
+
+            toolbar.setPadding(
+                    toolbar.getPaddingLeft(),
+                    top,
+                    toolbar.getPaddingRight(),
+                    toolbar.getPaddingBottom()
+            );
+
+            contentRoot.setPadding(
+                    left,
+                    0,
+                    right,
+                    bottom + dpToPx(6)
+            );
+
+            navigationView.setPadding(
+                    left + dpToPx(6),
+                    top + dpToPx(6),
+                    right + dpToPx(6),
+                    bottom + dpToPx(6)
+            );
+
+            return insets;
+        });
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
 
     private void logout(ListenersUtils.ConfirmationCallback callback){
         ApiServices apiServices = AppController.getApiServices();

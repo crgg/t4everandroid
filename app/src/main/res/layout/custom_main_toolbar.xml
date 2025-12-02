@@ -5,6 +5,7 @@
     android:layout_height="?attr/actionBarSize"
     android:background="@color/background"
     android:elevation="4dp"
+    android:fitsSystemWindows="true"
     android:paddingStart="12dp"
     android:paddingEnd="8dp">
 
