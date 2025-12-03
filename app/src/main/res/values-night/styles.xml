@@ -31,6 +31,11 @@
         <item name="android:popupBackground">@color/background</item>
     </style>
 
+<!--    <style name="CustomBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">-->
+<!--        <item name="android:windowBackground">@android:color/transparent</item>-->
+<!--        <item name="android:backgroundTint">@color/background</item>-->
+<!--    </style>-->
+
     <style name="CustomTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
         <item name="android:textColor">@color/soft_black</item>
         <item name="android:textColorHint">@color/gray_hint</item>

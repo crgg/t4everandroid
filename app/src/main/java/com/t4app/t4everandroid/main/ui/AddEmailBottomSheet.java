@@ -1,5 +1,6 @@
 package com.t4app.t4everandroid.main.ui;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,12 +12,14 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 
 public class AddEmailBottomSheet extends BottomSheetDialogFragment {
@@ -25,18 +28,34 @@ public class AddEmailBottomSheet extends BottomSheetDialogFragment {
     private AppCompatImageButton btnClose;
     private MaterialButton cancelBtn, forwardBtn;
 
-    public interface OnEmailSendListener {
-        void onSend(String to, String subject, String message);
+    private ListenersUtils.OnEmailSendListener listener;
+
+
+    public static AddEmailBottomSheet newInstance() {
+        return new AddEmailBottomSheet();
     }
 
-    private OnEmailSendListener listener;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
 
-    public AddEmailBottomSheet(OnEmailSendListener listener) {
-        this.listener = listener;
+        Fragment parent = getParentFragment();
+        if (parent instanceof ListenersUtils.OnEmailSendListener) {
+            listener = (ListenersUtils.OnEmailSendListener) parent;
+        } else if (context instanceof ListenersUtils.OnEmailSendListener) {
+            listener = (ListenersUtils.OnEmailSendListener) context;
+        } else {
+            throw new IllegalStateException(
+                    "Parent Fragment o Activity deben implementar OnEmailSendListener"
+            );
+        }
     }
 
-    public AddEmailBottomSheet() {}
-
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
     @Nullable
     @Override
     public View onCreateView(

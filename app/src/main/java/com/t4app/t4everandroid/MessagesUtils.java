@@ -26,22 +26,6 @@ public class MessagesUtils {
     private static boolean isDialogShowing = false;
     private static AlertDialog currentDialog;
 
-    public static boolean isIsDialogShowing() {
-        return isDialogShowing;
-    }
-
-    public static AlertDialog getCurrentDialog() {
-        return currentDialog;
-    }
-
-    public static void setIsDialogShowing(boolean isDialogShowing) {
-        MessagesUtils.isDialogShowing = isDialogShowing;
-    }
-
-    public static void setCurrentDialog(AlertDialog currentDialog) {
-        MessagesUtils.currentDialog = currentDialog;
-    }
-
     public static void showErrorDialog(Context context, String errorMessage) {
         if (errorMessage == null){
             return;
@@ -75,6 +59,9 @@ public class MessagesUtils {
             TextView tvMessage = dialogView.findViewById(R.id.tvMessage);
             Button ok_btn = dialogView.findViewById(R.id.ok_btn);
 
+            if (errorMessage.contains("413 Request Entity Too Large")){
+                errorMessage = "Video Too heavy";
+            }
             tvMessage.setText(errorMessage);
 
             ok_btn.setOnClickListener(new SafeClickListener() {

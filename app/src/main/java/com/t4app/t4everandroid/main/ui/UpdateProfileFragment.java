@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -65,7 +66,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UpdateProfileFragment extends Fragment {
+public class UpdateProfileFragment extends Fragment implements ListenersUtils.OnOptionImageListener {
     private static final String TAG = "UPDATE_PROFILE";
     private FragmentUpdateProfileBinding binding;
 
@@ -81,8 +82,6 @@ public class UpdateProfileFragment extends Fragment {
 
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private CameraPermissionManager.PermissionCallback permissionCallback;
-
-    private ImageSelectorBottomSheet bottomSheet;
 
     private SelectImageUtils selectImageUtils;
 
@@ -230,8 +229,6 @@ public class UpdateProfileFragment extends Fragment {
         setupCountryAutocomplete();
         setupLanguageAutocomplete();
 
-        bottomSheet = getImageSelectorBottomSheet();
-
         return view;
     }
 
@@ -241,6 +238,7 @@ public class UpdateProfileFragment extends Fragment {
         binding.iconUpload.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
+                ImageSelectorBottomSheet bottomSheet = ImageSelectorBottomSheet.newInstance();
                 bottomSheet.show(getChildFragmentManager(), "ImageSelector");
             }
         });
@@ -287,30 +285,6 @@ public class UpdateProfileFragment extends Fragment {
                 ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_home);
             }
         });
-    }
-
-    @NonNull
-    private ImageSelectorBottomSheet getImageSelectorBottomSheet() {
-        ImageSelectorBottomSheet bottomSheet = new ImageSelectorBottomSheet();
-        bottomSheet.setListener(new ImageSelectorBottomSheet.Listener() {
-            @Override
-            public void onCameraSelected() {
-                if (CameraPermissionManager.hasCameraPermission(requireContext())){
-                    openCamera();
-                }else{
-                    CameraPermissionManager.requestCameraPermission(
-                            requireActivity(),
-                            cameraPermissionLauncher,
-                            permissionCallback);
-                }
-            }
-
-            @Override
-            public void onGallerySelected() {
-                openGallery();
-            }
-        });
-        return bottomSheet;
     }
 
     private void uploadImageUser(){
@@ -622,4 +596,20 @@ public class UpdateProfileFragment extends Fragment {
                         isGranted, requireContext(), permissionCallback));
     }
 
+    @Override
+    public void onCameraSelected() {
+        if (CameraPermissionManager.hasCameraPermission(requireContext())){
+            openCamera();
+        }else{
+            CameraPermissionManager.requestCameraPermission(
+                    requireActivity(),
+                    cameraPermissionLauncher,
+                    permissionCallback);
+        }
+    }
+
+    @Override
+    public void onGallerySelected() {
+        openGallery();
+    }
 }

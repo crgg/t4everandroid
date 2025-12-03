@@ -1,11 +1,13 @@
 package com.t4app.t4everandroid.main.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
@@ -224,7 +227,34 @@ public class NotificationsFragment extends Fragment {
         BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
 
+        categoriesBottomSheet.setContentView(view);
+        categoriesBottomSheet.setOnShowListener(dialogInterface -> {
+
+            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
+
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (bottomSheet == null) return;
+
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+            BottomSheetBehavior<FrameLayout> behavior =
+                    BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            behavior.setPeekHeight(0);
+            behavior.setDraggable(true);
+        });
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                categoriesBottomSheet.dismiss();
+            }
+        });
 
         List<String> items;
         if (isType){
@@ -295,7 +325,6 @@ public class NotificationsFragment extends Fragment {
             categoriesBottomSheet.dismiss();
         });
 
-        categoriesBottomSheet.setContentView(view);
         categoriesBottomSheet.show();
     }
 

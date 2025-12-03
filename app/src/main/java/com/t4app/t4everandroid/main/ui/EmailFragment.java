@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentEmailBinding;
@@ -35,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class EmailFragment extends Fragment {
+public class EmailFragment extends Fragment implements ListenersUtils.OnEmailSendListener {
     private static final String TAG = "EMAIL_FRAG";
     private FragmentEmailBinding binding;
 
@@ -253,25 +254,7 @@ public class EmailFragment extends Fragment {
         binding.emailRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.emailRv.setAdapter(adapter);
 
-        bottomSheet = new AddEmailBottomSheet((to, subject, message) -> {
-            EmailTest emailTest = new EmailTest(
-                    getNameFromEmail(to),
-                    to,
-                    subject,
-                    message,
-                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            .format(new Date()),
-                    "personal",
-                    false,
-                    true,
-                    false,
-                    false,
-                    true
-            );
-
-            adapter.addItem(emailTest);
-            binding.emailRv.scrollToPosition(0);
-        });
+        bottomSheet =AddEmailBottomSheet.newInstance();
 
         binding.searchEmail.markUnread.setOnClickListener(new SafeClickListener() {
             @Override
@@ -338,7 +321,7 @@ public class EmailFragment extends Fragment {
         binding.itemAddEmail.composeEmail.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                bottomSheet.show(getActivity().getSupportFragmentManager(), "ComposeEmailBottomSheet");
+                bottomSheet.show(getChildFragmentManager(), "ComposeEmailBottomSheet");
             }
         });
 
@@ -510,4 +493,24 @@ public class EmailFragment extends Fragment {
     }
 
 
+    @Override
+    public void onSend(String to, String subject, String message) {
+        EmailTest emailTest = new EmailTest(
+                getNameFromEmail(to),
+                to,
+                subject,
+                message,
+                new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        .format(new Date()),
+                "personal",
+                false,
+                true,
+                false,
+                false,
+                true
+        );
+
+        adapter.addItem(emailTest);
+        binding.emailRv.scrollToPosition(0);
+    }
 }

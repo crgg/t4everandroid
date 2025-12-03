@@ -45,6 +45,10 @@ import okhttp3.Response;
 
 public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "VIEWER_MEDIA";
+    private static final String ARG_MEDIA = "arg_media";
+    private static final String ARG_TYPE_DOC = "arg_type_doc";
+    private static final String ARG_FROM_URI = "arg_from_uri";
+    private static final String ARG_URI = "arg_uri";
 
     private ExoPlayer player;
 
@@ -68,25 +72,37 @@ public class ViewerDocumentBottomSheet extends BottomSheetDialogFragment {
     private String typeDoc;
     private boolean fromUri;
 
-    public void setMedia(Media media) {
-        this.media = media;
+    public static ViewerDocumentBottomSheet newInstance(String typeDoc, boolean fromUri, Uri uri){
+        ViewerDocumentBottomSheet bottomSheet = new ViewerDocumentBottomSheet();
+        Bundle bundle = new Bundle();
+        bundle.putString(ARG_TYPE_DOC, typeDoc);
+        bundle.putBoolean(ARG_FROM_URI, fromUri);
+        bundle.putString(ARG_URI, uri.toString());
+        bottomSheet.setArguments(bundle);
+        return bottomSheet;
     }
 
-    public void setTypeDoc(String typeDoc) {
-        this.typeDoc = typeDoc;
-    }
-
-    public void setFromUri(boolean fromUri) {
-        this.fromUri = fromUri;
-    }
-
-    public void setUri(Uri uri) {
-        this.uri = uri;
+    public static ViewerDocumentBottomSheet newInstance(Media media){
+        ViewerDocumentBottomSheet bottomSheet = new ViewerDocumentBottomSheet();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_MEDIA, media);
+        bottomSheet.setArguments(bundle);
+        return bottomSheet;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            media = (Media) args.getSerializable(ARG_MEDIA);
+            typeDoc = args.getString(ARG_TYPE_DOC);
+            fromUri = args.getBoolean(ARG_FROM_URI);
+            String uriStr = args.getString(ARG_URI);
+            if (uriStr != null){
+                uri = Uri.parse(uriStr);
+            }
+        }
     }
 
     @Nullable

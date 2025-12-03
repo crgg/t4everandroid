@@ -69,7 +69,7 @@
             android:src="@drawable/ic_stop_48_dp"
             android:tint="@color/white"
             android:background="@drawable/bg_profile"
-            android:backgroundTint="@color/gray_hint"
+            android:backgroundTint="@color/red"
             android:layout_gravity="center"
             android:layout_width="120dp"
             android:layout_height="120dp"/>

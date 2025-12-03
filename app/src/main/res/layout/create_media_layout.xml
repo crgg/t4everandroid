@@ -1,330 +1,339 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="15dp"
-    android:orientation="vertical"
-    android:background="@drawable/bg_bottom_sheet_rounded"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_bottom_sheet_rounded"
+    android:fillViewport="true"
+    android:overScrollMode="always">
 
     <LinearLayout
-        android:id="@+id/data_container"
+        android:padding="15dp"
         android:orientation="vertical"
+        android:background="@drawable/bg_bottom_sheet_rounded"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:text="@string/new_conversation"
-                android:textSize="17sp"
-                android:textColor="@color/soft_black"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_close"
-                android:src="@drawable/ic_close"
-                android:background="@null"
-                android:tint="@color/soft_black"
-                android:layout_width="46dp"
-                android:layout_height="46dp"/>
-        </LinearLayout>
-
-        <TextView
-            android:textColor="@color/soft_black"
-            android:textSize="15sp"
-            android:maxLines="1"
-            android:text="@string/media_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <LinearLayout
-            android:layout_marginTop="10dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/option_text"
-                android:background="@drawable/bg_border_line_second_color"
-                android:orientation="vertical"
-                android:layout_marginEnd="15dp"
-                android:padding="16dp"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/icon_text"
-                    android:contentDescription="@string/text"
-                    android:src="@drawable/ic_doc"
-                    app:tint="@color/second_login_color"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"/>
-
-                <TextView
-                    android:id="@+id/text"
-                    android:gravity="center"
-                    android:maxLines="3"
-                    android:textSize="14sp"
-                    android:text="@string/text"
-                    android:textColor="@color/text_color"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_audio"
-                android:background="@drawable/bg_border_line_second_color"
-                android:orientation="vertical"
-                android:layout_marginEnd="10dp"
-                android:padding="16dp"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/icon_audio"
-                    android:contentDescription="@string/text"
-                    android:src="@drawable/ic_conversations"
-                    app:tint="@color/second_login_color"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"/>
-
-                <TextView
-                    android:id="@+id/audio"
-                    android:gravity="center"
-                    android:maxLines="3"
-                    android:textSize="14sp"
-                    android:text="@string/audio"
-                    android:textColor="@color/text_color"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_video"
-                android:background="@drawable/bg_border_line_second_color"
-                android:orientation="vertical"
-                android:layout_marginStart="5dp"
-                android:padding="16dp"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/icon_video"
-                    android:contentDescription="@string/text"
-                    android:src="@drawable/ic_video"
-                    app:tint="@color/second_login_color"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"/>
-
-                <TextView
-                    android:id="@+id/video"
-                    android:gravity="center"
-                    android:maxLines="3"
-                    android:textSize="14sp"
-                    android:text="@string/video"
-                    android:textColor="@color/text_color"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container_text"
-            android:visibility="gone"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="10dp"
+            android:id="@+id/data_container"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:textSize="14sp"
-                android:text="@string/conversation_content"
-                android:textColor="@color/soft_black"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/conversation_layout"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/conversation_value"
+                <TextView
+                    android:text="@string/new_conversation"
+                    android:textSize="17sp"
+                    android:textColor="@color/soft_black"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btn_close"
+                    android:src="@drawable/ic_close"
+                    android:background="@null"
+                    android:tint="@color/soft_black"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:textColor="@color/soft_black"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:text="@string/media_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/option_text"
+                    android:background="@drawable/bg_border_line_second_color"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="15dp"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/icon_text"
+                        android:contentDescription="@string/text"
+                        android:src="@drawable/ic_doc"
+                        app:tint="@color/second_login_color"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"/>
+
+                    <TextView
+                        android:id="@+id/text"
+                        android:gravity="center"
+                        android:maxLines="3"
+                        android:textSize="14sp"
+                        android:text="@string/text"
+                        android:textColor="@color/text_color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/option_audio"
+                    android:background="@drawable/bg_border_line_second_color"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="10dp"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/icon_audio"
+                        android:contentDescription="@string/text"
+                        android:src="@drawable/ic_conversations"
+                        app:tint="@color/second_login_color"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"/>
+
+                    <TextView
+                        android:id="@+id/audio"
+                        android:gravity="center"
+                        android:maxLines="3"
+                        android:textSize="14sp"
+                        android:text="@string/audio"
+                        android:textColor="@color/text_color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/option_video"
+                    android:background="@drawable/bg_border_line_second_color"
+                    android:orientation="vertical"
+                    android:layout_marginStart="5dp"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/icon_video"
+                        android:contentDescription="@string/text"
+                        android:src="@drawable/ic_video"
+                        app:tint="@color/second_login_color"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"/>
+
+                    <TextView
+                        android:id="@+id/video"
+                        android:gravity="center"
+                        android:maxLines="3"
+                        android:textSize="14sp"
+                        android:text="@string/video"
+                        android:textColor="@color/text_color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/container_text"
+                android:visibility="gone"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="14sp"
+                    android:text="@string/conversation_content"
+                    android:textColor="@color/soft_black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/conversation_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="230dp"
-                    android:scrollbars="vertical"
-                    android:overScrollMode="always"
-                    android:paddingVertical="8dp"
-                    android:hint="@string/write_the_conversation_here"
-                    android:textColor="@color/text_color"
-                    android:textColorHint="@color/gray_hint"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:gravity="top|start"
-                    android:textSize="15sp"
-                    android:scrollHorizontally="false"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                    android:layout_height="wrap_content">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/start_record_audio"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center"
-            android:layout_height="43dp"
-            android:layout_marginTop="20dp"
-            android:text="@string/start_recording"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            app:iconGravity="textStart"
-            app:icon="@drawable/ic_conversation_24_dp"
-            app:iconTint="@color/white"
-            android:textSize="13sp"
-            app:cornerRadius="8dp"
-            android:backgroundTint="@color/red"
-            app:strokeColor="@color/red"
-            app:strokeWidth="2dp"
-            android:visibility="gone"
-            app:rippleColor="@color/red"
-            android:textColor="@color/white" />
-
-        <com.t4app.t4everandroid.main.ui.media.AudioPlayerView
-            android:id="@+id/audioPlayer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:visibility="gone"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/start_record_video"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center"
-            android:layout_height="43dp"
-            android:layout_marginTop="20dp"
-            android:visibility="gone"
-            android:text="@string/start_recording"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            app:iconGravity="textStart"
-            app:icon="@drawable/ic_video"
-            app:iconTint="@color/white"
-            android:textSize="13sp"
-            app:cornerRadius="8dp"
-            android:backgroundTint="@color/red"
-            app:strokeColor="@color/red"
-            app:strokeWidth="2dp"
-            app:rippleColor="@color/red"
-            android:textColor="@color/white" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/video_player"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center"
-            android:layout_height="43dp"
-            android:layout_marginTop="20dp"
-            android:visibility="gone"
-            android:text="@string/play_video"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            app:iconGravity="textStart"
-            app:icon="@drawable/ic_play"
-            app:iconTint="@color/white"
-            android:textSize="13sp"
-            app:cornerRadius="8dp"
-            android:backgroundTint="@color/border_color_buttons"
-            app:strokeColor="@color/border_color_buttons"
-            app:strokeWidth="2dp"
-            app:rippleColor="@color/border_color_buttons"
-            android:textColor="@color/white" />
-
-        <LinearLayout
-            android:layout_marginTop="35dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/conversation_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="230dp"
+                        android:scrollbars="vertical"
+                        android:overScrollMode="always"
+                        android:paddingVertical="8dp"
+                        android:hint="@string/write_the_conversation_here"
+                        android:textColor="@color/text_color"
+                        android:textColorHint="@color/gray_hint"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:gravity="top|start"
+                        android:textSize="15sp"
+                        android:scrollHorizontally="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/save_conversation"
-                android:layout_marginStart="5dp"
-                android:layout_width="0dp"
+                android:id="@+id/start_record_audio"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
                 android:layout_height="43dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="15dp"
-                android:text="@string/save_conversation"
+                android:layout_marginTop="20dp"
+                android:text="@string/start_recording"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 app:iconGravity="textStart"
-                app:icon="@drawable/ic_save"
+                app:icon="@drawable/ic_conversation_24_dp"
                 app:iconTint="@color/white"
                 android:textSize="13sp"
                 app:cornerRadius="8dp"
-                android:backgroundTint="@color/second_login_color"
-                app:strokeColor="@color/second_login_color"
+                android:backgroundTint="@color/red"
+                app:strokeColor="@color/red"
                 app:strokeWidth="2dp"
-                app:rippleColor="@color/second_login_color"
+                android:visibility="gone"
+                app:rippleColor="@color/red"
                 android:textColor="@color/white" />
 
+            <com.t4app.t4everandroid.main.ui.media.AudioPlayerView
+                android:id="@+id/audioPlayer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:visibility="gone"/>
+
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/cancel_btn"
+                android:id="@+id/start_record_video"
                 android:layout_width="wrap_content"
+                android:layout_gravity="center"
                 android:layout_height="43dp"
-                android:layout_marginStart="5dp"
-                android:text="@string/cancel"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                android:text="@string/start_recording"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                app:iconTint="@color/second_login_color"
+                app:iconGravity="textStart"
+                app:icon="@drawable/ic_video"
+                app:iconTint="@color/white"
                 android:textSize="13sp"
                 app:cornerRadius="8dp"
-                style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-                app:strokeColor="@color/second_login_color"
+                android:backgroundTint="@color/red"
+                app:strokeColor="@color/red"
                 app:strokeWidth="2dp"
-                app:rippleColor="@color/second_login_color"
-                android:textColor="@color/second_login_color" />
+                app:rippleColor="@color/red"
+                android:textColor="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/video_player"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_height="43dp"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                android:text="@string/play_video"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:iconGravity="textStart"
+                app:icon="@drawable/ic_play"
+                app:iconTint="@color/white"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/border_color_buttons"
+                app:strokeColor="@color/border_color_buttons"
+                app:strokeWidth="2dp"
+                app:rippleColor="@color/border_color_buttons"
+                android:textColor="@color/white" />
+
+            <LinearLayout
+                android:layout_marginTop="35dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/save_conversation"
+                    android:layout_marginStart="5dp"
+                    android:layout_width="0dp"
+                    android:layout_height="43dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="15dp"
+                    android:text="@string/save_conversation"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    app:iconGravity="textStart"
+                    app:icon="@drawable/ic_save"
+                    app:iconTint="@color/white"
+                    android:textSize="13sp"
+                    app:cornerRadius="8dp"
+                    android:backgroundTint="@color/second_login_color"
+                    app:strokeColor="@color/second_login_color"
+                    app:strokeWidth="2dp"
+                    app:rippleColor="@color/second_login_color"
+                    android:textColor="@color/white" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/cancel_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/cancel"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    app:iconTint="@color/second_login_color"
+                    android:textSize="13sp"
+                    app:cornerRadius="8dp"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                    app:strokeColor="@color/second_login_color"
+                    app:strokeWidth="2dp"
+                    app:rippleColor="@color/second_login_color"
+                    android:textColor="@color/second_login_color" />
+            </LinearLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/load_container"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ProgressBar
+                android:indeterminate="true"
+                android:indeterminateTintMode="src_atop"
+                android:indeterminateTint="@color/second_login_color"
+                android:layout_width="56dp"
+                android:layout_height="56dp"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/load_container"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ProgressBar
-            android:indeterminate="true"
-            android:indeterminateTintMode="src_atop"
-            android:indeterminateTint="@color/second_login_color"
-            android:layout_width="56dp"
-            android:layout_height="56dp"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</ScrollView>

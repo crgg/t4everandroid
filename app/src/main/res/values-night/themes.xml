@@ -5,6 +5,9 @@
         <item name="textInputStyle">@style/CustomTextInputLayoutStyle</item>
         <item name="editTextStyle">@style/CustomTextInputEditTextStyle</item>
         <item name="android:popupMenuStyle">@style/PopupMenu</item>
+
+<!--        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetStyle</item>-->
+
     </style>
 
     <style name="Theme.T4EverAndroid" parent="Base.Theme.T4EverAndroid" />

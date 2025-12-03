@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -69,7 +71,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MediaFragment extends Fragment {
+public class MediaFragment extends Fragment implements ListenersUtils.OnMediaAddedListener{
     private static final String TAG = "MEDIA_FRAG";
 
     private FragmentMediaBinding binding;
@@ -78,9 +80,6 @@ public class MediaFragment extends Fragment {
     private MediaAdapter adapter;
 
     private Snackbar snackbar;
-
-    private CreateMediaBottomSheet createMediaBottomSheet;
-    private UploadMediaBottomSheet uploadMediaBottomSheet;
 
     public MediaFragment() {}
 
@@ -100,7 +99,10 @@ public class MediaFragment extends Fragment {
         binding = FragmentMediaBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        checkStatus();
+        if (isAdded()){
+            checkStatus();
+        }
+
 
         binding.itemSelectLegacy.buttonActionsProfile.setOnClickListener(new SafeClickListener() {
             @Override
@@ -111,7 +113,6 @@ public class MediaFragment extends Fragment {
         });
         mediaTestList = new ArrayList<>();
 
-        ViewerDocumentBottomSheet viewerDocumentBottomSheet = new ViewerDocumentBottomSheet();
         adapter = new MediaAdapter(requireContext(), mediaTestList, new ListenersUtils.OnMediaActionsListener() {
             @Override
             public void onDelete(Media mediaTest, int pos) {
@@ -132,13 +133,13 @@ public class MediaFragment extends Fragment {
 
             @Override
             public void onView(Media mediaTest, int pos) {
-                viewerDocumentBottomSheet.setMedia(mediaTest);
                 FragmentManager fm = requireActivity().getSupportFragmentManager();
                 Fragment prev = fm.findFragmentByTag("viewer_doc");
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
-                viewerDocumentBottomSheet.show(getChildFragmentManager(), "viewer_doc");
+                ViewerDocumentBottomSheet bottomSheet = ViewerDocumentBottomSheet.newInstance(mediaTest);
+                bottomSheet.show(getChildFragmentManager(), "viewer_doc");
             }
         });
 
@@ -150,16 +151,6 @@ public class MediaFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        createMediaBottomSheet = getCreateMediaBottomSheet();
-        uploadMediaBottomSheet = new UploadMediaBottomSheet();
-        uploadMediaBottomSheet.setListener(mediaTest -> {
-            if (binding.mediaRv.getVisibility() == View.GONE){
-                binding.mediaRv.setVisibility(View.VISIBLE);
-                binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
-            }
-            adapter.addItem(mediaTest);
-            calculateMedias(mediaTestList);
-        });
         binding.createNewMediaBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
@@ -231,7 +222,8 @@ public class MediaFragment extends Fragment {
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
-                uploadMediaBottomSheet.show(getChildFragmentManager(), "add_media");
+                UploadMediaBottomSheet bottomSheet = UploadMediaBottomSheet.newInstance();
+                bottomSheet.show(getChildFragmentManager(), "add_media");
                 dialog.dismiss();
             }
         });
@@ -244,28 +236,14 @@ public class MediaFragment extends Fragment {
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
+
+                CreateMediaBottomSheet createMediaBottomSheet = CreateMediaBottomSheet.newInstance();
                 createMediaBottomSheet.show(getChildFragmentManager(), "create_media");
                 dialog.dismiss();
             }
         });
 
         dialog.show();
-    }
-
-    @NonNull
-    private CreateMediaBottomSheet getCreateMediaBottomSheet() {
-        CreateMediaBottomSheet bottomSheet = new CreateMediaBottomSheet();
-        bottomSheet.setListener(media -> {
-            if (binding.mediaRv.getVisibility() == View.GONE){
-                binding.mediaRv.setVisibility(View.VISIBLE);
-                binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
-            }
-            adapter.addItem(media);
-            calculateMedias(mediaTestList);
-//            mediaTestList.add(mediaTest);
-
-        });
-        return bottomSheet;
     }
 
     private void calculateMedias(List<Media> mediaTestList){
@@ -304,7 +282,9 @@ public class MediaFragment extends Fragment {
                         if (body.isStatus()){
                             if (body.getData() != null){
                                 calculateMedias(body.getData());
-                                checkStatus();
+                                if (isAdded()){
+                                    checkStatus();
+                                }
                                 mediaTestList.addAll(body.getData());
                                 GlobalDataCache.mediaList = new ArrayList<>(body.getData());
                                 adapter.notifyDataSetChanged();
@@ -480,7 +460,35 @@ public class MediaFragment extends Fragment {
         BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
 
+        categoriesBottomSheet.setContentView(view);
+
+        categoriesBottomSheet.setOnShowListener(dialogInterface -> {
+
+            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
+
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (bottomSheet == null) return;
+
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+            BottomSheetBehavior<FrameLayout> behavior =
+                    BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            behavior.setPeekHeight(0);
+            behavior.setDraggable(true);
+        });
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                categoriesBottomSheet.dismiss();
+            }
+        });
 
         List<String> items;
         items = Arrays.asList(
@@ -517,8 +525,6 @@ public class MediaFragment extends Fragment {
             }
             categoriesBottomSheet.dismiss();
         });
-
-        categoriesBottomSheet.setContentView(view);
         categoriesBottomSheet.show();
     }
 
@@ -562,10 +568,36 @@ public class MediaFragment extends Fragment {
 
     private void showProfilesBottomSheet() {
         BottomSheetDialog profilesBottomSheet = new BottomSheetDialog(requireContext());
-        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_profiles, null);
+        profilesBottomSheet.setContentView(view);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+        profilesBottomSheet.setOnShowListener(dialogInterface -> {
 
+            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
+
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (bottomSheet == null) return;
+
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+            BottomSheetBehavior<FrameLayout> behavior =
+                    BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            behavior.setPeekHeight(0);
+            behavior.setDraggable(true);
+        });
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewProfiles);
+        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                profilesBottomSheet.dismiss();
+            }
+        });
         List<LegacyProfile> profiles = GlobalDataCache.legacyProfiles;
         if (profiles == null) {
             profiles = new ArrayList<>();
@@ -579,7 +611,6 @@ public class MediaFragment extends Fragment {
             processChange(profile, profilesBottomSheet);
         });
 
-        profilesBottomSheet.setContentView(view);
         profilesBottomSheet.show();
     }
 
@@ -689,4 +720,14 @@ public class MediaFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onAddConversation(Media media) {
+        if (binding.mediaRv.getVisibility() == View.GONE){
+            binding.mediaRv.setVisibility(View.VISIBLE);
+            binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
+        }
+        adapter.addItem(media);
+        calculateMedias(mediaTestList);
+
+    }
 }

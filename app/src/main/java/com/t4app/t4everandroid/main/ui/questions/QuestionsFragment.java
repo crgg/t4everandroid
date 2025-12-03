@@ -1,5 +1,7 @@
 package com.t4app.t4everandroid.main.ui.questions;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.t4app.t4everandroid.AppController;
 import com.t4app.t4everandroid.ListenersUtils;
@@ -49,15 +53,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class QuestionsFragment extends Fragment {
+public class QuestionsFragment extends Fragment implements ListenersUtils.CreateQuestionListener {
     private static final String TAG = "QUESTION_FRAG";
 
     private FragmentQuestionsBinding binding;
 
     private QuestionGroupedAdapter adapter;
-    private CreateQuestionBottomSheet bottomSheet;
 
     private List<Question> questions;
+
+    private Map<String, String> emojiMap;
 
     public QuestionsFragment() {}
 
@@ -76,9 +81,9 @@ public class QuestionsFragment extends Fragment {
         binding = FragmentQuestionsBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        checkStatus();
-
-        bottomSheet = new CreateQuestionBottomSheet();
+        if (isAdded()){
+            checkStatus();
+        }
 
         binding.itemSearch.categoriesAuto.setOnClickListener(new SafeClickListener() {
             @Override
@@ -104,6 +109,14 @@ public class QuestionsFragment extends Fragment {
 
         questions = GlobalDataCache.questions;
 
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
         calculateTotalQuestions(questions);
         List<ListItem> grouped = groupByCategory(questions, null);
 
@@ -123,26 +136,17 @@ public class QuestionsFragment extends Fragment {
             @Override
             public void onEdit(Question questionTest, int pos) {
                 Log.d(TAG, "onEdit: " + questionTest.getQuestion());
-                bottomSheet.setEdit(true);
-                bottomSheet.setQuestionEdit(questionTest);
-                bottomSheet.setUpdatePos(pos);
                 FragmentManager fm = requireActivity().getSupportFragmentManager();
                 Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
-                bottomSheet.show(requireActivity().getSupportFragmentManager(), "CreateQuestionBottomSheet");
+                CreateQuestionBottomSheet bottomSheet = CreateQuestionBottomSheet.newInstance(questionTest, pos, true);
+                bottomSheet.show(getChildFragmentManager(), "EditQuestionBottomSheet");
             }
         });
         binding.questionsRv.setAdapter(adapter);
         binding.questionsRv.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
         binding.itemSearch.searchValue.addTextChangedListener(new TextWatcher() {
             @Override
@@ -176,26 +180,6 @@ public class QuestionsFragment extends Fragment {
             }
         });
 
-        bottomSheet.setListener(new CreateQuestionBottomSheet.CreateQuestionListener() {
-            @Override
-            public void onQuestionCreated(Question question) {
-                if (questions.isEmpty()){
-                    binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
-                    binding.questionsRv.setVisibility(View.VISIBLE);
-                }
-                questions.add(question);
-                adapter.addQuestionToCategory(question);
-                calculateTotalQuestions(questions);
-            }
-
-            @Override
-            public void onQuestionUpdated(Question question, int pos) {
-                questions.set(questions.indexOf(question), question);
-                calculateTotalQuestions(questions);
-                adapter.updateItem(pos, question);
-            }
-        });
-
         if (GlobalDataCache.legacyProfileSelected != null){
             getQuestions();
         }
@@ -203,25 +187,25 @@ public class QuestionsFragment extends Fragment {
         binding.itemSelectLegacy.btnAddFirst.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                bottomSheet.setEdit(false);
                 FragmentManager fm = requireActivity().getSupportFragmentManager();
                 Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
-                bottomSheet.show(requireActivity().getSupportFragmentManager(), "CreateQuestionBottomSheet");
+                CreateQuestionBottomSheet bottomSheet = CreateQuestionBottomSheet.newInstance(false);
+                bottomSheet.show(getChildFragmentManager(), "CreateQuestionBottomSheet");
             }
         });
         binding.addNewQuestionBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
-                bottomSheet.setEdit(false);
                 FragmentManager fm = requireActivity().getSupportFragmentManager();
                 Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
-                bottomSheet.show(requireActivity().getSupportFragmentManager(), "CreateQuestionBottomSheet");
+                CreateQuestionBottomSheet bottomSheet = CreateQuestionBottomSheet.newInstance(false);
+                bottomSheet.show(getChildFragmentManager(), "CreateQuestionBottomSheet");
             }
         });
 
@@ -299,7 +283,9 @@ public class QuestionsFragment extends Fragment {
                                 calculateTotalQuestions(body.getQuestions());
                             }
                             checkList();
-                            checkStatus();
+                            if (isAdded()){
+                                checkStatus();
+                            }
                         }
                     }
                 }
@@ -326,7 +312,34 @@ public class QuestionsFragment extends Fragment {
         BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
 
+        categoriesBottomSheet.setContentView(view);
+
+        categoriesBottomSheet.setOnShowListener(dialogInterface -> {
+
+            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
+
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (bottomSheet == null) return;
+
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+            BottomSheetBehavior<FrameLayout> behavior =
+                    BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            behavior.setPeekHeight(0);
+            behavior.setDraggable(true);
+        });
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                categoriesBottomSheet.dismiss();
+            }
+        });
 
         List<String> items = Arrays.asList(
                 getString(R.string.agreeableness),
@@ -351,15 +364,41 @@ public class QuestionsFragment extends Fragment {
             categoriesBottomSheet.dismiss();
         });
 
-        categoriesBottomSheet.setContentView(view);
         categoriesBottomSheet.show();
     }
 
     private void showProfilesBottomSheet() {
         BottomSheetDialog profilesBottomSheet = new BottomSheetDialog(requireContext());
-        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_profiles, null);
+        profilesBottomSheet.setContentView(view);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+        profilesBottomSheet.setOnShowListener(dialogInterface -> {
+
+            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
+
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (bottomSheet == null) return;
+
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+            BottomSheetBehavior<FrameLayout> behavior =
+                    BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            behavior.setPeekHeight(0);
+            behavior.setDraggable(true);
+        });
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewProfiles);
+        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                profilesBottomSheet.dismiss();
+            }
+        });
 
         List<LegacyProfile> profiles = GlobalDataCache.legacyProfiles;
         if (profiles == null) {
@@ -369,24 +408,34 @@ public class QuestionsFragment extends Fragment {
         LegacyItemsAdapter adapter = new LegacyItemsAdapter(profiles);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(), LinearLayoutManager.VERTICAL);
+        dividerItemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(),
+                R.drawable.recycler_divider)));
+
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         adapter.setOnItemClickListener(profile -> {
             processChange(profile, profilesBottomSheet);
         });
 
-        profilesBottomSheet.setContentView(view);
         profilesBottomSheet.show();
     }
 
-    private List<ListItem> groupByCategory(List<Question> list, @Nullable String filterCategory) {
-        Map<String, List<Question>> grouped = new LinkedHashMap<>();
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
 
-        Map<String, String> emojiMap = new HashMap<>();
+        emojiMap = new HashMap<>();
         emojiMap.put("agreeableness", getString(R.string.agreeableness));
         emojiMap.put("conscientiousness", getString(R.string.conscientiousness));
         emojiMap.put("extraversion", getString(R.string.extraversion));
         emojiMap.put("neuroticism", getString(R.string.neuroticism));
         emojiMap.put("openness", getString(R.string.openness));
+    }
+
+    private List<ListItem> groupByCategory(List<Question> list, @Nullable String filterCategory) {
+        Map<String, List<Question>> grouped = new LinkedHashMap<>();
 
         if (filterCategory != null) {
             filterCategory = removeEmojis(filterCategory).trim();
@@ -564,4 +613,21 @@ public class QuestionsFragment extends Fragment {
     }
 
 
+    @Override
+    public void onQuestionCreated(Question question) {
+        if (questions.isEmpty()){
+            binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
+            binding.questionsRv.setVisibility(View.VISIBLE);
+        }
+        questions.add(question);
+        adapter.addQuestionToCategory(question);
+        calculateTotalQuestions(questions);
+    }
+
+    @Override
+    public void onQuestionUpdated(Question question, int pos) {
+        questions.set(questions.indexOf(question), question);
+        calculateTotalQuestions(questions);
+        adapter.updateItem(pos, question);
+    }
 }

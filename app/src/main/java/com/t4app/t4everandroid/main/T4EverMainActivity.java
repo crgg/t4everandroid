@@ -143,7 +143,9 @@ public class T4EverMainActivity extends BaseActivity {
         userRepository = new UserRepository();
         getUserInfo();
 
-        showFragment(new HomeFragment());
+        if (savedInstanceState == null){
+            showFragment(new HomeFragment());
+        }
 
         MenuItem settingsItem = navigationView.getMenu().findItem(R.id.nav_settings);
 

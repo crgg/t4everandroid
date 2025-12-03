@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -34,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -49,8 +51,8 @@ import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.GlobalDataCache;
-import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -67,35 +69,74 @@ import retrofit2.Response;
 
 public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "CREATE_CONVERSATION";
-    private MaterialButton recordAudioBtn;
-    private MaterialButton recordVideoBtn;
-    private MaterialButton saveConversation;
 
-    private ActivityResultLauncher<Intent> launcher;
-    private AudioPlayerView audioPlayerView;
-
-    private Uri videoUri;
-    private Uri audioUri;
-    private ActivityResultLauncher<Intent> videoLauncher;
-
-    private MaterialButton videoView;
     private String type;
     private String textConversationValue;
 
+    private Uri videoUri;
+    private Uri audioUri;
+
+    private ListenersUtils.OnMediaAddedListener listener;
+    private CameraPermissionManager.PermissionCallback permissionCallback;
+
+    private ActivityResultLauncher<Intent> launcher;
+    private ActivityResultLauncher<Intent> videoLauncher;
+    private ActivityResultLauncher<String> cameraPermissionLauncher;
+
+    private AudioPlayerView audioPlayerView;
+
     private LinearLayout dataContainer;
     private LinearLayout loadContainer;
+    private LinearLayout containerText;
+    private LinearLayout optionText;
+    private LinearLayout optionAudio;
+    private LinearLayout optionVideo;
 
     private TextInputEditText conversationText;
     private TextInputLayout conversationTextLayout;
 
-    private ListenersUtils.OnMediaAddedListener listener;
+    private ImageView textIcon;
+    private ImageView audioIcon;
+    private ImageView videoIcon;
 
-    private ActivityResultLauncher<String> cameraPermissionLauncher;
-    private CameraPermissionManager.PermissionCallback permissionCallback;
+    private TextView text;
+    private TextView audio;
+    private TextView video;
 
-    public void setListener(ListenersUtils.OnMediaAddedListener listener) {
-        this.listener = listener;
+
+    private MaterialButton recordAudioBtn;
+    private MaterialButton recordVideoBtn;
+    private MaterialButton saveConversation;
+    private MaterialButton videoView;
+    private MaterialButton cancelBtn;
+    private AppCompatImageButton closeBtn;
+
+    public static CreateMediaBottomSheet newInstance(){
+        return new CreateMediaBottomSheet();
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        Fragment parent = getParentFragment();
+        if (parent instanceof ListenersUtils.OnMediaAddedListener) {
+            listener = (ListenersUtils.OnMediaAddedListener) parent;
+        } else if (context instanceof ListenersUtils.OnMediaAddedListener) {
+            listener = (ListenersUtils.OnMediaAddedListener) context;
+        } else {
+            throw new IllegalStateException(
+                    "Parent Fragment o Activity deben implementar OnMediaAddedListener"
+            );
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,66 +152,13 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.create_media_layout, container, false);
 
-        LinearLayout optionText = view.findViewById(R.id.option_text);
-        LinearLayout optionAudio = view.findViewById(R.id.option_audio);
-        LinearLayout optionVideo = view.findViewById(R.id.option_video);
-
-        LinearLayout containerText = view.findViewById(R.id.container_text);
-        conversationText = view.findViewById(R.id.conversation_value);
-        conversationTextLayout = view.findViewById(R.id.conversation_layout);
-        recordAudioBtn = view.findViewById(R.id.start_record_audio);
-        recordVideoBtn = view.findViewById(R.id.start_record_video);
-
-        loadContainer = view.findViewById(R.id.load_container);
-        dataContainer = view.findViewById(R.id.data_container);
-
-        audioPlayerView = view.findViewById(R.id.audioPlayer);
-        videoView = view.findViewById(R.id.video_player);
-
-        ImageView textIcon = view.findViewById(R.id.icon_text);
-        ImageView audioIcon = view.findViewById(R.id.icon_audio);
-        ImageView videoIcon = view.findViewById(R.id.icon_video);
-
-        TextView text = view.findViewById(R.id.text);
-        TextView audio = view.findViewById(R.id.audio);
-        TextView video = view.findViewById(R.id.video);
-
-        MaterialButton cancelBtn = view.findViewById(R.id.cancel_btn);
-        saveConversation = view.findViewById(R.id.save_conversation);
-        AppCompatImageButton closeBtn = view.findViewById(R.id.btn_close);
+        initViews(view);
 
         optionText.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
                 type = "text";
-                containerText.setVisibility(View.VISIBLE);
-                recordAudioBtn.setVisibility(View.GONE);
-                recordVideoBtn.setVisibility(View.GONE);
-
-                text.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-                audio.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
-                video.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
-
-                textIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                );
-                audioIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-                videoIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-
-                optionText.setBackgroundTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-                optionAudio.setBackgroundTintList(
-                       null
-                );
-                optionVideo.setBackgroundTintList(
-                        null
-                );
-                videoView.setVisibility(View.GONE);
+                applyMediaTypeState(type);
             }
         });
 
@@ -178,34 +166,7 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onSafeClick(View v) {
                 type = "audio";
-                containerText.setVisibility(View.GONE);
-                recordAudioBtn.setVisibility(View.VISIBLE);
-                recordVideoBtn.setVisibility(View.GONE);
-
-                text.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
-                audio.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-                video.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
-
-                textIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-                audioIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                );
-                videoIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-
-                optionText.setBackgroundTintList(
-                        null
-                );
-                optionAudio.setBackgroundTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-                optionVideo.setBackgroundTintList(
-                        null
-                );
-                videoView.setVisibility(View.GONE);
+                applyMediaTypeState(type);
             }
         });
 
@@ -213,34 +174,7 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onSafeClick(View v) {
                 type = "video";
-                containerText.setVisibility(View.GONE);
-                recordAudioBtn.setVisibility(View.GONE);
-                recordVideoBtn.setVisibility(View.VISIBLE);
-
-                hideAudioPlayer();
-                text.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
-                audio.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_color));
-                video.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-
-                textIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-                audioIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
-                videoIcon.setImageTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                );
-
-                optionText.setBackgroundTintList(
-                        null
-                );
-                optionAudio.setBackgroundTintList(
-                        null
-                );
-                optionVideo.setBackgroundTintList(
-                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.second_login_color))
-                );
+                applyMediaTypeState(type);
             }
         });
 
@@ -309,11 +243,16 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
                         Intent data = result.getData();
                         if (data != null && data.getData() != null) {
                             videoUri = data.getData();
+                            long sizeBytes = getFileSizeFromUri(requireContext(), videoUri);
+                            if (sizeBytes > 0) {
+                                double sizeMB = sizeBytes / (1024.0 * 1024.0);
+                                Log.d(TAG, "Video size: " + sizeMB + " MB");
+                            }
+
                         }
 
                         if (videoUri != null) {
                             videoView.setVisibility(View.VISIBLE);
-
                         }else{
                             Log.d(TAG, "VIDEO URI IS NULL");
                         }
@@ -374,6 +313,25 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
+
+        if (savedInstanceState != null) {
+            String audioString = savedInstanceState.getString("audio_uri_state");
+            if (audioString != null) {
+                audioUri = Uri.parse(audioString);
+                setupAudioPlayer(audioUri);
+            }
+
+            String videoString = savedInstanceState.getString("video_uri");
+            if (videoString != null) {
+                Log.d(TAG, "Video URI NO ES NULL: ");
+                videoUri = Uri.parse(videoString);
+                videoView.setVisibility(View.VISIBLE);
+            }
+
+            type = savedInstanceState.getString("type", "text");
+            applyMediaTypeState(type);
+        }
+
     }
 
 
@@ -447,18 +405,27 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
+    private RequestBody createRequestBodyFromUri(Context context, Uri uri, String mimeType) {
+        return new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return MediaType.parse(mimeType);
+            }
 
-    private RequestBody createRequestBodyFromUri(Context context, Uri uri, String mimeType) throws IOException {
-        InputStream inputStream = context.getContentResolver().openInputStream(uri);
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        byte[] data = new byte[8192];
-        int nRead;
-        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-        buffer.flush();
-        return RequestBody.create(buffer.toByteArray(), MediaType.parse(mimeType));
+            @Override
+            public void writeTo(okio.BufferedSink sink) throws IOException {
+                try (InputStream in = context.getContentResolver().openInputStream(uri)) {
+                    if (in == null) return;
+                    byte[] buffer = new byte[8192];
+                    int read;
+                    while ((read = in.read(buffer)) != -1) {
+                        sink.write(buffer, 0, read);
+                    }
+                }
+            }
+        };
     }
+
 
     private String getFileName(Context context, Uri uri) {
         String result = null;
@@ -512,10 +479,25 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
                 + ".provider", videoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 60);
-        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+        intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 30L * 1024L * 1024L);
 
         videoLauncher.launch(intent);
     }
+
+    private long getFileSizeFromUri(Context context, Uri uri) {
+        try (ParcelFileDescriptor pfd =
+                     context.getContentResolver().openFileDescriptor(uri, "r")) {
+            if (pfd != null) {
+                long size = pfd.getStatSize(); // bytes
+                return size; // puede ser -1 en algunos casos
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
 
     public void setupAudioPlayer(Uri audioUri) {
         if (audioPlayerView != null) {
@@ -634,6 +616,24 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
         };
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (audioUri != null) {
+            outState.putString("audio_uri_state", audioUri.toString());
+        }
+
+        if (videoUri != null) {
+            outState.putString("video_uri", videoUri.toString());
+        }
+
+        if (type != null) {
+            outState.putString("type", type);
+        }
+    }
+
+
     private void setupPermissionLauncher() {
         cameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -656,4 +656,94 @@ public class CreateMediaBottomSheet extends BottomSheetDialogFragment {
             audioPlayerView.stopPlayback();
         }
     }
+
+    private void applyMediaTypeState(String type) {
+
+        int white = ContextCompat.getColor(requireContext(), R.color.white);
+        int normal = ContextCompat.getColor(requireContext(), R.color.text_color);
+        int tintNormal = ContextCompat.getColor(requireContext(), R.color.second_login_color);
+        int tintSelected = white;
+        int bgSelected = tintNormal;
+
+        containerText.setVisibility(View.GONE);
+        recordAudioBtn.setVisibility(View.GONE);
+        recordVideoBtn.setVisibility(View.GONE);
+        if (videoUri == null){
+            videoView.setVisibility(View.GONE);
+        }
+
+        text.setTextColor(normal);
+        audio.setTextColor(normal);
+        video.setTextColor(normal);
+
+        textIcon.setImageTintList(ColorStateList.valueOf(tintNormal));
+        audioIcon.setImageTintList(ColorStateList.valueOf(tintNormal));
+        videoIcon.setImageTintList(ColorStateList.valueOf(tintNormal));
+
+        optionText.setBackgroundTintList(null);
+        optionAudio.setBackgroundTintList(null);
+        optionVideo.setBackgroundTintList(null);
+
+        switch (type) {
+
+            case "text":
+                containerText.setVisibility(View.VISIBLE);
+
+                text.setTextColor(white);
+                textIcon.setImageTintList(ColorStateList.valueOf(tintSelected));
+
+                optionText.setBackgroundTintList(ColorStateList.valueOf(bgSelected));
+                break;
+
+            case "audio":
+                recordAudioBtn.setVisibility(View.VISIBLE);
+
+                audio.setTextColor(white);
+                audioIcon.setImageTintList(ColorStateList.valueOf(tintSelected));
+
+                optionAudio.setBackgroundTintList(ColorStateList.valueOf(bgSelected));
+                break;
+
+            case "video":
+                recordVideoBtn.setVisibility(View.VISIBLE);
+                hideAudioPlayer();
+
+                video.setTextColor(white);
+                videoIcon.setImageTintList(ColorStateList.valueOf(tintSelected));
+
+                optionVideo.setBackgroundTintList(ColorStateList.valueOf(bgSelected));
+                break;
+        }
+    }
+
+    private void initViews(View view){
+        optionText = view.findViewById(R.id.option_text);
+        optionAudio = view.findViewById(R.id.option_audio);
+        optionVideo = view.findViewById(R.id.option_video);
+
+        containerText = view.findViewById(R.id.container_text);
+        conversationText = view.findViewById(R.id.conversation_value);
+        conversationTextLayout = view.findViewById(R.id.conversation_layout);
+        recordAudioBtn = view.findViewById(R.id.start_record_audio);
+        recordVideoBtn = view.findViewById(R.id.start_record_video);
+
+        loadContainer = view.findViewById(R.id.load_container);
+        dataContainer = view.findViewById(R.id.data_container);
+
+        audioPlayerView = view.findViewById(R.id.audioPlayer);
+        videoView = view.findViewById(R.id.video_player);
+
+        textIcon = view.findViewById(R.id.icon_text);
+        audioIcon = view.findViewById(R.id.icon_audio);
+        videoIcon = view.findViewById(R.id.icon_video);
+
+        text = view.findViewById(R.id.text);
+        audio = view.findViewById(R.id.audio);
+        video = view.findViewById(R.id.video);
+
+        cancelBtn = view.findViewById(R.id.cancel_btn);
+        saveConversation = view.findViewById(R.id.save_conversation);
+        closeBtn = view.findViewById(R.id.btn_close);
+    }
+
 }

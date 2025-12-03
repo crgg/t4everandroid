@@ -1,5 +1,6 @@
 package com.t4app.t4everandroid;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,24 +13,40 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class ImageSelectorBottomSheet extends BottomSheetDialogFragment {
+    private ListenersUtils.OnOptionImageListener listener;
 
-    public interface Listener {
-        void onCameraSelected();
-        void onGallerySelected();
+    public static ImageSelectorBottomSheet newInstance() {
+        return new ImageSelectorBottomSheet();
     }
 
-    private Listener listener;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
 
-    public void setListener(Listener listener) {
-        this.listener = listener;
+        Fragment parent = getParentFragment();
+        if (parent instanceof ListenersUtils.OnOptionImageListener) {
+            listener = (ListenersUtils.OnOptionImageListener) parent;
+        } else if (context instanceof ListenersUtils.OnOptionImageListener) {
+            listener = (ListenersUtils.OnOptionImageListener) context;
+        } else {
+            throw new IllegalStateException(
+                    "Parent Fragment o Activity deben implementar OnOptionImageListener"
+            );
+        }
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

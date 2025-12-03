@@ -71,7 +71,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateLegacyProfileActivity extends BaseActivity {
+public class CreateLegacyProfileActivity extends BaseActivity implements ListenersUtils.OnOptionImageListener{
     private static final String TAG = "CREATE_LEGACY_PROFILE_ACT";
     private ActivityCreateLegacyProfileBinding binding;
 
@@ -93,7 +93,6 @@ public class CreateLegacyProfileActivity extends BaseActivity {
 
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private CameraPermissionManager.PermissionCallback permissionCallback;
-    private ImageSelectorBottomSheet bottomSheet;
 
     private boolean isUpdate;
 
@@ -169,8 +168,6 @@ public class CreateLegacyProfileActivity extends BaseActivity {
                     }
                 }
         );
-
-        bottomSheet = getImageSelectorBottomSheet();
 
         setupPermissionCallback();
         setupPermissionLauncher();
@@ -276,6 +273,7 @@ public class CreateLegacyProfileActivity extends BaseActivity {
         binding.uploadImageBtn.setOnClickListener(new SafeClickListener() {
             @Override
             public void onSafeClick(View v) {
+                ImageSelectorBottomSheet bottomSheet = ImageSelectorBottomSheet.newInstance();
                 bottomSheet.show(getSupportFragmentManager(), "ImageSelector");
             }
         });
@@ -539,30 +537,6 @@ public class CreateLegacyProfileActivity extends BaseActivity {
         autoLanguage = findViewById(R.id.auto_language);
     }
 
-    @NonNull
-    private ImageSelectorBottomSheet getImageSelectorBottomSheet() {
-        ImageSelectorBottomSheet bottomSheet = new ImageSelectorBottomSheet();
-        bottomSheet.setListener(new ImageSelectorBottomSheet.Listener() {
-            @Override
-            public void onCameraSelected() {
-                if (CameraPermissionManager.hasCameraPermission(CreateLegacyProfileActivity.this)){
-                    openCamera();
-                }else{
-                    CameraPermissionManager.requestCameraPermission(
-                            CreateLegacyProfileActivity.this,
-                            cameraPermissionLauncher,
-                            permissionCallback);
-                }
-            }
-
-            @Override
-            public void onGallerySelected() {
-                openGallery();
-            }
-        });
-        return bottomSheet;
-    }
-
     private void clearErrors() {
         fullNameLayout.setError(null);
         aliasLayout.setError(null);
@@ -779,4 +753,20 @@ public class CreateLegacyProfileActivity extends BaseActivity {
     }
 
 
+    @Override
+    public void onCameraSelected() {
+        if (CameraPermissionManager.hasCameraPermission(CreateLegacyProfileActivity.this)){
+            openCamera();
+        }else{
+            CameraPermissionManager.requestCameraPermission(
+                    CreateLegacyProfileActivity.this,
+                    cameraPermissionLauncher,
+                    permissionCallback);
+        }
+    }
+
+    @Override
+    public void onGallerySelected() {
+        openGallery();
+    }
 }

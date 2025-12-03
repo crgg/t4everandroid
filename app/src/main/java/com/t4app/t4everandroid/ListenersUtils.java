@@ -65,4 +65,18 @@ public class ListenersUtils {
         void onDeleteAudio(Interactions interactions, int position);
     }
 
+    public interface CreateQuestionListener {
+        void onQuestionCreated(Question question);
+        void onQuestionUpdated(Question question, int pos);
+    }
+
+    public interface OnOptionImageListener {
+        void onCameraSelected();
+        void onGallerySelected();
+    }
+
+    public interface OnEmailSendListener {
+        void onSend(String to, String subject, String message);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.t4app.t4everandroid.main.ui.questions;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.main.Models.Question;
@@ -39,11 +42,9 @@ import java.util.Locale;
 public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
 
     private static final String TAG = "CREATE_QUESTION";
-
-    public interface CreateQuestionListener {
-        void onQuestionCreated(Question question);
-        void onQuestionUpdated(Question question, int pos);
-    }
+    private static final String ARG_QUESTION = "arg_question";
+    private static final String ARG_POS = "arg_pos";
+    private static final String ARG_IS_EDIT = "arg_is_edit";
 
     private AppCompatImageButton closeBtn;
     private AppCompatAutoCompleteTextView categories;
@@ -58,22 +59,62 @@ public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
     private Question questionEdit;
     private int updatePos;
 
-    private CreateQuestionListener listener;
+    private ListenersUtils.CreateQuestionListener listener;
 
-    public void setListener(CreateQuestionListener listener) {
-        this.listener = listener;
+    public static CreateQuestionBottomSheet newInstance(Question question, int position, boolean isEdit) {
+        CreateQuestionBottomSheet sheet = new CreateQuestionBottomSheet();
+
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_QUESTION, question);
+        args.putInt(ARG_POS, position);
+        args.putBoolean(ARG_IS_EDIT, isEdit);
+        sheet.setArguments(args);
+
+        return sheet;
     }
 
-    public void setEdit(boolean edit) {
-        this.isEdit = edit;
+    public static CreateQuestionBottomSheet newInstance(boolean isEdit) {
+        CreateQuestionBottomSheet sheet = new CreateQuestionBottomSheet();
+
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_IS_EDIT, isEdit);
+        sheet.setArguments(args);
+
+        return sheet;
     }
 
-    public void setUpdatePos(int updatePos) {
-        this.updatePos = updatePos;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        Fragment parent = getParentFragment();
+        if (parent instanceof ListenersUtils.CreateQuestionListener) {
+            listener = (ListenersUtils.CreateQuestionListener) parent;
+        } else if (context instanceof ListenersUtils.CreateQuestionListener) {
+            listener = (ListenersUtils.CreateQuestionListener) context;
+        } else {
+            throw new IllegalStateException(
+                    "Parent Fragment o Activity deben implementar CreateQuestionListener"
+            );
+        }
     }
 
-    public void setQuestionEdit(Question questionEdit) {
-        this.questionEdit = questionEdit;
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            questionEdit = (Question) args.getSerializable(ARG_QUESTION);
+            updatePos = args.getInt(ARG_POS);
+            isEdit = args.getBoolean(ARG_IS_EDIT, false);
+        }
     }
 
     @Nullable
@@ -162,8 +203,36 @@ public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
     public void showCategories() {
         BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
+        categoriesBottomSheet.setContentView(view);
+
+        categoriesBottomSheet.setOnShowListener(dialogInterface -> {
+
+            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
+
+            FrameLayout bottomSheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (bottomSheet == null) return;
+
+            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
+
+            BottomSheetBehavior<FrameLayout> behavior =
+                    BottomSheetBehavior.from(bottomSheet);
+
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            behavior.setPeekHeight(0);
+            behavior.setDraggable(true);
+        });
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
+
+        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                categoriesBottomSheet.dismiss();
+            }
+        });
 
         List<String> items = Arrays.asList(
                 getString(R.string.agreeableness),
@@ -182,9 +251,9 @@ public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
             categoriesBottomSheet.dismiss();
         });
 
-        categoriesBottomSheet.setContentView(view);
         categoriesBottomSheet.show();
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

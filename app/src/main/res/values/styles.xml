@@ -28,7 +28,7 @@
     </style>
 
     <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
-        <item name="android:popupBackground">@android:color/white</item>
+        <item name="android:popupBackground">@color/background</item>
     </style>
 
     <style name="CustomTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">

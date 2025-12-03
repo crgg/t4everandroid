@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class LegacyItemsAdapter extends RecyclerView.Adapter<LegacyItemsAdapter.
     @Override
     public ProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(android.R.layout.simple_list_item_1, parent, false);
+                .inflate(R.layout.item_legacy_text, parent, false);
         return new ProfileViewHolder(view);
     }
 

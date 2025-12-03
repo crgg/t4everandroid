@@ -178,7 +178,7 @@
     <string name="current_password_is_required">Current password is required</string>
     <string name="new_password_is_required">New password is required</string>
     <string name="select_a_photo_from_the_gallery">Select a photo from\nthe gallery.</string>
-    <string name="take_a_photo_from_the_ncamera">Take a photo from the\ncamera</string>
+    <string name="take_a_photo_from_the_ncamera">Take a photo from\nthe camera</string>
     <string name="select_an_option">Select An Option</string>
     <string name="gallery">gallery</string>
     <string name="camera">camera</string>
