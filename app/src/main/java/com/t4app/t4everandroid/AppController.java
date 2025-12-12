@@ -8,7 +8,6 @@ import com.t4app.t4everandroid.room.AppDatabase;
 
 public class AppController extends Application {
     private static AppController instance;
-//    private static AppDatabase database;
     private static AppDatabase database;
 
     private static ApiServices apiServices = null;
@@ -35,13 +34,6 @@ public class AppController extends Application {
         }
         return database;
     }
-
-//    public static AppDatabase getDatabase() {
-//        if (database == null) {
-//            throw new IllegalStateException("The database is not yet initialized.");
-//        }
-//        return database;
-//    }
 
     public static AppController getInstance() {
         return instance;

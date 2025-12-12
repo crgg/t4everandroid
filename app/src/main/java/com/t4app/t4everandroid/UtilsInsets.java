@@ -1,16 +1,12 @@
 package com.t4app.t4everandroid;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import com.google.android.material.navigation.NavigationView;
 
 public class UtilsInsets {
 

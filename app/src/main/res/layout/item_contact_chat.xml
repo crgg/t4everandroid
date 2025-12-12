@@ -63,6 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/no_messages_yet"
+                android:visibility="gone"
                 android:textSize="14sp"
                 android:textColor="@color/text_color" />
         </LinearLayout>

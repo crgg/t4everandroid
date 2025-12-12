@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
@@ -28,9 +27,8 @@ import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.LegacyProfileAdapter;
-import com.t4app.t4everandroid.main.ui.ChatFragment;
+import com.t4app.t4everandroid.main.ui.chat.ChatFragment;
 import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
-import com.t4app.t4everandroid.main.viewmodel.MainViewModel;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 

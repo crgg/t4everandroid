@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.DateUtils;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
@@ -20,6 +21,7 @@ import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.Session;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
+import com.t4app.t4everandroid.main.ui.chat.ChatFragment;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
@@ -158,17 +160,26 @@ public class HomeFragment extends Fragment {
                                     binding.questionAnsweredItem.countQuestionsAnswered.setText("0");
                                     binding.scheduledMessagesItem.countMessages.setText("0");
                                 }else{
-                                    if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()){
-                                        int sessions = 0;
-                                        for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles){
-                                            if (legacyProfile.getOpenSession() != null){
-                                                GlobalDataCache.legacyProfileSelected = legacyProfile;
-                                                GlobalDataCache.sessionId = legacyProfile.getOpenSession().getId();
-                                                sessions++;
+                                    if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()) {
+
+                                        LegacyProfile keepProfile = null;
+                                        Session keepSession = null;
+
+                                        for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles) {
+                                            Session s = legacyProfile.getOpenSession();
+                                            if (s == null) continue;
+
+                                            if (keepSession == null || DateUtils.isAfter(s.getDateStart(), keepSession.getDateStart())) {
+                                                keepSession = s;
+                                                keepProfile = legacyProfile;
                                             }
                                         }
-                                        if (sessions > 1){
-                                            endSessions();
+
+                                        if (keepSession != null) {
+                                            GlobalDataCache.legacyProfileSelected = keepProfile;
+                                            GlobalDataCache.sessionId = keepSession.getId();
+
+                                            endSessionsExcept(keepSession.getId());
                                         }
                                     }
                                     binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
@@ -197,17 +208,19 @@ public class HomeFragment extends Fragment {
                 .commit();
     }
 
-    private void endSessions(){
-        if (GlobalDataCache.legacyProfiles != null && !GlobalDataCache.legacyProfiles.isEmpty()){
-            GlobalDataCache.legacyProfileSelected = null;
-            GlobalDataCache.sessionId = null;
-            for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles){
-                if (legacyProfile.getOpenSession() != null){
-                    endSession(legacyProfile.getOpenSession().getId(), session -> {});
-                }
+    private void endSessionsExcept(String keepSessionId) {
+        if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()) return;
+
+        for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles) {
+            Session s = legacyProfile.getOpenSession();
+            if (s == null) continue;
+
+            if (!s.getId().equals(keepSessionId)) {
+                endSession(s.getId(), session -> {});
             }
         }
     }
+
 
     private void endSession(String sessionId, ListenersUtils.OnSessionStartedOrEndCallback callback){
         ApiServices apiServices = AppController.getApiServices();

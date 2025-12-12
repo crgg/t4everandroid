@@ -1,7 +1,6 @@
 package com.t4app.t4everandroid.main;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,24 +13,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.AppController;
@@ -43,12 +37,10 @@ import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.SessionManager;
-import com.t4app.t4everandroid.UtilsInsets;
 import com.t4app.t4everandroid.databinding.ActivityT4EverMainBinding;
-import com.t4app.t4everandroid.main.viewmodel.MainViewModel;
 import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
 import com.t4app.t4everandroid.main.repository.UserRepository;
-import com.t4app.t4everandroid.main.ui.ChatFragment;
+import com.t4app.t4everandroid.main.ui.chat.ChatFragment;
 import com.t4app.t4everandroid.main.ui.NotificationsFragment;
 import com.t4app.t4everandroid.main.ui.media.MediaFragment;
 import com.t4app.t4everandroid.main.ui.HomeFragment;

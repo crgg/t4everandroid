@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid.main.adapter;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import java.util.List;
 
 public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdapter.ViewHolder> {
+
+    private static final String TAG = "LEGACY_ADAPTER";
 
     private List<LegacyProfile> profileList;
     private final ListenersUtils.OnProfileActionListener listener;
@@ -68,6 +71,7 @@ public class LegacyProfileAdapter extends RecyclerView.Adapter<LegacyProfileAdap
         }
 
         if (profile.getOpenSession() != null && profile.getLastSession() == null){
+            Log.d(TAG, "HAS OPEN SESSION " + profile.getName());
             holder.itemView.post(() -> {
                 int newPos = holder.getBindingAdapterPosition();
                 if (newPos == RecyclerView.NO_POSITION || newPos == lastClicked) return;

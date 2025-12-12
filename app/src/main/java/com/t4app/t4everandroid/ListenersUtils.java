@@ -1,12 +1,13 @@
 package com.t4app.t4everandroid;
 
 import com.t4app.t4everandroid.Login.models.User;
-import com.t4app.t4everandroid.main.Models.Interactions;
 import com.t4app.t4everandroid.main.Models.Media;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
 import com.t4app.t4everandroid.main.Models.NotificationItem;
 import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.Models.Session;
+import com.t4app.t4everandroid.main.ui.chat.models.InlineData;
+import com.t4app.t4everandroid.main.ui.chat.models.Messages;
 
 public class ListenersUtils {
 
@@ -60,9 +61,10 @@ public class ListenersUtils {
         void onEmailChanged(String newEmail);
     }
 
-    public interface OnInteractionActionsListener{
-        void onDelete(Interactions interactions, int position);
-        void onDeleteAudio(Interactions interactions, int position);
+    public interface OnMessageActionsListener{
+        void onDelete(Messages messages, int position);
+        void onViewFile(InlineData inlineData);
+        void onDeleteAudio(Messages messages, int position);
     }
 
     public interface CreateQuestionListener {

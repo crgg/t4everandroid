@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
+<androidx.cardview.widget.CardView android:fitsSystemWindows="true"
     app:cardCornerRadius="16dp"
     app:cardElevation="8dp"
+    android:background="@android:color/transparent"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toBottomOf="parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:padding="12dp"
+        android:padding="5dp"
         android:orientation="horizontal"
-        android:background="@color/background"
+        android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -308,60 +309,72 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:visibility="visible"
-                    android:id="@+id/container_text_interaction"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/upload_file"
-                        android:src="@drawable/ic_attach_file"
-                        android:rotation="45"
-                        android:tint="@color/second_login_color"
-                        android:background="@null"
-                        android:padding="10dp"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"/>
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/record_audio_btn"
-                        android:src="@drawable/ic_conversation_24_dp"
-                        android:tint="@color/second_login_color"
-                        android:background="@null"
-                        android:padding="10dp"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"/>
-
-                    <EditText
-                        android:id="@+id/text_interaction"
-                        android:gravity="center_vertical"
-                        android:hint="@string/write_a_message"
-                        android:background="@drawable/bg_border_line"
-                        android:textColorHint="@color/gray_hint"
-                        android:textColor="@color/text_color"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:inputType="text|textMultiLine"
-                        android:maxLines="8"
-                        android:scrollbars="vertical"
+                    <LinearLayout
+                        android:id="@+id/imagesSelectedContainer"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/send_interaction_btn"
-                        android:src="@drawable/ic_send"
-                        android:tint="@color/white"
-                        android:background="@drawable/bg_profile"
-                        android:backgroundTint="@color/sign_in_color"
-                        android:layout_width="43dp"
-                        android:layout_height="43dp"/>
+                    <LinearLayout
+                        android:visibility="visible"
+                        android:id="@+id/container_text_message"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
+                        <androidx.appcompat.widget.AppCompatImageButton
+                            android:id="@+id/upload_file"
+                            android:src="@drawable/ic_attach_file"
+                            android:rotation="45"
+                            android:tint="@color/second_login_color"
+                            android:background="@null"
+                            android:padding="10dp"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"/>
+
+                        <androidx.appcompat.widget.AppCompatImageButton
+                            android:id="@+id/record_audio_btn"
+                            android:src="@drawable/ic_conversation_24_dp"
+                            android:tint="@color/second_login_color"
+                            android:background="@null"
+                            android:padding="10dp"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"/>
+
+                        <EditText
+                            android:id="@+id/text_message"
+                            android:gravity="center_vertical"
+                            android:hint="@string/write_a_message"
+                            android:background="@drawable/bg_border_line"
+                            android:textColorHint="@color/gray_hint"
+                            android:textColor="@color/text_color"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:inputType="text|textMultiLine"
+                            android:maxLines="8"
+                            android:scrollbars="vertical"
+                            android:layout_height="wrap_content"/>
+
+                        <androidx.appcompat.widget.AppCompatImageButton
+                            android:id="@+id/send_message_btn"
+                            android:src="@drawable/ic_send"
+                            android:tint="@color/white"
+                            android:background="@drawable/bg_profile"
+                            android:backgroundTint="@color/sign_in_color"
+                            android:layout_width="43dp"
+                            android:layout_height="43dp"/>
+
+                    </LinearLayout>
                 </LinearLayout>
-
             </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
+

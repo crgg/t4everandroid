@@ -2,6 +2,7 @@ package com.t4app.t4everandroid.network;
 
 public class ApiConfig {
     public static final String BASE_URL = "https://backend.t4ever.com/";
+    public static final String BASE_CHAT_URL = "https://t4chatbot.t4ever.com/";
     public static final String CLIENT_ID = "395482359077-q47be5ha9cp073r4qlpm48ip9ggm5rdc.apps.googleusercontent.com";
 
     public static final String LOGIN_URL = "api/auth/login";
@@ -11,7 +12,7 @@ public class ApiConfig {
     public static final String ASSISTANTS_URL = "api/assistants";
     public static final String RESEND_EMAIL_URL = "api/email/resend";
     public static final String GET_USER_INFO = "api/auth/user";
-    public static final String GET_INTERACTIONS = "api/interactions";
+    public static final String GET_MESSAGES = "api/messages";
     public static final String ACTIONS_ASSISTANTS_URL = "api/assistants/{uuid}";
     public static final String GET_QUESTIONS_ASSISTANT = "api/assistant-questions";
     public static final String UPDATE_PROFILE_URL = "api/update-user-info";
@@ -22,6 +23,6 @@ public class ApiConfig {
     public static final String UPLOAD_IMAGE_ASSISTANT_URL = "api/set-assistant-avatar";
     public static final String UPLOAD_MEDIA = "api/media";
     public static final String DELETE_MEDIA = "api/media/{uuid}";
-    public static final String DELETE_INTERACTION = "api/interactions/{uuid}";
+    public static final String DELETE_MESSAGE = "api/messages/{uuid}";
 
 }

@@ -4,16 +4,17 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
-import com.t4app.t4everandroid.network.responses.ResponseCreateInteraction;
+import com.t4app.t4everandroid.network.responses.ResponseCreateMessage;
 import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
-import com.t4app.t4everandroid.network.responses.ResponseGetInteractions;
+import com.t4app.t4everandroid.network.responses.ResponseGetMessages;
 import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
 import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
@@ -33,6 +34,7 @@ import retrofit2.http.Query;
 
 public interface ApiServices {
 
+    //LOGIN AND REGISTER
     @POST(ApiConfig.LOGIN_URL)
     @FormUrlEncoded
     Call<LoginResponse> login(
@@ -54,6 +56,8 @@ public interface ApiServices {
             @FieldMap Map<String, Object> body
     );
 
+
+    //ASSISTANTS URL
     @GET(ApiConfig.ASSISTANTS_URL)
     Call<ResponseGetAssistants> getAssistants();
 
@@ -62,14 +66,11 @@ public interface ApiServices {
             @Path("uuid")String uuid
     );
 
-    @DELETE(ApiConfig.DELETE_MEDIA)
-    Call<JsonObject> deleteMedia(
-            @Path("uuid")String uuid
-    );
-
-    @DELETE(ApiConfig.DELETE_INTERACTION)
-    Call<JsonObject> deleteInteraction(
-            @Path("uuid")String uuid
+    @POST(ApiConfig.UPLOAD_IMAGE_ASSISTANT_URL)
+    @Multipart
+    Call<ResponseCreateAssistant> uploadImageAssistant(
+            @Part MultipartBody.Part assistantId,
+            @Part MultipartBody.Part file
     );
 
     @PUT(ApiConfig.ACTIONS_ASSISTANTS_URL)
@@ -83,34 +84,9 @@ public interface ApiServices {
             @Body ProfileRequest body
             );
 
-    @POST(ApiConfig.RESEND_EMAIL_URL)
-    Call<JsonObject> resendEmail();
-
-    @GET(ApiConfig.GET_QUESTIONS_ASSISTANT)
-    Call<ResponseGetAssistantQuestions> getQuestionsAssistant(
-            @Query("assistant_id") String uuid
-    );
-
-    @GET(ApiConfig.UPLOAD_MEDIA)
-    Call<ResponseGetMedia> getMediaAssistant(
-            @Query("assistant_id") String uuid,
-            @Query("type") String type
-    );
-
-    @POST(ApiConfig.UPDATE_PROFILE_URL)
-    @FormUrlEncoded
-    Call<ResponseUpdateProfile> updateProfile(
-            @FieldMap Map<String, Object> body
-    );
-
     @POST(ApiConfig.END_SESSION_URL)
     Call<ResponseStartEndSession> endSession(
             @Path("session_id") String clientId
-    );
-
-    @POST(ApiConfig.GET_INTERACTIONS)
-    Call<ResponseCreateInteraction> sendInteraction(
-            @Body Map<String, Object> body
     );
 
     @POST(ApiConfig.START_SESSION_URL)
@@ -119,26 +95,22 @@ public interface ApiServices {
             @FieldMap Map<String, Object> body
     );
 
-    @GET(ApiConfig.GET_USER_INFO)
-    Call<ResponseGetUserInfo> getUserInfo();
+    @POST(ApiConfig.RESEND_EMAIL_URL)
+    Call<JsonObject> resendEmail();
 
-    @GET(ApiConfig.GET_INTERACTIONS)
-    Call<ResponseGetInteractions> getInteractions(
-            @Query("session_id") String sessionId
+
+
+    //MEDIA
+    @GET(ApiConfig.UPLOAD_MEDIA)
+    Call<ResponseGetMedia> getMediaAssistant(
+            @Query("assistant_id") String uuid,
+            @Query("type") String type
     );
 
-    @POST(ApiConfig.UPLOAD_PROFILE_IMAGE_URL)
-    @Multipart
-    Call<ResponseUpdateProfile> uploadImageProfile(
-            @Part MultipartBody.Part file
-            );
-
-    @POST(ApiConfig.UPLOAD_IMAGE_ASSISTANT_URL)
-    @Multipart
-    Call<ResponseCreateAssistant> uploadImageAssistant(
-            @Part MultipartBody.Part assistantId,
-            @Part MultipartBody.Part file
-            );
+    @DELETE(ApiConfig.DELETE_MEDIA)
+    Call<JsonObject> deleteMedia(
+            @Path("uuid")String uuid
+    );
 
     @POST(ApiConfig.UPLOAD_MEDIA)
     @Multipart
@@ -148,10 +120,57 @@ public interface ApiServices {
             @Part("assistant_id") RequestBody assistantId
     );
 
+
+
+    @GET(ApiConfig.GET_USER_INFO)
+    Call<ResponseGetUserInfo> getUserInfo();
+
+
+    //UPLOAD PROFILE
+    @POST(ApiConfig.UPLOAD_PROFILE_IMAGE_URL)
+    @Multipart
+    Call<ResponseUpdateProfile> uploadImageProfile(
+            @Part MultipartBody.Part file
+    );
+
     @POST(ApiConfig.CHANGE_PASSWORD_URL)
     @FormUrlEncoded
     Call<JsonObject> changePassword(
             @FieldMap Map<String, Object> body
+    );
+
+    @POST(ApiConfig.UPDATE_PROFILE_URL)
+    @FormUrlEncoded
+    Call<ResponseUpdateProfile> updateProfile(
+            @FieldMap Map<String, Object> body
+    );
+
+    //MESSAGES
+    @DELETE(ApiConfig.DELETE_MESSAGE)
+    Call<JsonObject> deleteMessage(
+            @Path("uuid")String uuid
+    );
+
+    @POST(ApiConfig.GET_MESSAGES)
+    Call<ResponseCreateMessage> sendMessageText(
+            @Body Map<String, Object> body
+    );
+
+    @POST(ApiConfig.GET_MESSAGES)
+    Call<ResponseCreateMessage> sendMessageWithFile(
+            @Body RequestBody body
+    );
+
+    @GET(ApiConfig.GET_MESSAGES)
+    Call<ResponseGetMessages> getMessages(
+            @Query("legacyProfileId") String sessionId
+    );
+
+
+    //QUESTIONS
+    @GET(ApiConfig.GET_QUESTIONS_ASSISTANT)
+    Call<ResponseGetAssistantQuestions> getQuestionsAssistant(
+            @Query("assistant_id") String uuid
     );
 
 }
