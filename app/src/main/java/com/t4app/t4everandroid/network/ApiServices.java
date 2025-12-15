@@ -1,20 +1,21 @@
 package com.t4app.t4everandroid.network;
 
 import com.google.gson.JsonObject;
-import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
+import com.t4app.t4everandroid.network.responses.CreateAnswerResponse;
+import com.t4app.t4everandroid.network.responses.GetAnswerResponse;
+import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
-import com.t4app.t4everandroid.network.responses.ResponseCreateMessage;
 import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
+import com.t4app.t4everandroid.network.responses.ResponseCreateMessage;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistants;
-import com.t4app.t4everandroid.network.responses.ResponseGetMessages;
 import com.t4app.t4everandroid.network.responses.ResponseGetMedia;
+import com.t4app.t4everandroid.network.responses.ResponseGetMessages;
 import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
 
-import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
@@ -121,12 +122,10 @@ public interface ApiServices {
     );
 
 
-
+    //UPLOAD PROFILE
     @GET(ApiConfig.GET_USER_INFO)
     Call<ResponseGetUserInfo> getUserInfo();
 
-
-    //UPLOAD PROFILE
     @POST(ApiConfig.UPLOAD_PROFILE_IMAGE_URL)
     @Multipart
     Call<ResponseUpdateProfile> uploadImageProfile(
@@ -167,10 +166,36 @@ public interface ApiServices {
     );
 
 
+    @GET(ApiConfig.GET_LATEST_MESSAGES)
+    Call<ResponseGetMessages> getLastMessages(
+    );
+
+
     //QUESTIONS
     @GET(ApiConfig.GET_QUESTIONS_ASSISTANT)
     Call<ResponseGetAssistantQuestions> getQuestionsAssistant(
             @Query("assistant_id") String uuid
+    );
+
+    @GET(ApiConfig.GET_ANSWERS)
+    Call<GetAnswerResponse> getAnswers(
+            @Query("legacyProfileId") String uuid
+    );
+
+    @DELETE(ApiConfig.DELETE_ANSWER)
+    Call<GetAnswerResponse> deleteAnswer(
+            @Path("uuid") String uuid
+    );
+
+    @POST(ApiConfig.GET_ANSWERS)
+    Call<CreateAnswerResponse> createAnswer(
+            @Body Map<String, Object> body
+    );
+
+    @PUT(ApiConfig.DELETE_ANSWER)
+    Call<CreateAnswerResponse> updateAnswer(
+            @Path("uuid") String uuid,
+            @Body Map<String, Object> body
     );
 
 }

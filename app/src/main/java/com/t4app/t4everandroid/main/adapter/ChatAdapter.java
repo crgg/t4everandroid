@@ -29,8 +29,8 @@ import java.util.List;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "CHAT_ADAPTER";
 
-    private static final int VT_SENT = 1;      // user
-    private static final int VT_RECEIVED = 2;  // model
+    private static final int VT_SENT = 1;
+    private static final int VT_RECEIVED = 2;
 
     private final List<Messages> messages;
     private final Context context;
@@ -69,12 +69,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Messages message = messages.get(position);
-        boolean isLast = position == getItemCount() - 1;
+
 
         if (holder instanceof SentVH) {
             SentVH vh = (SentVH) holder;
 
-            vh.deleteInteraction.setVisibility(isLast ? View.VISIBLE : View.GONE);
+            int lastUserPos = getLastUserMessagePosition();
+            boolean isLastUserMessage = position == lastUserPos;
+
+            vh.deleteInteraction.setVisibility(
+                    isLastUserMessage ? View.VISIBLE : View.GONE
+            );
+
             vh.deleteInteraction.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
@@ -86,7 +92,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             });
 
             vh.bind(message);
-
         } else if (holder instanceof ReceivedVH) {
             ReceivedVH vh = (ReceivedVH) holder;
             vh.bind(message);
@@ -168,8 +173,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             vDim.setVisibility(View.GONE);
             ivPlay.setVisibility(View.GONE);
             ivPreview.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-
 
             if (isImage) {
                 Glide.with(ivPreview.getContext())
@@ -314,6 +317,17 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             notifyItemChanged(getItemCount() - 1);
         }
     }
+
+    private int getLastUserMessagePosition() {
+        for (int i = messages.size() - 1; i >= 0; i--) {
+            Messages m = messages.get(i);
+            if (m != null && "user".equalsIgnoreCase(m.role)) {
+                return i;
+            }
+        }
+        return RecyclerView.NO_POSITION;
+    }
+
 
     public List<Messages> getMessages() {
         return messages;

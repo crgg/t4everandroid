@@ -12,7 +12,6 @@ public class ApiConfig {
     public static final String ASSISTANTS_URL = "api/assistants";
     public static final String RESEND_EMAIL_URL = "api/email/resend";
     public static final String GET_USER_INFO = "api/auth/user";
-    public static final String GET_MESSAGES = "api/messages";
     public static final String ACTIONS_ASSISTANTS_URL = "api/assistants/{uuid}";
     public static final String GET_QUESTIONS_ASSISTANT = "api/assistant-questions";
     public static final String UPDATE_PROFILE_URL = "api/update-user-info";
@@ -23,6 +22,12 @@ public class ApiConfig {
     public static final String UPLOAD_IMAGE_ASSISTANT_URL = "api/set-assistant-avatar";
     public static final String UPLOAD_MEDIA = "api/media";
     public static final String DELETE_MEDIA = "api/media/{uuid}";
+
     public static final String DELETE_MESSAGE = "api/messages/{uuid}";
+    public static final String GET_MESSAGES = "api/messages";
+    public static final String GET_LATEST_MESSAGES = "api/messages/latest";
+
+    public static final String GET_ANSWERS = "api/answers";
+    public static final String DELETE_ANSWER = "api/answers/{uuid}";
 
 }

@@ -72,7 +72,7 @@
     <string name="new_question">New Question</string>
     <string name="search_questions">Search questions...</string>
     <string name="go_to_legacy_profiles">Go to legacy profiles</string>
-    <string name="you_need_to_select_a_legacy_profile">You need to select a legacy profile to start adding\nquestions.</string>
+    <string name="you_need_to_select_a_legacy_profile">You need to select a legacy profile to start adding\nanswers.</string>
     <string name="you_need_to_select_a_legacy_profile_conversation">You need to select a legacy profile to start recording\nconversations.</string>
     <string name="you_need_to_select_a_legacy_profile_messages">You need to select a legacy profile to start creating\nmessages.</string>
     <string name="you_need_to_select_a_legacy_profile_chat">You need to select a legacy profile to start start\nchatting.</string>
@@ -121,7 +121,7 @@
     <string name="image_profile">Image Profile</string>
     <string name="selected">Selected</string>
     <string name="you_need_to_select_a_legacy_to_start">You need to select a legacy profile to start adding \nquestions.</string>
-    <string name="start_adding_questions_to_capture_the_essence_of">Start adding questions to capture the essence of %1$s</string>
+    <string name="start_adding_questions_to_capture_the_essence_of">Start adding answers to capture the essence of %1$s</string>
     <string name="profile_selected_media">Start recording media to preserve the way of expressing yourself of %1$s</string>
     <string name="profile_selected_messages">Start creating special messages for %1$s</string>
     <string name="msg_delete_profile">Are you sure you want to delete this profile?\nYou will not be able to undo this.</string>
@@ -135,7 +135,7 @@
     <string name="answer">Answer</string>
     <string name="write_the_answer_here">Write the answer here...</string>
     <string name="save_question">Save Question</string>
-    <string name="you_must_write_a_question">You must write a question.</string>
+    <string name="you_must_write_a_question">You must write an answer.</string>
     <string name="total_questions">Total Questions</string>
     <string name="answered">Answered</string>
     <string name="pending">Pending</string>

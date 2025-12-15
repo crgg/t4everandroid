@@ -68,8 +68,7 @@ public class ListenersUtils {
     }
 
     public interface CreateQuestionListener {
-        void onQuestionCreated(Question question);
-        void onQuestionUpdated(Question question, int pos);
+        void onQuestionUpdated(Question question, String answer,int pos);
     }
 
     public interface OnOptionImageListener {
@@ -79,6 +78,10 @@ public class ListenersUtils {
 
     public interface OnEmailSendListener {
         void onSend(String to, String subject, String message);
+    }
+
+    public interface OnActionSuccessListener{
+        void onSuccess();
     }
 
 }

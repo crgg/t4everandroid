@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,45 +41,34 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
+public class EditQuestionsBottomSheet extends BottomSheetDialogFragment {
 
     private static final String TAG = "CREATE_QUESTION";
     private static final String ARG_QUESTION = "arg_question";
     private static final String ARG_POS = "arg_pos";
-    private static final String ARG_IS_EDIT = "arg_is_edit";
 
-    private AppCompatImageButton closeBtn;
-    private AppCompatAutoCompleteTextView categories;
-    private MaterialButton saveQuestion;
-    private MaterialButton cancelBtn;
-    private TextInputLayout questionLayout;
-    private TextInputEditText questionValue;
+    private TextView questionValueText;
+
     private TextInputLayout answerLayout;
     private TextInputEditText answerValue;
 
-    private boolean isEdit;
+    private AppCompatAutoCompleteTextView categories;
+
+    private MaterialButton saveQuestion;
+    private MaterialButton cancelBtn;
+    private AppCompatImageButton closeBtn;
+
     private Question questionEdit;
     private int updatePos;
 
     private ListenersUtils.CreateQuestionListener listener;
 
-    public static CreateQuestionBottomSheet newInstance(Question question, int position, boolean isEdit) {
-        CreateQuestionBottomSheet sheet = new CreateQuestionBottomSheet();
+    public static EditQuestionsBottomSheet newInstance(Question question, int position) {
+        EditQuestionsBottomSheet sheet = new EditQuestionsBottomSheet();
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_QUESTION, question);
         args.putInt(ARG_POS, position);
-        args.putBoolean(ARG_IS_EDIT, isEdit);
-        sheet.setArguments(args);
-
-        return sheet;
-    }
-
-    public static CreateQuestionBottomSheet newInstance(boolean isEdit) {
-        CreateQuestionBottomSheet sheet = new CreateQuestionBottomSheet();
-
-        Bundle args = new Bundle();
-        args.putBoolean(ARG_IS_EDIT, isEdit);
         sheet.setArguments(args);
 
         return sheet;
@@ -113,7 +104,6 @@ public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
         if (args != null) {
             questionEdit = (Question) args.getSerializable(ARG_QUESTION);
             updatePos = args.getInt(ARG_POS);
-            isEdit = args.getBoolean(ARG_IS_EDIT, false);
         }
     }
 
@@ -126,134 +116,60 @@ public class CreateQuestionBottomSheet extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.bottom_sheet_create_question, container, false);
 
         closeBtn = view.findViewById(R.id.btn_close);
+        questionValueText = view.findViewById(R.id.question_value_text);
         categories = view.findViewById(R.id.auto_category);
         saveQuestion = view.findViewById(R.id.save_question);
         cancelBtn = view.findViewById(R.id.cancel_btn);
-        questionLayout = view.findViewById(R.id.question_layout);
-        questionValue = view.findViewById(R.id.question_value);
         answerLayout = view.findViewById(R.id.answer_layout);
         answerValue = view.findViewById(R.id.answer_value);
         cancelBtn.setOnClickListener(v -> dismiss());
         closeBtn.setOnClickListener(v -> dismiss());
 
-        if (isEdit){
-            Log.d(TAG, "onCreateView: " + isEdit + " QUESTION: " + questionEdit.getQuestion());
-            view.post(() -> {
-                questionValue.setText(questionEdit.getQuestion());
-//                answerValue.setText(questionEdit.getAnswer());
-                categories.setText(questionEdit.getDimension());
-            });
+        if (questionEdit.getAnswer() != null){
+            answerValue.setText(questionEdit.getAnswer().getAnswer());
         }
 
-        categories.setOnClickListener(new SafeClickListener() {
-            @Override
-            public void onSafeClick(View v) {
-               showCategories();
+        view.post(() -> {
+            questionValueText.setText(questionEdit.getQuestion());
+            if (getString(R.string.extraversion).toLowerCase().contains(questionEdit.getDimension().toLowerCase())) {
+                categories.setText(R.string.extraversion);
+            } else if (getString(R.string.conscientiousness).toLowerCase().contains(questionEdit.getDimension().toLowerCase())) {
+                categories.setText(R.string.conscientiousness);
+            } else if (getString(R.string.agreeableness).toLowerCase().contains(questionEdit.getDimension().toLowerCase())) {
+                categories.setText(R.string.agreeableness);
+            } else if (getString(R.string.neuroticism).toLowerCase().contains(questionEdit.getDimension().toLowerCase())) {
+                categories.setText(R.string.neuroticism);
+            } else if (getString(R.string.openness).toLowerCase().contains(questionEdit.getDimension().toLowerCase())) {
+                categories.setText(R.string.openness);
+            } else {
+                categories.setText(questionEdit.getDimension());
             }
+
+
         });
+
         saveQuestion.setOnClickListener(v -> {
-            String question = questionValue.getText().toString().trim();
             String answer = answerValue.getText().toString().trim();
-            if (!question.isEmpty() && !answer.isEmpty() && listener != null) {
-                if (isEdit){
-                    questionEdit.setDimension(removeEmojis(categories.getText().toString()));
-                    questionEdit.setQuestion(question);
-                    questionEdit.setAnsweredAt(getCurrentDateTime());
+            if (!answer.isEmpty() && listener != null) {
+                questionEdit.setDimension(removeEmojis(categories.getText().toString()));
 
-                    listener.onQuestionUpdated(questionEdit, updatePos);
-                }else{
-                    Question questionTest = new Question();
-                    questionTest.setQuestion(question);
-                    questionTest.setAnsweredAt(getCurrentDateTime());
-                    questionTest.setDimension(removeEmojis(categories.getText().toString()));
-                    listener.onQuestionCreated(questionTest);
-                }
+                listener.onQuestionUpdated(questionEdit, answer, updatePos);
 
-                questionValue.setText("");
                 answerValue.setText("");
                 dismiss();
             } else {
-                questionValue.setError(getString(R.string.you_must_write_a_question));
+                answerValue.setError(getString(R.string.you_must_write_a_question));
             }
         });
 
         return view;
     }
 
-    public String getCurrentDateTime() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime now = null;
-            now = LocalDateTime.now();
-            return now.format(formatter);
-        }else{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            Date now = new Date();
-            return sdf.format(now);
-        }
-
-    }
 
     public String removeEmojis(String input) {
         if (input == null) return null;
         return input.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
     }
-
-    public void showCategories() {
-        BottomSheetDialog categoriesBottomSheet = new BottomSheetDialog(requireContext());
-        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_categories, null);
-        categoriesBottomSheet.setContentView(view);
-
-        categoriesBottomSheet.setOnShowListener(dialogInterface -> {
-
-            BottomSheetDialog dialog = (BottomSheetDialog) dialogInterface;
-
-            FrameLayout bottomSheet = dialog.findViewById(
-                    com.google.android.material.R.id.design_bottom_sheet
-            );
-            if (bottomSheet == null) return;
-
-            bottomSheet.setBackgroundColor(Color.TRANSPARENT);
-
-            BottomSheetBehavior<FrameLayout> behavior =
-                    BottomSheetBehavior.from(bottomSheet);
-
-            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            behavior.setSkipCollapsed(true);
-            behavior.setPeekHeight(0);
-            behavior.setDraggable(true);
-        });
-
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewCategories);
-
-        view.findViewById(R.id.cancel_btn).setOnClickListener(new SafeClickListener() {
-            @Override
-            public void onSafeClick(View v) {
-                categoriesBottomSheet.dismiss();
-            }
-        });
-
-        List<String> items = Arrays.asList(
-                getString(R.string.agreeableness),
-                getString(R.string.conscientiousness),
-                getString(R.string.extraversion),
-                getString(R.string.neuroticism),
-                getString(R.string.openness)
-        );
-
-        CategoriesAdapter adapter = new CategoriesAdapter(items);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        adapter.setOnItemClickListener(category -> {
-            categories.setText(category);
-            categoriesBottomSheet.dismiss();
-        });
-
-        categoriesBottomSheet.show();
-    }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

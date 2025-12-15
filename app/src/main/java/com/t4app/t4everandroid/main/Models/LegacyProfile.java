@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
+import com.t4app.t4everandroid.main.ui.chat.models.Messages;
 import com.t4app.t4everandroid.room.converters.LegacyProfileConverter;
 
 import java.io.Serializable;
@@ -71,6 +72,16 @@ public class LegacyProfile implements Serializable {
 
     @SerializedName("big_five_answers")
     private List<Question> bigFiveAnswers;
+
+    private transient Messages lastMessage;
+
+    public Messages getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(Messages lastMessage) {
+        this.lastMessage = lastMessage;
+    }
 
     public String getDeathDate() {
         return deathDate;

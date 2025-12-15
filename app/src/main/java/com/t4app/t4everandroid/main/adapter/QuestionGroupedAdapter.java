@@ -93,19 +93,23 @@ public class QuestionGroupedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
         void bind(Question question) {
             txtQuestion.setText(question.getQuestion());
-            if (question.getAnsweredAt() == null){
+            if (question.getAnswer() == null){
                 txtNoAnswer.setVisibility(View.VISIBLE);
+                btnDelete.setVisibility(View.GONE);
             }else{
                 txtNoAnswer.setVisibility(View.GONE);
+                txtAnswer.setText(question.getAnswer().getAnswer());
+                btnDelete.setVisibility(View.VISIBLE);
             }
-//            txtAnswer.setText(question.get());
 
             btnDelete.setOnClickListener(new SafeClickListener() {
                 @Override
                 public void onSafeClick(View v) {
                     int currentPos = getAbsoluteAdapterPosition();
                     if (currentPos != RecyclerView.NO_POSITION){
-                        listener.onDelete(question, currentPos);
+                        if (question.getAnswer() != null){
+                            listener.onDelete(question, currentPos);
+                        }
                     }
                 }
             });

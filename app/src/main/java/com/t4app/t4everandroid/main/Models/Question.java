@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid.main.Models;
 
 import com.google.gson.annotations.SerializedName;
+import com.t4app.t4everandroid.main.ui.questions.models.Answer;
 
 import java.io.Serializable;
 
@@ -29,6 +30,16 @@ public class Question implements Serializable {
 
     @SerializedName("answered_at")
     private String answeredAt;
+
+    private Answer answer;
+
+    public Answer getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(Answer answer) {
+        this.answer = answer;
+    }
 
     public int getQuestionId() {
         return questionId;

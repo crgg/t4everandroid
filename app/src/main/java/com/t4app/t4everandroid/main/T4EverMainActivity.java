@@ -3,6 +3,7 @@ package com.t4app.t4everandroid.main;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -53,6 +54,7 @@ import com.t4app.t4everandroid.network.ApiServices;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,6 +92,17 @@ public class T4EverMainActivity extends BaseActivity {
             startActivity(intent);
             finish();
             return;
+        }
+
+        Intent intent = getIntent();
+
+        if (Intent.ACTION_SEND.equals(intent.getAction())) {
+            Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            Log.d("IMPORT", "Archivo recibido: " + uri);
+
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
+            ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            Log.d("IMPORT", "Archivos recibidos: " + uris.size());
         }
 
         drawerLayout = findViewById(R.id.drawer_layout);

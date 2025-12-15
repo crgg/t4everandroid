@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -45,6 +46,7 @@ import com.t4app.t4everandroid.databinding.FragmentChatBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.CategoryItem;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.ChatAdapter;
 import com.t4app.t4everandroid.main.adapter.OptionsFirstMsgAdapter;
@@ -54,6 +56,7 @@ import com.t4app.t4everandroid.main.ui.chat.models.CreateMessageUtils;
 import com.t4app.t4everandroid.main.ui.chat.models.InlineData;
 import com.t4app.t4everandroid.main.ui.chat.models.Messages;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
+import com.t4app.t4everandroid.main.ui.questions.models.Answer;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.RetrofitClient;
 import com.t4app.t4everandroid.network.responses.ResponseCreateMessage;
@@ -96,6 +99,7 @@ public class ChatFragment extends Fragment {
     private long startTime = 0L;
     private float startX = 0f;
 
+    private SelectContactAdapter contactAdapter;
 
     private final Runnable timerRunnable = new Runnable() {
         @Override
@@ -254,6 +258,21 @@ public class ChatFragment extends Fragment {
         binding.itemChat.chatRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.itemChat.chatRv.setAdapter(adapter);
 
+        binding.itemChat.moreOptionsChat.setOnClickListener(new SafeClickListener() {
+            @Override
+            public void onSafeClick(View v) {
+                PopupMenu menu = new PopupMenu(requireContext(), binding.itemChat.moreOptionsChat);
+                menu.getMenu().add("Export chat from WhatsApp");
+
+                menu.setOnMenuItemClickListener(item -> {
+                    openWhatsApp();
+                    return true;
+                });
+
+                menu.show();
+            }
+        });
+
         if (GlobalDataCache.legacyProfileSelected != null && GlobalDataCache.sessionId != null){
             getMessages(GlobalDataCache.legacyProfileSelected.getId());
         }
@@ -276,7 +295,7 @@ public class ChatFragment extends Fragment {
         });
 
 
-        SelectContactAdapter contactAdapter = new SelectContactAdapter(GlobalDataCache.legacyProfiles, requireActivity(), profile -> {
+        contactAdapter = new SelectContactAdapter(GlobalDataCache.legacyProfiles, requireActivity(), profile -> {
             if (GlobalDataCache.legacyProfileSelected == null){
                 Map<String, Object> data = new HashMap<>();
                 data.put("assistant_id", profile.getId());
@@ -326,6 +345,8 @@ public class ChatFragment extends Fragment {
         });
         binding.itemChat.contactsRv.setLayoutManager(new LinearLayoutManager(requireActivity()));
         binding.itemChat.contactsRv.setAdapter(contactAdapter);
+
+        getLatestMessages();
 
         return view;
     }
@@ -626,14 +647,14 @@ public class ChatFragment extends Fragment {
     private void deleteMessage(Messages interactions, int pos){
         ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
         Call<JsonObject> call = apiServices.deleteMessage(interactions.getId());
-        call.enqueue(new Callback<JsonObject>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.isSuccessful()) {
                     JsonObject body = response.body();
                     if (body != null) {
-                        if (body.has("status")) {
-                            if (body.get("status").getAsBoolean()) {
+                        if (body.has("message")) {
+                            if (body.get("message").getAsString().contains("Message deleted successfully")) {
                                 adapter.deleteItem(pos);
                                 updateUI(adapter.getMessages());
                             }
@@ -926,6 +947,49 @@ public class ChatFragment extends Fragment {
 
         dialog.setContentView(view);
         dialog.show();
+    }
+
+    private void openWhatsApp() {
+        Intent intent = requireActivity().getPackageManager()
+                .getLaunchIntentForPackage("com.whatsapp");
+        if (intent != null) {
+            startActivity(intent);
+        }
+    }
+
+
+    private void getLatestMessages(){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<ResponseGetMessages> call = apiServices.getLastMessages();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ResponseGetMessages> call, Response<ResponseGetMessages> response) {
+                if (response.isSuccessful()) {
+                    ResponseGetMessages body = response.body();
+                    if (body != null) {
+                        if (body.getData() != null) {
+                            Map<String, LegacyProfile> legacyProfileMap = new HashMap<>();
+                            for (LegacyProfile legacyProfile : GlobalDataCache.legacyProfiles) {
+                                legacyProfileMap.put(legacyProfile.getId(), legacyProfile);
+                            }
+                            for (Messages messages : body.getData()) {
+                                LegacyProfile legacyProfile = legacyProfileMap.get(messages.getLegacyProfileId());
+                                if (legacyProfile != null) {
+                                    legacyProfile.setLastMessage(messages);
+                                }
+                            }
+
+                            contactAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseGetMessages> call, Throwable throwable) {
+
+            }
+        });
     }
 
     @Override

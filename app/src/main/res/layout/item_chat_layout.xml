@@ -13,7 +13,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:padding="5dp"
         android:orientation="horizontal"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
@@ -100,7 +99,7 @@
         <LinearLayout
             android:id="@+id/container_chat"
             android:visibility="visible"
-            android:padding="12dp"
+            android:padding="8dp"
             android:orientation="vertical"
             android:background="@color/background"
             android:layout_width="match_parent"
@@ -135,6 +134,7 @@
 
                 <LinearLayout
                     android:orientation="vertical"
+                    android:layout_weight="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
@@ -159,6 +159,15 @@
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/moreOptionsChat"
+                    android:src="@drawable/ic_more_options"
+                    android:background="@null"
+                    android:scaleType="fitCenter"
+                    android:padding="7dp"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"/>
 
             </LinearLayout>
 

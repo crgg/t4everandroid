@@ -1,6 +1,7 @@
 package com.t4app.t4everandroid.main.ui.chat.models;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -18,6 +19,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
 public class CreateMessageUtils {
+    private static final String TAG = "CREATE_MESSAGE_UTILS";
 
     private final Gson gson = new Gson();
 
@@ -47,8 +49,7 @@ public class CreateMessageUtils {
             LegacyProfile legacyProfile,
             String text,
             List<Uri> uriFiles,
-            FragmentActivity activity
-    ) {
+            FragmentActivity activity) {
         List<Map<String, Object>> parts = new ArrayList<>();
         Map<String, Object> partText = new HashMap<>();
         partText.put("text", text);
@@ -86,11 +87,25 @@ public class CreateMessageUtils {
 
     @NonNull
     private static Map<String, Object> getLegacyProfileMap(LegacyProfile legacyProfile) {
+
+
+        Log.d(TAG, "Building LegacyProfileMap:");
+        Log.d(TAG, "id = " + legacyProfile.getId());
+        Log.d(TAG, "language = " + legacyProfile.getLanguage());
+        Log.d(TAG, "name = " + legacyProfile.getName());
+        Log.d(TAG, "alias = " + (legacyProfile.getAlias() != null ? legacyProfile.getAlias() : ""));
+        Log.d(TAG, "family_relationship = " + legacyProfile.getFamilyRelationship());
+        Log.d(TAG, "age = " + legacyProfile.getAge());
+        Log.d(TAG, "base_personality = " + legacyProfile.getBasePersonality());
+        Log.d(TAG, "country = " + legacyProfile.getCountry());
+        Log.d(TAG, "birth_date = " + legacyProfile.getBirthDate());
+        Log.d(TAG, "death_date = " + legacyProfile.getDeathDate());
+
         Map<String, Object> legacyProfileMap = new HashMap<>();
         legacyProfileMap.put("id", legacyProfile.getId());
         legacyProfileMap.put("language", legacyProfile.getLanguage());
         legacyProfileMap.put("name", legacyProfile.getName());
-        legacyProfileMap.put("alias", legacyProfile.getAlias());
+        legacyProfileMap.put("alias", legacyProfile.getAlias() != null ? legacyProfile.getAlias() : "");
         legacyProfileMap.put("family_relationship", legacyProfile.getFamilyRelationship());
         legacyProfileMap.put("age", legacyProfile.getAge());
         legacyProfileMap.put("base_personality", legacyProfile.getBasePersonality());

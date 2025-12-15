@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.t4app.t4everandroid.AppController;
+import com.t4app.t4everandroid.ErrorUtils;
 import com.t4app.t4everandroid.ListenersUtils;
 import com.t4app.t4everandroid.MessagesUtils;
 import com.t4app.t4everandroid.R;
@@ -37,7 +38,11 @@ import com.t4app.t4everandroid.main.adapter.CategoriesAdapter;
 import com.t4app.t4everandroid.main.adapter.QuestionGroupedAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyItemsAdapter;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
+import com.t4app.t4everandroid.main.ui.questions.models.Answer;
 import com.t4app.t4everandroid.network.ApiServices;
+import com.t4app.t4everandroid.network.RetrofitClient;
+import com.t4app.t4everandroid.network.responses.CreateAnswerResponse;
+import com.t4app.t4everandroid.network.responses.GetAnswerResponse;
 import com.t4app.t4everandroid.network.responses.ResponseGetAssistantQuestions;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
@@ -123,30 +128,39 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
         Log.d(TAG, "onCreateView: SET ADAPTER");
         adapter = new QuestionGroupedAdapter(requireContext(), grouped, new ListenersUtils.OnQuestionActionsListener() {
             @Override
-            public void onDelete(Question questionTest, int pos) {
-                MessagesUtils.showMessageConfirmation(requireActivity(), getString(R.string.msg_delete), confirmed -> {
+            public void onDelete(Question question, int pos) {
+                MessagesUtils.showMessageConfirmation(requireActivity(), getString(R.string.msg_delete),
+                        confirmed -> {
                     if (confirmed){
-                        adapter.removeItem(pos);
-                        questions.remove(questionTest);
-                        calculateTotalQuestions(questions);
+                        deleteAnswer(question.getAnswer().getId(), () -> {
+                            question.setAnswer(null);
+                            questions.set(questions.indexOf(question), question);
+                            calculateTotalQuestions(questions);
+                            adapter.updateItem(pos, question);
+                        });
+
                     }
                 });
             }
 
             @Override
-            public void onEdit(Question questionTest, int pos) {
-                Log.d(TAG, "onEdit: " + questionTest.getQuestion());
+            public void onEdit(Question question, int pos) {
+                Log.d(TAG, "onEdit: " + question.getQuestion());
                 FragmentManager fm = requireActivity().getSupportFragmentManager();
                 Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
                 if (prev != null) {
                     fm.beginTransaction().remove(prev).commit();
                 }
-                CreateQuestionBottomSheet bottomSheet = CreateQuestionBottomSheet.newInstance(questionTest, pos, true);
+                EditQuestionsBottomSheet bottomSheet = EditQuestionsBottomSheet.newInstance(question, pos);
                 bottomSheet.show(getChildFragmentManager(), "EditQuestionBottomSheet");
             }
         });
         binding.questionsRv.setAdapter(adapter);
         binding.questionsRv.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        if (GlobalDataCache.legacyProfileSelected != null){
+            getQuestions();
+        }
 
         binding.itemSearch.searchValue.addTextChangedListener(new TextWatcher() {
             @Override
@@ -180,35 +194,6 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
             }
         });
 
-        if (GlobalDataCache.legacyProfileSelected != null){
-            getQuestions();
-        }
-
-        binding.itemSelectLegacy.btnAddFirst.setOnClickListener(new SafeClickListener() {
-            @Override
-            public void onSafeClick(View v) {
-                FragmentManager fm = requireActivity().getSupportFragmentManager();
-                Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
-                if (prev != null) {
-                    fm.beginTransaction().remove(prev).commit();
-                }
-                CreateQuestionBottomSheet bottomSheet = CreateQuestionBottomSheet.newInstance(false);
-                bottomSheet.show(getChildFragmentManager(), "CreateQuestionBottomSheet");
-            }
-        });
-        binding.addNewQuestionBtn.setOnClickListener(new SafeClickListener() {
-            @Override
-            public void onSafeClick(View v) {
-                FragmentManager fm = requireActivity().getSupportFragmentManager();
-                Fragment prev = fm.findFragmentByTag("CreateQuestionBottomSheet");
-                if (prev != null) {
-                    fm.beginTransaction().remove(prev).commit();
-                }
-                CreateQuestionBottomSheet bottomSheet = CreateQuestionBottomSheet.newInstance(false);
-                bottomSheet.show(getChildFragmentManager(), "CreateQuestionBottomSheet");
-            }
-        });
-
         binding.itemSearch.categoriesAuto.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
@@ -235,30 +220,19 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
     private void checkStatus(){
         if (GlobalDataCache.legacyProfiles == null || GlobalDataCache.legacyProfiles.isEmpty()){
             binding.itemSelectLegacy.selectLegacyDescription.setText(getString(R.string.you_need_to_select_a_legacy_profile));
-            binding.addNewQuestionBtn.setEnabled(false);
-            binding.addNewQuestionBtn.setAlpha(0.5f);
 
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
             binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
 
         } else if (GlobalDataCache.legacyProfileSelected == null){
             binding.itemSelectLegacy.selectLegacyDescription.setText(R.string.you_need_to_select_a_legacy_to_start);
-            binding.addNewQuestionBtn.setEnabled(false);
-            binding.addNewQuestionBtn.setAlpha(0.5f);
 
-
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.GONE);
             binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.VISIBLE);
         }else {
             binding.changeGlobalProfile.setText(GlobalDataCache.legacyProfileSelected.getName());
             binding.itemSelectLegacy.selectLegacyDescription.setText(
                     getString(R.string.start_adding_questions_to_capture_the_essence_of,
                             GlobalDataCache.legacyProfileSelected.getName()));
-            binding.addNewQuestionBtn.setEnabled(true);
-            binding.addNewQuestionBtn.setAlpha(1f);
 
-            binding.itemSelectLegacy.btnAddFirst.setVisibility(View.VISIBLE);
-            binding.itemSelectLegacy.btnAddFirst.setText(R.string.add_first_question);
             binding.itemSelectLegacy.buttonActionsProfile.setVisibility(View.GONE);
         }
     }
@@ -277,10 +251,43 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
                         if (body.isStatus()){
                             GlobalDataCache.questions.addAll(body.getQuestions());
 //                            questions.addAll(body.getQuestions());
+                            Map<Integer, Question> questionMap = new HashMap<>();
+                            for (Question question : questions) {
+                                questionMap.put(question.getQuestionId(), question);
+                            }
+                            getAnswers(questionMap);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseGetAssistantQuestions> call, Throwable throwable) {
+                Log.d(TAG, "onFailure get messages: " + throwable.getMessage());
+            }
+        });
+    }
+
+    private void getAnswers(Map<Integer, Question> questionMap){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<GetAnswerResponse> call = apiServices.getAnswers(GlobalDataCache.legacyProfileSelected.getId());
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<GetAnswerResponse> call, Response<GetAnswerResponse> response) {
+                if (response.isSuccessful()){
+                    GetAnswerResponse body = response.body();
+                    if (body != null){
+                        if (body.getData() != null){
+                            for (Answer answer : body.getData()) {
+                                Question question = questionMap.get(answer.getQuestionExternalId());
+                                if (question != null) {
+                                    question.setAnswer(answer);
+                                }
+                            }
+
                             if (adapter != null){
-                                Log.d(TAG, "UPDATE LIST " + body.getQuestions().size());
-                                adapter.updateList(groupByCategory(body.getQuestions(), null));
-                                calculateTotalQuestions(body.getQuestions());
+                                adapter.updateList(groupByCategory(GlobalDataCache.questions, null));
+                                calculateTotalQuestions(GlobalDataCache.questions);
                             }
                             checkList();
                             if (isAdded()){
@@ -292,10 +299,11 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
             }
 
             @Override
-            public void onFailure(Call<ResponseGetAssistantQuestions> call, Throwable throwable) {
-                Log.d(TAG, "onFailure get messages: " + throwable.getMessage());
+            public void onFailure(Call<GetAnswerResponse> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: get ANSWER" + throwable.getMessage());
             }
         });
+
     }
 
     private void checkList() {
@@ -490,13 +498,13 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
             int pending = 0;
 
             List<String> categoriesFounded = new ArrayList<>();
-            for (Question questionTest : questions){
-                if (!categoriesFounded.contains(questionTest.getDimension())){
-                    categoriesFounded.add(questionTest.getDimension());
+            for (Question question : questions){
+                if (!categoriesFounded.contains(question.getDimension())){
+                    categoriesFounded.add(question.getDimension());
                 }
-                if (!questionTest.getQuestion().isEmpty() && questionTest.getAnsweredAt() != null){
+                if (!question.getQuestion().isEmpty() && (question.getAnswer() != null)){
                     answered++;
-                }else if (questionTest.getAnsweredAt() == null){
+                }else if (question.getAnswer() == null){
                     pending++;
                 }
             }
@@ -504,6 +512,86 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
             binding.totalCategories.setText(String.valueOf(categoriesFounded.size()));
             binding.totalPending.setText(String.valueOf(pending));
         }
+    }
+
+    private void deleteAnswer(String answerId, ListenersUtils.OnActionSuccessListener listener){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<GetAnswerResponse> call = apiServices.deleteAnswer(answerId);
+        call.enqueue(new Callback<GetAnswerResponse>() {
+            @Override
+            public void onResponse(Call<GetAnswerResponse> call, Response<GetAnswerResponse> response) {
+                if (response.isSuccessful()){
+                    GetAnswerResponse body = response.body();
+                    if (body != null){
+                        if (body.getMessage() != null && body.getMessage().contains("Answer deleted")){
+                            listener.onSuccess();
+                        }else if (body.getError() != null){
+                            MessagesUtils.showErrorDialog(requireActivity(), body.getError());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetAnswerResponse> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: DELETE ANSWER" + throwable.getMessage());
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+    public void createAnswer(Map<String, Object> data, Question question, int pos){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<CreateAnswerResponse> call = apiServices.createAnswer(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<CreateAnswerResponse> call, Response<CreateAnswerResponse> response) {
+                if (response.isSuccessful()) {
+                    CreateAnswerResponse body = response.body();
+                    if (body != null) {
+                        if (body.getMessage() != null && body.getData() != null) {
+                            question.setAnswer(body.getData());
+                            questions.set(questions.indexOf(question), question);
+                            calculateTotalQuestions(questions);
+                            adapter.updateItem(pos, question);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CreateAnswerResponse> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: create Answer" + throwable.getMessage());
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+    public void updateAnswer(Map<String, Object> data, Question question, int pos){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<CreateAnswerResponse> call = apiServices.updateAnswer(question.getAnswer().getId(), data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<CreateAnswerResponse> call, Response<CreateAnswerResponse> response) {
+                if (response.isSuccessful()) {
+                    CreateAnswerResponse body = response.body();
+                    if (body != null) {
+                        if (body.getMessage() != null && body.getData() != null) {
+                            question.setAnswer(body.getData());
+                            questions.set(questions.indexOf(question), question);
+                            calculateTotalQuestions(questions);
+                            adapter.updateItem(pos, question);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CreateAnswerResponse> call, Throwable throwable) {
+                Log.e(TAG, "onFailure: create Answer" + throwable.getMessage());
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
     }
 
     private void processChange(LegacyProfile profile, BottomSheetDialog profilesBottomSheet){
@@ -612,22 +700,22 @@ public class QuestionsFragment extends Fragment implements ListenersUtils.Create
         });
     }
 
-
     @Override
-    public void onQuestionCreated(Question question) {
-        if (questions.isEmpty()){
-            binding.itemSelectLegacy.getRoot().setVisibility(View.GONE);
-            binding.questionsRv.setVisibility(View.VISIBLE);
+    public void onQuestionUpdated(Question question, String answer,int pos) {
+        if (question.getAnswer() != null){
+            Map<String, Object> data = new HashMap<>();
+            data.put("answer", answer);
+            data.put("question", question.getQuestion());
+            data.put("questionExternalId", question.getQuestionId());
+            updateAnswer(data, question, pos);
+        }else{
+            Map<String, Object> data = new HashMap<>();
+            data.put("answer", answer);
+            data.put("legacyProfileId", GlobalDataCache.legacyProfileSelected.getId());
+            data.put("question", question.getQuestion());
+            data.put("questionExternalId", question.getQuestionId());
+            createAnswer(data, question, pos);
         }
-        questions.add(question);
-        adapter.addQuestionToCategory(question);
-        calculateTotalQuestions(questions);
-    }
 
-    @Override
-    public void onQuestionUpdated(Question question, int pos) {
-        questions.set(questions.indexOf(question), question);
-        calculateTotalQuestions(questions);
-        adapter.updateItem(pos, question);
     }
 }

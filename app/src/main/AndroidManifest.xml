@@ -27,6 +27,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.T4EverAndroid">
+
         <activity
             android:name=".main.ui.media.RecordAudioActivity"
             android:exported="false" />
@@ -41,7 +42,22 @@
             android:exported="false" />
         <activity
             android:name=".main.T4EverMainActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:label="Import from WhatsApp">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".Login.ui.T4EverOnboardingActivity"
             android:exported="true">

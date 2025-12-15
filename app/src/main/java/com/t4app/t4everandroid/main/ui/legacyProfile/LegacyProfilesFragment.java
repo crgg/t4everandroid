@@ -25,6 +25,7 @@ import com.t4app.t4everandroid.SafeClickListener;
 import com.t4app.t4everandroid.databinding.FragmentLegacyProfilesBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.Models.Session;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.LegacyProfileAdapter;
 import com.t4app.t4everandroid.main.ui.chat.ChatFragment;
@@ -279,7 +280,11 @@ public class LegacyProfilesFragment extends Fragment {
                         getString(R.string.msg_delete_profile),
                         confirmed -> {
                             if (confirmed){
-                                deleteProfile(profile, pos);
+                                if (profile.getOpenSession() != null){
+                                    endSession(profile.getOpenSession().getId(), session -> deleteProfile(profile, pos));
+                                }else{
+                                    deleteProfile(profile, pos);
+                                }
                             }
                         });
             }
@@ -364,6 +369,8 @@ public class LegacyProfilesFragment extends Fragment {
                             if (body.get("status").getAsBoolean()) {
                                 adapter.removeItem(pos);
                                 GlobalDataCache.legacyProfiles.remove(legacyProfile);
+                                GlobalDataCache.legacyProfileSelected = null;
+                                GlobalDataCache.sessionId = "";
                             }
                         }
                     }

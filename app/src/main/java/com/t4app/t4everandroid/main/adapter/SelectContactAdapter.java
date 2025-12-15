@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.t4app.t4everandroid.R;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
+import com.t4app.t4everandroid.main.ui.chat.models.Part;
 
 import java.util.List;
 
@@ -54,6 +55,19 @@ public class SelectContactAdapter extends RecyclerView.Adapter<SelectContactAdap
         if (user.getId().equalsIgnoreCase(GlobalDataCache.legacyProfileSelected.getId())) {
 
             lastClicked = holder.getAbsoluteAdapterPosition();
+        }
+
+        if (user.getLastMessage() != null){
+            for (Part part : user.getLastMessage().getParts()){
+                if (part.getText() != null){
+                    holder.txtLastMessage.setText(part.getText());
+                    holder.txtLastMessage.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        }else{
+            holder.txtLastMessage.setText("");
+            holder.txtLastMessage.setVisibility(View.GONE);
         }
 
         holder.bindSelection(position == lastClicked, activity);
