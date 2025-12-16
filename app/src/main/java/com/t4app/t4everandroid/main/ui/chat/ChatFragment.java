@@ -2,13 +2,18 @@ package com.t4app.t4everandroid.main.ui.chat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -16,8 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -46,7 +53,6 @@ import com.t4app.t4everandroid.databinding.FragmentChatBinding;
 import com.t4app.t4everandroid.main.GlobalDataCache;
 import com.t4app.t4everandroid.main.Models.CategoryItem;
 import com.t4app.t4everandroid.main.Models.LegacyProfile;
-import com.t4app.t4everandroid.main.Models.Question;
 import com.t4app.t4everandroid.main.T4EverMainActivity;
 import com.t4app.t4everandroid.main.adapter.ChatAdapter;
 import com.t4app.t4everandroid.main.adapter.OptionsFirstMsgAdapter;
@@ -56,23 +62,32 @@ import com.t4app.t4everandroid.main.ui.chat.models.CreateMessageUtils;
 import com.t4app.t4everandroid.main.ui.chat.models.InlineData;
 import com.t4app.t4everandroid.main.ui.chat.models.Messages;
 import com.t4app.t4everandroid.main.ui.legacyProfile.LegacyProfilesFragment;
-import com.t4app.t4everandroid.main.ui.questions.models.Answer;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.RetrofitClient;
+import com.t4app.t4everandroid.network.responses.ImportWhatsappResponse;
 import com.t4app.t4everandroid.network.responses.ResponseCreateMessage;
 import com.t4app.t4everandroid.network.responses.ResponseGetMessages;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
+import com.t4app.t4everandroid.network.responses.VerifyWhatsappResponse;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -80,21 +95,22 @@ import retrofit2.Response;
 
 public class ChatFragment extends Fragment {
     private static final String TAG = "CHAT_FRAGMENT";
+    private static final String ARG_URI = "arg_uri";
 
     private ChatAdapter adapter;
     private FragmentChatBinding binding;
 
-    private float cancelThreshold = 200;
+    private final float cancelThreshold = 200;
     private boolean canceled = false;
 
     private MediaRecorder recorder;
     private File audioFile;
     private boolean isRecording = false;
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
     private SessionManager sessionManager;
 
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private boolean isRunning = false;
     private long startTime = 0L;
     private float startX = 0f;
@@ -110,7 +126,7 @@ public class ChatFragment extends Fragment {
             int minutes = seconds / 60;
             seconds = seconds % 60;
 
-            String time = String.format("%02d:%02d", minutes, seconds);
+            String time = String.format(Locale.getDefault(),"%02d:%02d", minutes, seconds);
             binding.itemChat.audioTimer.setText(time);
 
             handler.postDelayed(this, 1000);
@@ -128,7 +144,6 @@ public class ChatFragment extends Fragment {
 
             });
 
-    private ActivityResultLauncher<String[]> pickMediaLauncher;
     private ActivityResultLauncher<String[]> pickMultipleMediaLauncher;
 
     AddFilesManager filesManager;
@@ -136,27 +151,32 @@ public class ChatFragment extends Fragment {
     public ChatFragment() {
     }
 
-    public static ChatFragment newInstance() {
-        return new ChatFragment();
+    public static ChatFragment newInstance(Uri uri) {
+        ChatFragment fragment = new ChatFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(ARG_URI,uri.toString());
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         sessionManager = SessionManager.getInstance();
 
-        pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+        //TODO CREATE IMAGEVIEW AND ADD IN LAYOUT PREVIEW
+        ActivityResultLauncher<String[]> pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
                 uri -> {
                     if (uri == null) return;
 
                     final int flags = (requireActivity().getIntent() != null ? requireActivity().getIntent().getFlags() : 0)
-                    & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                            & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
                     try {
                         requireActivity().getContentResolver().takePersistableUriPermission(uri,
                                 Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    }catch (Exception ign){}
+                    } catch (Exception ign) {
+                    }
 
                     //TODO CREATE IMAGEVIEW AND ADD IN LAYOUT PREVIEW
 
@@ -361,6 +381,20 @@ public class ChatFragment extends Fragment {
             parseLastMessage(GlobalDataCache.legacyProfileSelected.getId());
         }
 
+        Bundle args = getArguments();
+        if (args != null){
+            String uriStr = args.getString(ARG_URI);
+            Uri uri = Uri.parse(uriStr);
+            if (GlobalDataCache.legacyProfileSelected != null){
+                try {
+                    verifyFileExport(uri);
+                } catch (IOException e) {
+                    Log.e(TAG, "Verify File Export: ", e);
+                }
+            }
+        }
+
+
         Animation slideIn = AnimationUtils.loadAnimation(requireActivity(), R.anim.slide_in_left);
         Animation slideOut = AnimationUtils.loadAnimation(requireActivity(), R.anim.slide_in_right);
 
@@ -547,130 +581,6 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    private void getMessages(String sessionId){
-        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
-        Call<ResponseGetMessages> call = apiServices.getMessages(sessionId);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ResponseGetMessages> call, Response<ResponseGetMessages> response) {
-                if (response.isSuccessful()){
-                    ResponseGetMessages body = response.body();
-                    if (body != null){
-                        if (body.getData() != null){
-                            Collections.reverse(body.getData());
-                            adapter.updateMessages(body.getData());
-                            updateUI(body.getData());
-                            binding.itemChat.chatRv.post(() -> {
-                                int last = adapter.getItemCount() - 1;
-                                if (last >= 0) binding.itemChat.chatRv.scrollToPosition(last);
-                            });
-                            binding.itemChat.containerChat.setVisibility(View.VISIBLE);
-                            binding.itemChat.containerSelectContact.setVisibility(View.GONE);
-                            binding.itemChat.chatSubtitle.setText(getString(R.string.chat_with_the_digital_version_of,
-                                    GlobalDataCache.legacyProfileSelected.getName()));
-
-                            binding.itemChat.chatTitle.setText(getString(R.string.chat_with,
-                                    GlobalDataCache.legacyProfileSelected.getName()));
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseGetMessages> call, Throwable throwable) {
-                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
-            }
-        });
-    }
-
-
-    private void sendMessageText(Map<String, Object> data, ListenersUtils.ConfirmationCallback callback){
-        binding.itemChat.sendMessageBtn.setEnabled(false);
-        binding.itemChat.sendMessageBtn.setAlpha(0.5f);
-
-        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
-        Call<ResponseCreateMessage> call = apiServices.sendMessageText(data);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ResponseCreateMessage> call, Response<ResponseCreateMessage> response) {
-                if (response.isSuccessful()) {
-                    ResponseCreateMessage body = response.body();
-                    if (body != null) {
-                        if (body.getData() != null) {
-                            adapter.addMessage(body.getData());
-                            callback.onResult(true);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseCreateMessage> call, Throwable throwable) {
-                Log.e(TAG, "onFailure: " + throwable.getMessage());
-                binding.itemChat.sendMessageBtn.setEnabled(true);
-                binding.itemChat.sendMessageBtn.setAlpha(1.0f);
-                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
-            }
-        });
-    }
-
-    private void sendMessageMedia(RequestBody data, ListenersUtils.ConfirmationCallback callback){
-        binding.itemChat.sendMessageBtn.setEnabled(false);
-        binding.itemChat.sendMessageBtn.setAlpha(0.5f);
-        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
-        Call<ResponseCreateMessage> call = apiServices.sendMessageWithFile(data);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ResponseCreateMessage> call, Response<ResponseCreateMessage> response) {
-                if (response.isSuccessful()) {
-                    ResponseCreateMessage body = response.body();
-                    if (body != null) {
-                        if (body.getData() != null) {
-                            adapter.addMessage(body.getData());
-                            callback.onResult(true);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseCreateMessage> call, Throwable throwable) {
-                Log.e(TAG, "onFailure: " + throwable.getMessage());
-                binding.itemChat.sendMessageBtn.setEnabled(true);
-                binding.itemChat.sendMessageBtn.setAlpha(1.0f);
-                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
-            }
-        });
-    }
-
-
-    private void deleteMessage(Messages interactions, int pos){
-        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
-        Call<JsonObject> call = apiServices.deleteMessage(interactions.getId());
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful()) {
-                    JsonObject body = response.body();
-                    if (body != null) {
-                        if (body.has("message")) {
-                            if (body.get("message").getAsString().contains("Message deleted successfully")) {
-                                adapter.deleteItem(pos);
-                                updateUI(adapter.getMessages());
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable throwable) {
-                Log.e(TAG, "onFailure ERROR DELETE MEDIA ", throwable);
-                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
-            }
-        });
-    }
-
     private void checkPermissionAndStart(ListenersUtils.ConfirmationCallback callback) {
         if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -767,7 +677,7 @@ public class ChatFragment extends Fragment {
             isRecording = false;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "stopRecording: ", e);
         }
     }
 
@@ -784,7 +694,7 @@ public class ChatFragment extends Fragment {
         Call<ResponseStartEndSession> call = apiServices.startSession(data);
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+            public void onResponse(@NonNull Call<ResponseStartEndSession> call, @NonNull Response<ResponseStartEndSession> response) {
                 if (response.isSuccessful()) {
                     ResponseStartEndSession body = response.body();
                     if (body != null) {
@@ -798,7 +708,7 @@ public class ChatFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<ResponseStartEndSession> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "onFailure: START SESSION " + throwable.getMessage());
             }
         });
@@ -809,7 +719,7 @@ public class ChatFragment extends Fragment {
         Call<ResponseStartEndSession> call = apiServices.endSession(sessionId);
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<ResponseStartEndSession> call, Response<ResponseStartEndSession> response) {
+            public void onResponse(@NonNull Call<ResponseStartEndSession> call, @NonNull Response<ResponseStartEndSession> response) {
                 if (response.isSuccessful()) {
                     ResponseStartEndSession body = response.body();
                     if (body != null) {
@@ -823,7 +733,7 @@ public class ChatFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ResponseStartEndSession> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<ResponseStartEndSession> call, @NonNull Throwable throwable) {
                 Log.e(TAG, "onFailure:END SESSION " + throwable.getMessage());
             }
         });
@@ -957,13 +867,36 @@ public class ChatFragment extends Fragment {
         }
     }
 
+//    private void showPopup(View anchor) {
+//        LayoutInflater inflater = LayoutInflater.from(requireContext());
+//        View view = inflater.inflate(R.layout.popup_export_layout, null);
+//
+//        PopupWindow popupWindow = new PopupWindow(
+//                view,
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                true
+//        );
+//
+//        popupWindow.setOutsideTouchable(true);
+//        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//
+//
+//        view.findViewById(R.id.btnImport).setOnClickListener(v -> {
+//            popupWindow.dismiss();
+//            importChat();
+//        });
+//
+//        popupWindow.showAsDropDown(anchor, 0, 10);
+//    }
+
 
     private void getLatestMessages(){
         ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
         Call<ResponseGetMessages> call = apiServices.getLastMessages();
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<ResponseGetMessages> call, Response<ResponseGetMessages> response) {
+            public void onResponse(@NonNull Call<ResponseGetMessages> call, @NonNull Response<ResponseGetMessages> response) {
                 if (response.isSuccessful()) {
                     ResponseGetMessages body = response.body();
                     if (body != null) {
@@ -986,28 +919,203 @@ public class ChatFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ResponseGetMessages> call, Throwable throwable) {
-
+            public void onFailure(@NonNull Call<ResponseGetMessages> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure: Get Last Message" + throwable.getMessage());
             }
         });
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private void verifyFileExport(Uri uri) throws IOException {
+        List<File> fileList = extractZipToCache(requireContext(), uri);
+        Log.d(TAG, "verifyFileExport: SIZE FILES " + fileList);
 
-        if (GlobalDataCache.legacyProfileSelected != null){
-            String lastMsg = binding.itemChat.textMessage.getText().toString();
-            String json = sessionManager.getLastMsgMap();
-            Type type = new TypeToken<Map<String, String>>(){}.getType();
-            Map<String, String> map = gson.fromJson(json, type);
-            if (map == null){
-                map = new HashMap<>();
+        List<MultipartBody.Part> parts = buildMultipartFiles(fileList);
+
+        Log.d(TAG, "verifyFileExport: " + parts.get(0).body().contentType());
+
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<VerifyWhatsappResponse> call = apiServices.verifyWhatsappFile(parts);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<VerifyWhatsappResponse> call, @NonNull Response<VerifyWhatsappResponse> response) {
+                if (response.isSuccessful()){
+                    VerifyWhatsappResponse body = response.body();
+                    if (body != null){
+                        if (body.message.contains("File structure successfully validated")){
+                            for (String user : body.getUsers()){
+                                if (user.equalsIgnoreCase(GlobalDataCache.legacyProfileSelected.getName()) ||
+                                        user.equalsIgnoreCase(GlobalDataCache.legacyProfileSelected.getAlias())){
+//                                    importWhatsappConversation(user, bodyPart);
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
             }
-            map.put(GlobalDataCache.legacyProfileSelected.getId(), lastMsg);
-            String newJson = gson.toJson(map);
-            sessionManager.setLastMsgMap(newJson);
-        }
+
+            @Override
+            public void onFailure(@NonNull Call<VerifyWhatsappResponse> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure: VALIDATE DATA" + throwable.getMessage());
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+    private void importWhatsappConversation(String legacyProfileWhatsapp, MultipartBody.Part file){
+        RequestBody legacyProfileWhatsappPart = RequestBody.create(legacyProfileWhatsapp, MediaType.parse("text/plain"));
+        RequestBody legacyProfileIdPart = RequestBody.create(GlobalDataCache.legacyProfileSelected.getId(),MediaType.parse("text/plain"));
+
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<ImportWhatsappResponse> call = apiServices.importWhatsappConversation(
+                legacyProfileWhatsappPart,
+                legacyProfileIdPart,
+                file);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ImportWhatsappResponse> call, @NonNull Response<ImportWhatsappResponse> response) {
+                if (response.isSuccessful()){
+                    ImportWhatsappResponse body = response.body();
+                    if (body != null){
+                        if (body.getData() != null){
+                            adapter.addMessage(body.getData());
+                            MessagesUtils.showSuccessDialog(requireActivity(), body.getMessage());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ImportWhatsappResponse> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure: Import Messages From Whatsapp" + throwable.getMessage());
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+    private void getMessages(String sessionId){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<ResponseGetMessages> call = apiServices.getMessages(sessionId);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseGetMessages> call, @NonNull Response<ResponseGetMessages> response) {
+                if (response.isSuccessful()){
+                    ResponseGetMessages body = response.body();
+                    if (body != null){
+                        if (body.getData() != null){
+                            Collections.reverse(body.getData());
+                            adapter.updateMessages(body.getData());
+                            updateUI(body.getData());
+                            binding.itemChat.chatRv.post(() -> {
+                                int last = adapter.getItemCount() - 1;
+                                if (last >= 0) binding.itemChat.chatRv.scrollToPosition(last);
+                            });
+                            binding.itemChat.containerChat.setVisibility(View.VISIBLE);
+                            binding.itemChat.containerSelectContact.setVisibility(View.GONE);
+                            binding.itemChat.chatSubtitle.setText(getString(R.string.chat_with_the_digital_version_of,
+                                    GlobalDataCache.legacyProfileSelected.getName()));
+
+                            binding.itemChat.chatTitle.setText(getString(R.string.chat_with,
+                                    GlobalDataCache.legacyProfileSelected.getName()));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseGetMessages> call, @NonNull Throwable throwable) {
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+
+    private void sendMessageText(Map<String, Object> data, ListenersUtils.ConfirmationCallback callback){
+        binding.itemChat.sendMessageBtn.setEnabled(false);
+        binding.itemChat.sendMessageBtn.setAlpha(0.5f);
+
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<ResponseCreateMessage> call = apiServices.sendMessageText(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseCreateMessage> call, @NonNull Response<ResponseCreateMessage> response) {
+                if (response.isSuccessful()) {
+                    ResponseCreateMessage body = response.body();
+                    if (body != null) {
+                        if (body.getData() != null) {
+                            adapter.addMessage(body.getData());
+                            callback.onResult(true);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseCreateMessage> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure: " + throwable.getMessage());
+                binding.itemChat.sendMessageBtn.setEnabled(true);
+                binding.itemChat.sendMessageBtn.setAlpha(1.0f);
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+    private void sendMessageMedia(RequestBody data, ListenersUtils.ConfirmationCallback callback){
+        binding.itemChat.sendMessageBtn.setEnabled(false);
+        binding.itemChat.sendMessageBtn.setAlpha(0.5f);
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<ResponseCreateMessage> call = apiServices.sendMessageWithFile(data);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseCreateMessage> call, @NonNull Response<ResponseCreateMessage> response) {
+                if (response.isSuccessful()) {
+                    ResponseCreateMessage body = response.body();
+                    if (body != null) {
+                        if (body.getData() != null) {
+                            adapter.addMessage(body.getData());
+                            callback.onResult(true);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseCreateMessage> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure: " + throwable.getMessage());
+                binding.itemChat.sendMessageBtn.setEnabled(true);
+                binding.itemChat.sendMessageBtn.setAlpha(1.0f);
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
+    }
+
+
+    private void deleteMessage(Messages interactions, int pos){
+        ApiServices apiServices = RetrofitClient.getChatBotRetrofitClient().create(ApiServices.class);
+        Call<JsonObject> call = apiServices.deleteMessage(interactions.getId());
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    JsonObject body = response.body();
+                    if (body != null) {
+                        if (body.has("message")) {
+                            if (body.get("message").getAsString().contains("Message deleted successfully")) {
+                                adapter.deleteItem(pos);
+                                updateUI(adapter.getMessages());
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable throwable) {
+                Log.e(TAG, "onFailure ERROR DELETE MEDIA ", throwable);
+                MessagesUtils.showErrorDialog(requireActivity(), ErrorUtils.parseError(throwable));
+            }
+        });
     }
 
     private void parseLastMessage(String profileId){
@@ -1035,6 +1143,100 @@ public class ChatFragment extends Fragment {
                     }
                 }
             }
+        }
+    }
+
+    private List<MultipartBody.Part> buildMultipartFiles(List<File> files) {
+        List<MultipartBody.Part> parts = new ArrayList<>();
+        boolean hasTextFile = false;
+
+        for (File file : files) {
+            String mimeType = getMimeType(file);
+            if (mimeType == null) continue;
+            Log.d(TAG, "FILE: " + file.getName() + " -> " + mimeType);
+            RequestBody body = RequestBody.create(file, MediaType.parse(mimeType));
+            if (mimeType.equals("text/plain")
+                    && file.getName().toLowerCase().endsWith(".txt")) {
+                hasTextFile = true;
+            }
+            MultipartBody.Part part = MultipartBody.Part.createFormData("files[]", file.getName(), body);
+
+            parts.add(part);
+        }
+
+        if (!hasTextFile) {
+            throw new IllegalStateException(
+                    "ZIP no contiene archivo text/plain (.txt)"
+            );
+        }
+
+        return parts;
+    }
+
+
+
+    public List<File> extractZipToCache(Context context, Uri zipUri) throws IOException {
+        List<File> files = new ArrayList<>();
+
+        File destDir = new File(context.getCacheDir(), "zip_extract");
+        if (!destDir.exists()) destDir.mkdirs();
+
+        InputStream is = context.getContentResolver().openInputStream(zipUri);
+        ZipInputStream zis = new ZipInputStream(is);
+        ZipEntry entry;
+
+        while ((entry = zis.getNextEntry()) != null) {
+            if (entry.isDirectory()) continue;
+
+            File outFile = new File(destDir, entry.getName());
+
+            String canonicalPath = outFile.getCanonicalPath();
+            if (!canonicalPath.startsWith(destDir.getCanonicalPath())) {
+                throw new SecurityException("Zip path traversal");
+            }
+
+            outFile.getParentFile().mkdirs();
+
+            FileOutputStream fos = new FileOutputStream(outFile);
+            byte[] buffer = new byte[1024];
+            int len;
+
+            while ((len = zis.read(buffer)) > 0) {
+                fos.write(buffer, 0, len);
+            }
+
+            fos.close();
+            files.add(outFile);
+        }
+
+        zis.close();
+        return files;
+    }
+
+    private String getMimeType(File file) {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(file.getName());
+        if (extension != null) {
+            return MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(extension.toLowerCase());
+        }
+        return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (GlobalDataCache.legacyProfileSelected != null){
+            String lastMsg = binding.itemChat.textMessage.getText().toString();
+            String json = sessionManager.getLastMsgMap();
+            Type type = new TypeToken<Map<String, String>>(){}.getType();
+            Map<String, String> map = gson.fromJson(json, type);
+            if (map == null){
+                map = new HashMap<>();
+            }
+            map.put(GlobalDataCache.legacyProfileSelected.getId(), lastMsg);
+            String newJson = gson.toJson(map);
+            sessionManager.setLastMsgMap(newJson);
         }
     }
 

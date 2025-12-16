@@ -94,17 +94,6 @@ public class T4EverMainActivity extends BaseActivity {
             return;
         }
 
-        Intent intent = getIntent();
-
-        if (Intent.ACTION_SEND.equals(intent.getAction())) {
-            Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-            Log.d("IMPORT", "Archivo recibido: " + uri);
-
-        } else if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
-            ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-            Log.d("IMPORT", "Archivos recibidos: " + uris.size());
-        }
-
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
@@ -149,7 +138,21 @@ public class T4EverMainActivity extends BaseActivity {
         getUserInfo();
 
         if (savedInstanceState == null){
-            showFragment(new HomeFragment());
+            Intent intent = getIntent();
+            if (Intent.ACTION_SEND.equals(intent.getAction())) {
+                Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                if (uri != null){
+                    showFragment(HomeFragment.newInstance(uri));
+                }
+                Log.d("IMPORT", "Archivo recibido: " + uri);
+
+            } else if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
+                ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+                Log.d("IMPORT", "Archivos recibidos: " + uris.size());
+                showFragment(new ChatFragment());
+            }else {
+                showFragment(new HomeFragment());
+            }
         }
 
         MenuItem settingsItem = navigationView.getMenu().findItem(R.id.nav_settings);

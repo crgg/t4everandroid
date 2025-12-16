@@ -30,4 +30,8 @@ public class ApiConfig {
     public static final String GET_ANSWERS = "api/answers";
     public static final String DELETE_ANSWER = "api/answers/{uuid}";
 
+
+    public static final String VERIFY_WHATSAPP_FILE = "api/whatsapp/verify";
+    public static final String IMPORT_FILE_WHATSAPP = "api/whatsapp/import";
+
 }

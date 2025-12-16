@@ -1,5 +1,6 @@
 package com.t4app.t4everandroid.main.ui;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +30,8 @@ import com.t4app.t4everandroid.main.ui.questions.QuestionsFragment;
 import com.t4app.t4everandroid.network.ApiServices;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 
+import java.io.IOException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,18 +39,33 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HOME_FRAG";
+    private static final String ARG_URI = "arg_uri";
+
+    private Uri uriImport = null;
 
     private FragmentHomeBinding binding;
     private SessionManager sessionManager;
     public HomeFragment() {}
 
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
+    public static HomeFragment newInstance(Uri uri) {
+        HomeFragment fragment = new HomeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(ARG_URI,uri.toString());
+        fragment.setArguments(bundle);
+        return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        if (args != null){
+            String uriStr = args.getString(ARG_URI);
+            uriImport = Uri.parse(uriStr);
+
+        }
 
         sessionManager = SessionManager.getInstance();
     }
@@ -181,6 +199,10 @@ public class HomeFragment extends Fragment {
 
                                             endSessionsExcept(keepSession.getId());
                                         }
+                                    }
+                                    if (uriImport != null){
+                                        showFragment(ChatFragment.newInstance(uriImport));
+                                        ((T4EverMainActivity)requireActivity()).selectNavItem(R.id.nav_chat);
                                     }
                                     binding.legacyProfilesItem.countLegacyProfiles.setText(String.valueOf(body.getData().size()));
                                     binding.questionAnsweredItem.countQuestionsAnswered.setText(String.valueOf(GlobalDataCache.mediaList.size()));

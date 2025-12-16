@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.t4app.t4everandroid.main.Models.ProfileRequest;
 import com.t4app.t4everandroid.network.responses.CreateAnswerResponse;
 import com.t4app.t4everandroid.network.responses.GetAnswerResponse;
+import com.t4app.t4everandroid.network.responses.ImportWhatsappResponse;
 import com.t4app.t4everandroid.network.responses.LoginResponse;
 import com.t4app.t4everandroid.network.responses.ResponseCreateAssistant;
 import com.t4app.t4everandroid.network.responses.ResponseCreateMedia;
@@ -15,7 +16,9 @@ import com.t4app.t4everandroid.network.responses.ResponseGetMessages;
 import com.t4app.t4everandroid.network.responses.ResponseGetUserInfo;
 import com.t4app.t4everandroid.network.responses.ResponseStartEndSession;
 import com.t4app.t4everandroid.network.responses.ResponseUpdateProfile;
+import com.t4app.t4everandroid.network.responses.VerifyWhatsappResponse;
 
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
@@ -170,6 +173,19 @@ public interface ApiServices {
     Call<ResponseGetMessages> getLastMessages(
     );
 
+    @POST(ApiConfig.VERIFY_WHATSAPP_FILE)
+    @Multipart
+    Call<VerifyWhatsappResponse> verifyWhatsappFile(
+            @Part List<MultipartBody.Part> files
+    );
+
+    @POST(ApiConfig.IMPORT_FILE_WHATSAPP)
+    @Multipart
+    Call<ImportWhatsappResponse> importWhatsappConversation(
+            @Part("legacyProfileNameOfWhatsapp") RequestBody legacyProfileNameOfWhatsapp,
+            @Part("legacyProfileId") RequestBody legacyProfileId,
+            @Part MultipartBody.Part file
+    );
 
     //QUESTIONS
     @GET(ApiConfig.GET_QUESTIONS_ASSISTANT)
